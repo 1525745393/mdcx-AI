@@ -42,6 +42,7 @@ from .file_crawler import FileScraper, classify_existing_scrape_result, classify
 from .image import add_mark
 from .media_resource import MediaResourceContext
 from .nfo import get_nfo_data, write_nfo
+from .vsmeta import write_vsmeta
 from .translate import translate_actor, translate_info, translate_title_outline
 from .utils import (
     add_definition_tag,
@@ -853,6 +854,18 @@ class Scraper:
 
         # 生成nfo文件
         await write_nfo(file_info, res, nfo_new_path, folder_new_path, update_nfo)
+
+        # 生成vsmeta文件 (Synology Video Station)
+        vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
+        await write_vsmeta(
+            file_info, 
+            res, 
+            vsmeta_new_path, 
+            folder_new_path,
+            poster_path=poster_final_path,
+            backdrop_path=fanart_final_path,
+            update=update_nfo
+        )
 
         # 移动字幕、种子、bif、trailer、其他文件
         if file_info.has_sub:

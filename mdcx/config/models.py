@@ -297,6 +297,7 @@ class Config(BaseModel):
             DownloadableFile.EXTRAFANART,
             DownloadableFile.TRAILER,
             DownloadableFile.NFO,
+            DownloadableFile.VSMETA,
             DownloadableFile.EXTRAFANART_EXTRAS,
             DownloadableFile.EXTRAFANART_COPY,
             DownloadableFile.THEME_VIDEOS,

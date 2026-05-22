@@ -261,6 +261,7 @@ class DownloadableFile(Enum):
     EXTRAFANART = "extrafanart"
     TRAILER = "trailer"
     NFO = "nfo"
+    VSMETA = "vsmeta"
     EXTRAFANART_EXTRAS = "extrafanart_extras"
     EXTRAFANART_COPY = "extrafanart_copy"
     THEME_VIDEOS = "theme_videos"
@@ -282,6 +283,7 @@ class DownloadableFile(Enum):
             "额外剧照",
             "预告片",
             "Nfo",
+            "VSMETA",
             "额外剧照扩展",
             "额外剧照复制",
             "主题视频",
@@ -303,6 +305,7 @@ class KeepableFile(Enum):
     EXTRAFANART = "extrafanart"
     TRAILER = "trailer"
     NFO = "nfo"
+    VSMETA = "vsmeta"
     EXTRAFANART_COPY = "extrafanart_copy"
     THEME_VIDEOS = "theme_videos"
 
@@ -315,6 +318,7 @@ class KeepableFile(Enum):
             "额外剧照",
             "预告片",
             "nfo",
+            "VSMETA",
             "复制额外剧照",
             "主题视频",
         ]
