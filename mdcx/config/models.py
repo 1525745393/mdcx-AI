@@ -535,6 +535,7 @@ class Config(BaseModel):
     )
     pic_simple_name: bool = Field(default=False, title="图片简化命名")
     trailer_simple_name: bool = Field(default=True, title="预告片简化命名")
+    vsmeta_keep_ext: bool = Field(default=False, title="VSMETA保留视频扩展名")
     hd_name: Literal["height", "hd"] = Field(default="height", title="高清名称")
     hd_get: Literal["video", "path", "none"] = Field(default="video", title="获取高清")
     folder_moword: bool = Field(default=True, title="目录版本字符")

@@ -730,7 +730,9 @@ async def deal_old_files(
     处理本地已存在的thumb、poster、fanart、nfo、vsmeta
     """
     nfo_old_path = file_path.with_suffix(".nfo")
-    vsmeta_old_path = file_path.with_suffix(".vsmeta")
+    # 两种可能的 VSMETA 旧路径（带和不带视频扩展名）
+    vsmeta_old_path_without_ext = file_path.with_suffix(".vsmeta")
+    vsmeta_old_path_with_ext = folder_old_path / (file_path.name + ".vsmeta")
     file_name = file_path.stem
     extrafanart_old_path = folder_old_path / "extrafanart"
     extrafanart_new_path = folder_new_path / "extrafanart"
@@ -759,7 +761,8 @@ async def deal_old_files(
     file_path_list = {
         nfo_old_path,
         nfo_new_path,
-        vsmeta_old_path,
+        vsmeta_old_path_without_ext,
+        vsmeta_old_path_with_ext,
         vsmeta_new_path,
         thumb_old_path_with_filename,
         thumb_old_path_no_filename,
@@ -1010,11 +1013,18 @@ async def deal_old_files(
 
     # vsmeta 处理
     try:
+        # 找到实际存在的旧 VSMETA 文件（支持两种命名格式）
+        existing_old_vsmeta = None
+        if await aiofiles.os.path.exists(vsmeta_old_path_without_ext):
+            existing_old_vsmeta = vsmeta_old_path_without_ext
+        elif await aiofiles.os.path.exists(vsmeta_old_path_with_ext):
+            existing_old_vsmeta = vsmeta_old_path_with_ext
+            
         if await aiofiles.os.path.exists(vsmeta_new_path):
-            if str(vsmeta_old_path).lower() != str(vsmeta_new_path).lower() and await aiofiles.os.path.exists(vsmeta_old_path):
-                await delete_file_async(vsmeta_old_path)
-        elif vsmeta_old_path != vsmeta_new_path and await aiofiles.os.path.exists(vsmeta_old_path):
-            await move_file_async(vsmeta_old_path, vsmeta_new_path)
+            if existing_old_vsmeta and str(existing_old_vsmeta).lower() != str(vsmeta_new_path).lower():
+                await delete_file_async(existing_old_vsmeta)
+        elif existing_old_vsmeta and existing_old_vsmeta != vsmeta_new_path:
+            await move_file_async(existing_old_vsmeta, vsmeta_new_path)
     except Exception:
         signal.show_log_text(traceback.format_exc())
 

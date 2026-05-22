@@ -801,7 +801,11 @@ class Scraper:
             # 移动文件
             if await move_movie(other, file_info, file_path, file_new_path):
                 if Switch.SORT_DEL in manager.config.switch_on:
-                    vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
+                    # 根据配置决定 VSMETA 文件名是否保留视频扩展名
+                    if manager.config.vsmeta_keep_ext:
+                        vsmeta_new_path = folder_new_path / (file_new_path.name + ".vsmeta")
+                    else:
+                        vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
                     await deal_old_files(
                         res.number,
                         other,
@@ -826,7 +830,12 @@ class Scraper:
                 return None, None
 
         # 清理旧的thumb、poster、fanart、extrafanart、nfo、vsmeta
-        vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
+        # 根据配置决定 VSMETA 文件名是否保留视频扩展名
+        if manager.config.vsmeta_keep_ext:
+            vsmeta_new_path = folder_new_path / (file_new_path.name + ".vsmeta")
+        else:
+            vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
+            
         pic_final_catched, single_folder_catched = await deal_old_files(
             res.number,
             other,
