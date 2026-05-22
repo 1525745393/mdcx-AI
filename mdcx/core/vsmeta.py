@@ -1,9 +1,7 @@
 import time
 import traceback
-import struct
 from io import BytesIO
 from pathlib import Path
-from typing import Optional, Tuple
 
 import aiofiles
 from PIL import Image
@@ -31,7 +29,7 @@ def encode_leb128(value: int) -> bytes:
     return bytes(result)
 
 
-def decode_leb128(data: bytes, offset: int = 0) -> Tuple[int, int]:
+def decode_leb128(data: bytes, offset: int = 0) -> tuple[int, int]:
     """Decode LEB128 encoded integer"""
     result = 0
     shift = 0
@@ -118,7 +116,7 @@ class VSMetaEncoder:
         """Write a boolean tag"""
         self.write_tag(tag, encode_boolean(value))
 
-    def write_image_tag(self, tag: int, image_path: Optional[Path]):
+    def write_image_tag(self, tag: int, image_path: Path | None):
         """Write an image tag from file path"""
         if image_path and image_path.exists():
             try:
@@ -138,7 +136,7 @@ class VSMetaEncoder:
         return self.buffer.getvalue()
 
 
-def parse_release_date(release_str: str) -> Tuple[int, int, int]:
+def parse_release_date(release_str: str) -> tuple[int, int, int]:
     """Parse release date string (YYYY-MM-DD)"""
     try:
         if release_str and len(release_str) >= 10:
@@ -156,8 +154,8 @@ async def write_vsmeta(
     data: CrawlersResult,
     vsmeta_file: Path,
     output_dir: Path,
-    poster_path: Optional[Path] = None,
-    backdrop_path: Optional[Path] = None,
+    poster_path: Path | None = None,
+    backdrop_path: Path | None = None,
     update: bool = True
 ) -> bool:
     """
