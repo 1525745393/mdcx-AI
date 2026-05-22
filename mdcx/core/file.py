@@ -720,15 +720,17 @@ async def deal_old_files(
     poster_new_path_with_filename: Path,
     fanart_new_path_with_filename: Path,
     nfo_new_path: Path,
+    vsmeta_new_path: Path,
     # file_ex: str,
     poster_final_path: Path,
     thumb_final_path: Path,
     fanart_final_path: Path,
 ) -> tuple[bool, bool]:
     """
-    处理本地已存在的thumb、poster、fanart、nfo
+    处理本地已存在的thumb、poster、fanart、nfo、vsmeta
     """
     nfo_old_path = file_path.with_suffix(".nfo")
+    vsmeta_old_path = file_path.with_suffix(".vsmeta")
     file_name = file_path.stem
     extrafanart_old_path = folder_old_path / "extrafanart"
     extrafanart_new_path = folder_new_path / "extrafanart"
@@ -757,6 +759,8 @@ async def deal_old_files(
     file_path_list = {
         nfo_old_path,
         nfo_new_path,
+        vsmeta_old_path,
+        vsmeta_new_path,
         thumb_old_path_with_filename,
         thumb_old_path_no_filename,
         thumb_new_path_with_filename,
@@ -1001,6 +1005,16 @@ async def deal_old_files(
                 await delete_file_async(nfo_old_path)
         elif nfo_old_path != nfo_new_path and await aiofiles.os.path.exists(nfo_old_path):
             await move_file_async(nfo_old_path, nfo_new_path)
+    except Exception:
+        signal.show_log_text(traceback.format_exc())
+
+    # vsmeta 处理
+    try:
+        if await aiofiles.os.path.exists(vsmeta_new_path):
+            if str(vsmeta_old_path).lower() != str(vsmeta_new_path).lower() and await aiofiles.os.path.exists(vsmeta_old_path):
+                await delete_file_async(vsmeta_old_path)
+        elif vsmeta_old_path != vsmeta_new_path and await aiofiles.os.path.exists(vsmeta_old_path):
+            await move_file_async(vsmeta_old_path, vsmeta_new_path)
     except Exception:
         signal.show_log_text(traceback.format_exc())
 

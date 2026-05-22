@@ -614,6 +614,30 @@ class Scraper:
                 # 启用"允许(使用本地 nfo)更新 nfo 文件"时
                 update_nfo = True
 
+        # 判断是否write_vsmeta
+        update_vsmeta = True
+        # 不写vsmeta的情况：
+        if manager.config.main_mode == 2 and Switch.SORT_DEL in manager.config.switch_on:
+            # 2模式勾选“删除本地已下载的文件”
+            update_vsmeta = False
+        elif manager.config.main_mode in [1, 2, 3] or (
+            manager.config.main_mode == 4 and not is_nfo_existed and ReadMode.NO_NFO_SCRAPE in read_mode
+        ):
+            # 1、2、3模式，或4模式启用了“本地之前刮削失败和没有nfo的文件重新刮削
+            if DownloadableFile.VSMETA not in manager.config.download_files:
+                # [下载]处不勾选下载vsmeta时
+                update_vsmeta = False
+            if KeepableFile.VSMETA in manager.config.keep_files and is_nfo_existed:
+                # [下载]处勾选保留vsmeta且nfo存在时（这里假设nfo存在时vsmeta也存在，实际应该也存在）
+                update_vsmeta = False
+        elif manager.config.main_mode == 4:
+            # 4（读取）模式默认不写vsmeta
+            update_vsmeta = False
+            # 除非
+            if is_nfo_existed and ReadMode.HAS_NFO_UPDATE in read_mode and ReadMode.READ_UPDATE_NFO in read_mode:
+                # 启用"允许(使用本地 nfo)更新 nfo 文件"时，也更新vsmeta
+                update_vsmeta = True
+
         # 刮削json_data
         # 获取已刮削的json_data
         if file_classification is None:
@@ -777,6 +801,7 @@ class Scraper:
             # 移动文件
             if await move_movie(other, file_info, file_path, file_new_path):
                 if Switch.SORT_DEL in manager.config.switch_on:
+                    vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
                     await deal_old_files(
                         res.number,
                         other,
@@ -788,18 +813,20 @@ class Scraper:
                         poster_new_path_with_filename,
                         fanart_new_path_with_filename,
                         nfo_new_path,
+                        vsmeta_new_path,
                         # file_ex,
                         poster_final_path,
                         thumb_final_path,
                         fanart_final_path,
-                    )  # 清理旧的thumb、poster、fanart、nfo
+                    )  # 清理旧的thumb、poster、fanart、nfo、vsmeta
                 await save_success_list(file_path, file_new_path)  # 保存成功列表
                 return res, other
             else:
                 # 返回MDCx1_1main, 继续处理下一个文件
                 return None, None
 
-        # 清理旧的thumb、poster、fanart、extrafanart、nfo
+        # 清理旧的thumb、poster、fanart、extrafanart、nfo、vsmeta
+        vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
         pic_final_catched, single_folder_catched = await deal_old_files(
             res.number,
             other,
@@ -811,6 +838,7 @@ class Scraper:
             poster_new_path_with_filename,
             fanart_new_path_with_filename,
             nfo_new_path,
+            vsmeta_new_path,
             # file_ex,
             poster_final_path,
             thumb_final_path,
@@ -856,7 +884,6 @@ class Scraper:
         await write_nfo(file_info, res, nfo_new_path, folder_new_path, update_nfo)
 
         # 生成vsmeta文件 (Synology Video Station)
-        vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
         await write_vsmeta(
             file_info, 
             res, 
@@ -864,7 +891,7 @@ class Scraper:
             folder_new_path,
             poster_path=poster_final_path,
             backdrop_path=fanart_final_path,
-            update=update_nfo
+            update=update_vsmeta
         )
 
         # 移动字幕、种子、bif、trailer、其他文件
