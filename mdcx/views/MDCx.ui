@@ -9023,6 +9023,13 @@
                             </property>
                           </widget>
                         </item>
+                        <item>
+                          <widget class="QCheckBox" name="checkBox_download_vsmeta">
+                            <property name="text">
+                              <string>vsmeta</string>
+                            </property>
+                          </widget>
+                        </item>
                       </layout>
                     </widget>
                     <widget class="QWidget" name="layoutWidget">
@@ -12172,6 +12179,78 @@
                             </property>
                             <property name="text">
                               <string>在视频目录创建「trailers」文件夹，多分集共用一个「trailer.mp4」</string>
+                            </property>
+                          </widget>
+                        </item>
+                      </layout>
+                    </widget>
+                  </widget>
+                  <widget class="QGroupBox" name="groupBox_vsmeta">
+                    <property name="geometry">
+                      <rect>
+                        <x>30</x>
+                        <y>2980</y>
+                        <width>701</width>
+                        <height>121</height>
+                      </rect>
+                    </property>
+                    <property name="minimumSize">
+                      <size>
+                        <width>200</width>
+                        <height>0</height>
+                      </size>
+                    </property>
+                    <property name="maximumSize">
+                      <size>
+                        <width>739</width>
+                        <height>16777215</height>
+                      </size>
+                    </property>
+                    <property name="title">
+                      <string>VSMETA 命名规则</string>
+                    </property>
+                    <widget class="QWidget" name="gridLayoutWidget_vsmeta">
+                      <property name="geometry">
+                        <rect>
+                          <x>60</x>
+                          <y>30</y>
+                          <width>621</width>
+                          <height>71</height>
+                        </rect>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout_vsmeta">
+                        <item row="0" column="0">
+                          <widget class="QCheckBox" name="checkBox_vsmeta_keep_ext">
+                            <property name="sizePolicy">
+                              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                              </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                              <size>
+                                <width>250</width>
+                                <height>0</height>
+                              </size>
+                            </property>
+                            <property name="text">
+                              <string>保留视频扩展名</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="0" column="1">
+                          <widget class="QLabel" name="label_vsmeta">
+                            <property name="sizePolicy">
+                              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                              </sizepolicy>
+                            </property>
+                            <property name="styleSheet">
+                              <string notr="true">color: rgb(8, 128, 128);</string>
+                            </property>
+                            <property name="text">
+                              <string>勾选后生成：视频文件名.vsmeta，不勾选生成：视频名.vsmeta</string>
                             </property>
                           </widget>
                         </item>

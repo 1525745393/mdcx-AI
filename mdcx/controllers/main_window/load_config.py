@@ -552,6 +552,7 @@ def load_config(self: "MyMAinWindow"):
             (self.Ui.checkBox_download_extrafanart, DownloadableFile.EXTRAFANART),
             (self.Ui.checkBox_download_trailer, DownloadableFile.TRAILER),
             (self.Ui.checkBox_download_nfo, DownloadableFile.NFO),
+            (self.Ui.checkBox_download_vsmeta, DownloadableFile.VSMETA),
             (self.Ui.checkBox_extras, DownloadableFile.EXTRAFANART_EXTRAS),
             (self.Ui.checkBox_download_extrafanart_copy, DownloadableFile.EXTRAFANART_COPY),
             (self.Ui.checkBox_theme_videos, DownloadableFile.THEME_VIDEOS),
@@ -691,6 +692,8 @@ def load_config(self: "MyMAinWindow"):
             (self.Ui.radioButton_trailer_with_filename, False),
             default=self.Ui.radioButton_trailer_no_filename,
         )
+        # VSMETA 是否保留视频扩展名
+        self.Ui.checkBox_vsmeta_keep_ext.setChecked(manager.config.vsmeta_keep_ext)
         # 画质命名规则
         set_radio_buttons(
             manager.config.hd_name,
