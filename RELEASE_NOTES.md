@@ -1,8 +1,20 @@
-# MDCx 220260522 发布说明
+# MDCx 220260523 发布说明
 
 ## 🚀 新功能
 
-### 1. 群晖 Video Station VSMETA 元数据生成
+### 1. 项目 Code Wiki 文档
+- 完整的项目架构说明
+- 核心模块职责分析
+- 数据模型文档
+- 开发指南
+- 快速上手指南
+
+### 2. VSMETA 配置界面
+- 新增 VSMETA 配置选项到设置界面
+- 支持配置 VSMETA 文件命名格式
+- 用户友好的界面交互
+
+### 3. 群晖 Video Station VSMETA 元数据生成
 - **完整支持 VSMETA 格式**：自动生成符合群晖 Video Station 规范的元数据文件
 - **图片嵌入**：支持将海报和背景图嵌入 VSMETA 文件
 - **完整元数据**：包含标题、简介、演员、导演、标签、评分、发布日期、片长等字段
@@ -46,8 +58,12 @@
 - `mdcx/config/models.py` - 添加 VSMETA 配置项
 - `mdcx/core/scraper.py` - 集成 VSMETA 功能
 - `mdcx/core/file.py` - VSMETA 文件处理
+- `mdcx/controllers/main_window/load_config.py` - VSMETA 配置加载
+- `mdcx/controllers/main_window/save_config.py` - VSMETA 配置保存
+- `mdcx/views/MDCx.ui` - VSMETA 配置界面
 - `mdcx/consts.py` - 版本号更新
 - `changelog.md` - 更新日志
+- `RELEASE_NOTES.md` - 发布说明
 
 ## 📦 安装与使用
 
