@@ -1,5 +1,10 @@
 name: Build and Release with Python3.13
 
+permissions:
+  contents: write
+  actions: write
+  deployments: write
+
 on:
   release:
     types: [published]
