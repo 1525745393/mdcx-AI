@@ -835,7 +835,7 @@ class Scraper:
             vsmeta_new_path = folder_new_path / (file_new_path.name + ".vsmeta")
         else:
             vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
-            
+
         pic_final_catched, single_folder_catched = await deal_old_files(
             res.number,
             other,
@@ -894,13 +894,13 @@ class Scraper:
 
         # 生成vsmeta文件 (Synology Video Station)
         await write_vsmeta(
-            file_info, 
-            res, 
-            vsmeta_new_path, 
+            file_info,
+            res,
+            vsmeta_new_path,
             folder_new_path,
             poster_path=poster_final_path,
             backdrop_path=fanart_final_path,
-            update=update_vsmeta
+            update=update_vsmeta,
         )
 
         # 移动字幕、种子、bif、trailer、其他文件

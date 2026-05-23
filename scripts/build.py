@@ -165,15 +165,15 @@ class BuildManager:
         for module_name in HIDDEN_IMPORTS:
             cmd.extend(["--hidden-import", module_name])
         # 添加 collect-all 和排除模块
-        cmd.extend([
-            "--collect-all",
-            "mdcx",
-            "--collect-all",
-            "curl_cffi",
-        ])
-        cmd.extend([
-            item for module in EXCLUDED_MODULES for item in ("--exclude-module", module)
-        ])
+        cmd.extend(
+            [
+                "--collect-all",
+                "mdcx",
+                "--collect-all",
+                "curl_cffi",
+            ]
+        )
+        cmd.extend([item for module in EXCLUDED_MODULES for item in ("--exclude-module", module)])
         self._run_command(cmd, "✅ 生成 .spec 文件", "spec 文件生成失败")
 
     def _modify_spec(self):

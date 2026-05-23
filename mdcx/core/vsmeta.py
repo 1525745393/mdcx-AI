@@ -156,7 +156,7 @@ async def write_vsmeta(
     output_dir: Path,
     poster_path: Path | None = None,
     backdrop_path: Path | None = None,
-    update: bool = True
+    update: bool = True,
 ) -> bool:
     """
     Generate and write VSMETA file for Synology Video Station
@@ -185,6 +185,7 @@ async def write_vsmeta(
         if not vsmeta_policy.should_download:
             if not vsmeta_policy.should_keep and await aiofiles.os.path.exists(vsmeta_file):
                 from ..utils.file import delete_file_async
+
                 await delete_file_async(vsmeta_file)
             return True
         LogBuffer.log().write(f"\n 🍀 VSMETA done! (old)({get_used_time(start_time)}s)")
@@ -195,6 +196,7 @@ async def write_vsmeta(
             await aiofiles.os.makedirs(output_dir)
 
         from ..utils.file import delete_file_async
+
         await delete_file_async(vsmeta_file)
 
         encoder = VSMetaEncoder()

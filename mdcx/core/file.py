@@ -1019,7 +1019,7 @@ async def deal_old_files(
             existing_old_vsmeta = vsmeta_old_path_without_ext
         elif await aiofiles.os.path.exists(vsmeta_old_path_with_ext):
             existing_old_vsmeta = vsmeta_old_path_with_ext
-            
+
         if await aiofiles.os.path.exists(vsmeta_new_path):
             if existing_old_vsmeta and str(existing_old_vsmeta).lower() != str(vsmeta_new_path).lower():
                 await delete_file_async(existing_old_vsmeta)
