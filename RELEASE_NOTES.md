@@ -1,6 +1,12 @@
-# MDCx 220260527 发布说明
+# MDCx 220260528 发布说明
 
 ## 🐛 Bug 修复
+
+### 更新仓库链接
+- 更新 GitHub 仓库链接到 1525745393/mdcx-AI
+
+### 修复代码规范问题
+- 修复导入排序问题，符合项目代码规范
 
 ### 修复 IndentationError 错误
 - 修复 `mdcx/controllers/main_window/save_config.py` 第 375 行意外缩进错误
@@ -25,7 +31,7 @@
 ### 修改文件
 - `mdcx/config/enums.py` - 添加 VSMETA 枚举
 - `mdcx/config/models.py` - 添加 VSMETA 配置项
-- `mdcx/core/scraper.py` - 集成 VSMETA 功能
+- `mdcx/core/scraper.py` - 集成 VSMETA 功能并修复导入排序
 - `mdcx/core/file.py` - VSMETA 文件处理
 - `mdcx/controllers/main_window/load_config.py` - VSMETA 配置加载
 - `mdcx/controllers/main_window/save_config.py` - VSMETA 配置保存
