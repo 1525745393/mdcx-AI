@@ -5116,7 +5116,7 @@ class Ui_MDCx(object):
         self.label_122.setObjectName("label_122")
         self.gridLayout_38.addWidget(self.label_122, 1, 1, 1, 1)
         self.groupBox_vsmeta = QtWidgets.QGroupBox(parent=self.scrollAreaWidgetContents_mingming)
-        self.groupBox_vsmeta.setGeometry(QtCore.QRect(30, 2980, 701, 121))
+        self.groupBox_vsmeta.setGeometry(QtCore.QRect(30, 1350, 701, 121))
         self.groupBox_vsmeta.setMinimumSize(QtCore.QSize(200, 0))
         self.groupBox_vsmeta.setMaximumSize(QtCore.QSize(739, 16777215))
         self.groupBox_vsmeta.setObjectName("groupBox_vsmeta")
