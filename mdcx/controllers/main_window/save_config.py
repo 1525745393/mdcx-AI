@@ -372,26 +372,26 @@ def save_config(self: "MyMAinWindow"):
     # endregion
 
     # region download
-        manager.config.download_files = get_checkboxes(
-            (self.Ui.checkBox_download_poster, DownloadableFile.POSTER),
-            (self.Ui.checkBox_download_thumb, DownloadableFile.THUMB),
-            (self.Ui.checkBox_download_fanart, DownloadableFile.FANART),
-            (self.Ui.checkBox_download_extrafanart, DownloadableFile.EXTRAFANART),
-            (self.Ui.checkBox_download_trailer, DownloadableFile.TRAILER),
-            (self.Ui.checkBox_download_nfo, DownloadableFile.NFO),
-            (self.Ui.checkBox_download_vsmeta, DownloadableFile.VSMETA),
-            (self.Ui.checkBox_extras, DownloadableFile.EXTRAFANART_EXTRAS),
-            (self.Ui.checkBox_download_extrafanart_copy, DownloadableFile.EXTRAFANART_COPY),
-            (self.Ui.checkBox_theme_videos, DownloadableFile.THEME_VIDEOS),
-            (self.Ui.checkBox_ignore_pic_fail, DownloadableFile.IGNORE_PIC_FAIL),
-            (self.Ui.checkBox_ignore_youma, DownloadableFile.IGNORE_YOUMA),
-            (self.Ui.checkBox_poster_auto_best, DownloadableFile.POSTER_AUTO_BEST),
-            (self.Ui.checkBox_ignore_wuma, DownloadableFile.IGNORE_WUMA),
-            (self.Ui.checkBox_ignore_oumei, DownloadableFile.IGNORE_OUMEI),
-            (self.Ui.checkBox_ignore_fc2, DownloadableFile.IGNORE_FC2),
-            (self.Ui.checkBox_ignore_guochan, DownloadableFile.IGNORE_GUOCHAN),
-            (self.Ui.checkBox_ignore_size, DownloadableFile.IGNORE_SIZE),
-        )
+    manager.config.download_files = get_checkboxes(
+        (self.Ui.checkBox_download_poster, DownloadableFile.POSTER),
+        (self.Ui.checkBox_download_thumb, DownloadableFile.THUMB),
+        (self.Ui.checkBox_download_fanart, DownloadableFile.FANART),
+        (self.Ui.checkBox_download_extrafanart, DownloadableFile.EXTRAFANART),
+        (self.Ui.checkBox_download_trailer, DownloadableFile.TRAILER),
+        (self.Ui.checkBox_download_nfo, DownloadableFile.NFO),
+        (self.Ui.checkBox_download_vsmeta, DownloadableFile.VSMETA),
+        (self.Ui.checkBox_extras, DownloadableFile.EXTRAFANART_EXTRAS),
+        (self.Ui.checkBox_download_extrafanart_copy, DownloadableFile.EXTRAFANART_COPY),
+        (self.Ui.checkBox_theme_videos, DownloadableFile.THEME_VIDEOS),
+        (self.Ui.checkBox_ignore_pic_fail, DownloadableFile.IGNORE_PIC_FAIL),
+        (self.Ui.checkBox_ignore_youma, DownloadableFile.IGNORE_YOUMA),
+        (self.Ui.checkBox_poster_auto_best, DownloadableFile.POSTER_AUTO_BEST),
+        (self.Ui.checkBox_ignore_wuma, DownloadableFile.IGNORE_WUMA),
+        (self.Ui.checkBox_ignore_oumei, DownloadableFile.IGNORE_OUMEI),
+        (self.Ui.checkBox_ignore_fc2, DownloadableFile.IGNORE_FC2),
+        (self.Ui.checkBox_ignore_guochan, DownloadableFile.IGNORE_GUOCHAN),
+        (self.Ui.checkBox_ignore_size, DownloadableFile.IGNORE_SIZE),
+    )
 
     manager.config.keep_files = get_checkboxes(
         (self.Ui.checkBox_old_poster, KeepableFile.POSTER),

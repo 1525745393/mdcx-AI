@@ -1,6 +1,10 @@
-# MDCx 220260526 发布说明
+# MDCx 220260527 发布说明
 
 ## 🐛 Bug 修复
+
+### 修复 IndentationError 错误
+- 修复 `mdcx/controllers/main_window/save_config.py` 第 375 行意外缩进错误
+- 确保代码缩进正确，符合 Python 语法规范
 
 ### 修复 AttributeError 错误
 - 重新编译 `mdcx/views/MDCx.py`，确保 UI 文件包含最新添加的 VSMETA 控件
