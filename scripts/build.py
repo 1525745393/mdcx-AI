@@ -36,6 +36,17 @@ EXCLUDED_MODULES = [
     "typer",
 ]
 
+HIDDEN_IMPORTS = [
+    "_cffi_backend",
+    "mdcx.controllers.main_window.save_config",
+    "mdcx.controllers.main_window.load_config",
+    "mdcx.controllers.main_window.handlers",
+    "mdcx.controllers.main_window.bind_utils",
+    "mdcx.controllers.main_window.init",
+    "mdcx.controllers.main_window.site_priority_dialog",
+    "mdcx.controllers.main_window.style",
+]
+
 
 class BuildError(Exception): ...
 
@@ -149,12 +160,18 @@ class BuildManager:
             "libs:.",
             "--icon",
             "resources/Img/MDCx.icns",
-            "--hidden-import",
-            "_cffi_backend",
+        ]
+        # 添加隐藏导入
+        for module_name in HIDDEN_IMPORTS:
+            cmd.extend(["--hidden-import", module_name])
+        # 添加 collect-all 和排除模块
+        cmd.extend([
             "--collect-all",
             "curl_cffi",
-            *[item for module in EXCLUDED_MODULES for item in ("--exclude-module", module)],
-        ]
+        ])
+        cmd.extend([
+            item for module in EXCLUDED_MODULES for item in ("--exclude-module", module)
+        ])
         self._run_command(cmd, "✅ 生成 .spec 文件", "spec 文件生成失败")
 
     def _modify_spec(self):
