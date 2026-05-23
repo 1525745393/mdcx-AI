@@ -4,7 +4,7 @@ from pathlib import Path
 
 LOCAL_VERSION = 220260527
 
-GITHUB_REPO = "Hazard804/mdcx"
+GITHUB_REPO = "1525745393/mdcx-AI"
 GITHUB_RELEASES_URL = f"https://github.com/{GITHUB_REPO}/releases"
 GITHUB_RELEASES_API_LATEST = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 GITHUB_ISSUES_URL = f"https://github.com/{GITHUB_REPO}/issues/new/choose"
