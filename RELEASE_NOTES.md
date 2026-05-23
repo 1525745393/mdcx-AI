@@ -1,11 +1,11 @@
-# MDCx 220260524 发布说明
+# MDCx 220260525 发布说明
 
 ## 🐛 Bug 修复
 
-### 修复打包问题
+### 修复打包问题 (更彻底的修复)
+- 使用 `--collect-all mdcx` 确保整个 mdcx 包被完整包含在安装包中
 - 修复安装包运行时 ModuleNotFoundError 错误
-- 修复 PyInstaller 打包配置，确保所有模块正确包含在安装包中
-- 特别修复了 `mdcx.controllers.main_window.save_config` 等模块的导入问题
+- 确保 `mdcx.controllers.main_window.save_config` 等所有模块正确导入
 
 ## 📋 文件变更
 

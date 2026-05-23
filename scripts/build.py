@@ -167,6 +167,8 @@ class BuildManager:
         # 添加 collect-all 和排除模块
         cmd.extend([
             "--collect-all",
+            "mdcx",
+            "--collect-all",
             "curl_cffi",
         ])
         cmd.extend([
