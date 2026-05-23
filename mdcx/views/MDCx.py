@@ -4317,7 +4317,7 @@ class Ui_MDCx(object):
         self.scrollArea_7.setWidgetResizable(False)
         self.scrollArea_7.setObjectName("scrollArea_7")
         self.scrollAreaWidgetContents_mingming = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_mingming.setGeometry(QtCore.QRect(0, 0, 760, 3660))
+        self.scrollAreaWidgetContents_mingming.setGeometry(QtCore.QRect(0, 0, 760, 3900))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
