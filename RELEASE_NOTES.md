@@ -1,8 +1,13 @@
-# MDCx 220260525 发布说明
+# MDCx 220260526 发布说明
 
 ## 🐛 Bug 修复
 
-### 修复打包问题 (更彻底的修复)
+### 修复 AttributeError 错误
+- 重新编译 `mdcx/views/MDCx.py`，确保 UI 文件包含最新添加的 VSMETA 控件
+- 修复 `'Ui_MDCx' object has no attribute 'checkBox_download_vsmeta'` 错误
+- 确保所有 VSMETA 相关 UI 元素正确绑定
+
+### 之前版本的修复
 - 使用 `--collect-all mdcx` 确保整个 mdcx 包被完整包含在安装包中
 - 修复安装包运行时 ModuleNotFoundError 错误
 - 确保 `mdcx.controllers.main_window.save_config` 等所有模块正确导入
@@ -21,6 +26,7 @@
 - `mdcx/controllers/main_window/load_config.py` - VSMETA 配置加载
 - `mdcx/controllers/main_window/save_config.py` - VSMETA 配置保存
 - `mdcx/views/MDCx.ui` - VSMETA 配置界面
+- `mdcx/views/MDCx.py` - 重新编译的 UI Python 文件
 - `mdcx/consts.py` - 版本号更新
 - `changelog.md` - 更新日志
 - `RELEASE_NOTES.md` - 发布说明
@@ -48,4 +54,4 @@
 
 ---
 
-发布日期: 2026-05-22
+发布日期: 2026-05-23
