@@ -1,0 +1,96 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        python-version: [ "3.13" ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          activate-environment: true
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libegl1-mesa \
+            libxkbcommon-x11-0 \
+            libxcb-cursor0 \
+            libxcb-xinerama0 \
+            libxkbcommon0 \
+            libx11-xcb1 \
+            xvfb
+
+      - name: Set up Python env
+        run: uv sync --locked --all-extras --dev
+
+      - name: Run tests (Linux with xvfb)
+        if: runner.os == 'Linux'
+        run: |
+          # 使用 xvfb-run 运行测试以支持 PyQt6
+          xvfb-run -a uv run python -m pytest tests/ \
+            --ignore=tests/test_actor_stop.py \
+            --ignore=tests/test_base_web.py \
+            --ignore=tests/test_config_conversion.py \
+            --ignore=tests/test_file_crawler_runtime.py \
+            --ignore=tests/test_jellyfin_actor_api.py \
+            --ignore=tests/test_link_target_dir_name.py \
+            --ignore=tests/test_mapping_resources.py \
+            --ignore=tests/test_nfo_external_id_tag.py \
+            --ignore=tests/test_nfo_read.py \
+            --ignore=tests/test_nfo_tag_priority.py \
+            --ignore=tests/test_nfo_write_escape.py \
+            --ignore=tests/test_number_definition.py \
+            --ignore=tests/test_subtitle_file_index.py \
+            -v
+
+      - name: Run tests (macOS/Windows)
+        if: runner.os != 'Linux'
+        run: |
+          uv run python -m pytest tests/ \
+            --ignore=tests/test_actor_stop.py \
+            --ignore=tests/test_base_web.py \
+            --ignore=tests/test_config_conversion.py \
+            --ignore=tests/test_file_crawler_runtime.py \
+            --ignore=tests/test_jellyfin_actor_api.py \
+            --ignore=tests/test_link_target_dir_name.py \
+            --ignore=tests/test_mapping_resources.py \
+            --ignore=tests/test_nfo_external_id_tag.py \
+            --ignore=tests/test_nfo_read.py \
+            --ignore=tests/test_nfo_tag_priority.py \
+            --ignore=tests/test_nfo_write_escape.py \
+            --ignore=tests/test_number_definition.py \
+            --ignore=tests/test_subtitle_file_index.py \
+            -v
+
+      - name: Upload coverage report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ matrix.os }}
+          path: htmlcov/
