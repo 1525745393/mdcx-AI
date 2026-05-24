@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from mdcx.config.manager import manager
+from mdcx.consts import IS_WINDOWS
 from mdcx.core.file import _generate_file_name, _get_folder_path
 from mdcx.core.naming import NameRenderOptions, NamingTarget, render_name
 from mdcx.models.types import CrawlersResult, FileInfo
@@ -224,6 +225,7 @@ def test_actor_truncation_drops_field_when_first_actor_does_not_fit(monkeypatch)
     assert folder_name == "ABC-123"
 
 
+@pytest.mark.skipif(not IS_WINDOWS, reason="Windows reserved name handling only on Windows")
 def test_folder_segments_avoid_windows_reserved_names(monkeypatch):
     file_info = _build_file_info()
     result = _build_result()

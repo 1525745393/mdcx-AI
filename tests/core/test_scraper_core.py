@@ -185,9 +185,9 @@ class TestScraperTaskLimit:
         scraper.process_one_file = mock_process
 
         with patch("mdcx.core.scraper.signal") as mock_signal:
-            mock_signal.stop = False
+            mock_signal.stop = True
             with patch("mdcx.models.flags.Flags") as mock_flags:
-                mock_flags.stop_requested = False
+                mock_flags.stop_requested = True
 
                 movie_list = [
                     Path("/test/first.mp4"),
@@ -219,7 +219,7 @@ class TestScraperTaskExecution:
             mock_file_info.file_path = Path("/test/TEST-001.mp4")
             mock_info.return_value = mock_file_info
 
-            with patch("mdcx.core.scraper._process_one_file") as mock_process:
+            with patch("mdcx.core.scraper.Scraper._process_one_file") as mock_process:
                 mock_process.return_value = (None, None)
 
                 with patch("mdcx.core.scraper.Flags") as mock_flags:

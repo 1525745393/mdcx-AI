@@ -44,7 +44,17 @@ jobs:
             libxcb-xinerama0 \
             libxkbcommon0 \
             libx11-xcb1 \
-            xvfb
+            xvfb \
+            ffmpeg
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: choco install ffmpeg --yes
 
       - name: Set up Python env
         run: uv sync --locked --all-extras --dev
