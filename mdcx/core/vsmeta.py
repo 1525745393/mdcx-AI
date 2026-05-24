@@ -188,8 +188,8 @@ class VSMetaEncoder:
         b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
         if b64_data is None:
             return
-        self.write_indexed_string_field(self.TAG_EPISODE_THUMB_DATA, 0x01, b64_data, label=label)
-        self.write_indexed_string_field(self.TAG_EPISODE_THUMB_MD5, 0x01, md5_hex, label=f"{label}_md5")
+        self.write_string_field(self.TAG_EPISODE_THUMB_DATA, b64_data, label=label)
+        self.write_string_field(self.TAG_EPISODE_THUMB_MD5, md5_hex, label=f"{label}_md5")
 
     def write_poster_in_group2(self, image_path: Path | None, label: str = "poster_g2"):
         """Write poster image inside GROUP2 (without index byte)"""
@@ -534,7 +534,7 @@ async def write_vsmeta(
                 VSMetaEncoder.TAG2_TVSHOW_META_JSON, VSMetaEncoder.DEFAULT_META_JSON, label="tvshowMetaJson"
             )
 
-        encoder.write_submessage(VSMetaEncoder.TAG_GROUP2, build_group2, label="group2", index=0x01)
+        encoder.write_submessage(VSMetaEncoder.TAG_GROUP2, build_group2, label="group2")
 
         # ── 14. TAG_GROUP3 (0xAA + index 0x01): Backdrop + timestamp (movies) ──
 
@@ -546,7 +546,7 @@ async def write_vsmeta(
             # Timestamp (current Unix seconds)
             sub.write_varint_field(VSMetaEncoder.TAG3_TIMESTAMP, int(time.time()), label="timestamp")
 
-        encoder.write_submessage(VSMetaEncoder.TAG_GROUP3, build_group3, label="group3", index=0x01)
+        encoder.write_submessage(VSMetaEncoder.TAG_GROUP3, build_group3, label="group3")
 
         # ── Write atomically (tmp → rename) ──
         tmp_file = vsmeta_file.with_suffix(".vsmeta.tmp")
