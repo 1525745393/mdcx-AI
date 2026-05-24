@@ -1,4 +1,40 @@
-## 220260532 (2026-05-24)
+## 220260533 (2026-05-24)
+
+### 重大变更
+- **VSMETA 编码器完全重写**：从自定义 TLV 格式迁移到 Synology Video Station 标准 protobuf 格式
+  - 魔数头: `b"vsmeta"` → `0x08 0x01` (protobuf field 1, wire 0, value 1 = movie)
+  - TAG 方案: 自编 0x01-0x0F → protobuf `(field << 3) | wire_type` 编码
+  - 图片编码: 原始 JPEG 二进制 → Base64 (76字符换行) + MD5 校验
+  - 评分编码: LEB128 整数 → 单字节 BE 整数 / -1 补码
+  - 列表字段: 逗号拼接字符串 → protobuf repeated 字段
+  - 嵌套结构: 新增 3 层 GROUP 子消息（GROUP1: cast/crew, GROUP2: series info, GROUP3: backdrop/timestamp）
+
+### 新增
+- TAG_YEAR (0x28): 独立年份字段
+- TAG_SHOW_TITLE2 (0x1A): 副标题/排序标题 (原始标题 or 制作商)
+- TAG_EPISODE_TITLE (0x22): 短标题 (番号)
+- TAG_CLASSIFICATION (0x5A): 内容分级 (有码/无码)
+- TAG_EPISODE_META_JSON (0x4A): 外部 ID 引用 JSON
+- TAG_EPISODE_THUMB_MD5 (0x92): 封面图 MD5 校验
+- TAG2_TVSHOW_SUMMARY (0x32): 系列名称
+- TAG2_TVSHOW_META_JSON (0x4A): 系列元数据 JSON
+- TAG2_POSTER_DATA / TAG2_POSTER_MD5: GROUP2 内嵌封面图
+- TAG3_TIMESTAMP (0x18): Unix 时间戳
+- VSMetaEncoder: 新增 `write_varint_field` / `write_bytes_field` / `write_string_field` / `write_submessage` 方法
+- `leb128.py`: 新增 `encode_varint` 别名
+
+### 移除
+- 不存在的字段: TAGLINE (0x04), RUNTIME (0x06), COLLECTION (0x0D), STUDIO (0x0E), VERSION (0x14)
+- 内容已迁移到标准 protobuf 字段中
+
+### 兼容性
+- `write_vsmeta()` 函数签名完全不变
+- `should_update_vsmeta()` 不变
+- 所有 config 字段含义不变
+- scraper.py 调用方无需修改
+
+---
+
 
 ### 新增
 - VSMETA 设置标签页：嵌入封面图/背景图开关、锁定元数据、图片尺寸/质量、数量限制

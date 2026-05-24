@@ -18,6 +18,10 @@ def encode_leb128(value: int) -> bytes:
     return bytes(result)
 
 
+# Alias for protobuf varint wire type encoding (same as LEB128 unsigned)
+encode_varint = encode_leb128
+
+
 def decode_leb128(data: bytes, offset: int = 0) -> tuple[int, int]:
     """Decode LEB128 encoded integer, returns (value, next_offset)."""
     result = 0
