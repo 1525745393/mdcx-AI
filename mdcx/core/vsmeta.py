@@ -13,6 +13,7 @@ from ..models.log_buffer import LogBuffer
 from ..models.types import CrawlersResult, FileInfo
 from ..signals import signal
 from ..utils import get_used_time
+from ..utils.file import delete_file_async
 from ..utils.leb128 import (
     encode_boolean,
     encode_date,
@@ -50,7 +51,16 @@ class VSMetaEncoder:
     TAG_VERSION = 0x14  # VSMETA version
 
     def __init__(self):
+        self.reset()
+
+    def reset(self):
+        """Reset encoder to initial state for reuse"""
         self.buffer = BytesIO()
+        self.written_tags: list[str] = []
+
+    def _track(self, tag_name: str):
+        """Record that a tag was successfully written"""
+        self.written_tags.append(tag_name)
 
     def write_header(self, version: int = 1):
         """Write VSMETA header"""
@@ -63,21 +73,27 @@ class VSMetaEncoder:
         self.buffer.write(encode_leb128(len(value)))
         self.buffer.write(value)
 
-    def write_string_tag(self, tag: int, value: str):
-        """Write a string tag"""
+    def write_string_tag(self, tag: int, value: str, label: str | None = None):
+        """Write a string tag, optionally auto-track with label"""
         if value:
             self.write_tag(tag, encode_string(value))
+            if label:
+                self._track(label)
 
-    def write_int_tag(self, tag: int, value: int):
-        """Write an integer tag"""
+    def write_int_tag(self, tag: int, value: int, label: str | None = None):
+        """Write an integer tag, optionally auto-track with label"""
         self.write_tag(tag, encode_int(value))
+        if label:
+            self._track(label)
 
-    def write_boolean_tag(self, tag: int, value: bool):
-        """Write a boolean tag"""
+    def write_boolean_tag(self, tag: int, value: bool, label: str | None = None):
+        """Write a boolean tag, optionally auto-track with label"""
         self.write_tag(tag, encode_boolean(value))
+        if label:
+            self._track(label)
 
-    def write_image_tag(self, tag: int, image_path: Path | None):
-        """Write an image tag from file path"""
+    def write_image_tag(self, tag: int, image_path: Path | None, label: str | None = None):
+        """Write an image tag from file path, optionally auto-track with label"""
         if image_path and image_path.exists():
             try:
                 with Image.open(image_path) as img:
@@ -94,6 +110,8 @@ class VSMetaEncoder:
                     img.save(img_buffer, format="JPEG", quality=90)
                     img_data = img_buffer.getvalue()
                 self.write_tag(tag, encode_leb128(len(img_data)) + img_data)
+                if label:
+                    self._track(label)
             except Exception:
                 LogBuffer.log().write(f"\n ⚠️ VSMETA image tag failed: {image_path}")
                 signal.show_traceback_log(traceback.format_exc())
@@ -104,25 +122,41 @@ class VSMetaEncoder:
 
 
 def parse_release_date(release_str: str) -> tuple[int, int, int] | None:
-    """Parse release date string (YYYY-MM-DD), returns None if unparseable"""
+    """Parse release date string (YYYY-MM-DD), returns None if unparseable
+
+    Handles: '2020-01-01', '2020-1-1', '2020/01/01', etc.
+    """
+    import re
+
     try:
-        if release_str and len(release_str) >= 10:
-            year = int(release_str[0:4])
-            month = int(release_str[5:7])
-            day = int(release_str[8:10])
-            return year, month, day
+        if not release_str:
+            return None
+        raw = str(release_str).strip()
+        # Match YYYY-MM-DD or YYYY/MM/DD with optional zero-padding
+        m = re.match(r"(\d{4})[/-](\d{1,2})[/-](\d{1,2})", raw)
+        if m:
+            return int(m.group(1)), int(m.group(2)), int(m.group(3))
     except (ValueError, IndexError):
         pass
     return None
 
 
 def parse_score(score: str) -> int | None:
-    """Parse score string to VSMETA rating (0-100), returns None if unparseable"""
+    """Parse score string to VSMETA rating (0-100), returns None if unparseable
+
+    Handles: '8.5', '8.5分', '⭐8.5', '评分 8.5', etc.
+    """
+    import re
+
     try:
         raw = str(score).strip()
         if not raw or raw.upper() in ("N/A", "NA", "NULL", "NONE", "-"):
             return None
-        value = float(raw)
+        # Extract numeric value from mixed strings like "8.5分" / "⭐8.5"
+        num_match = re.search(r"(\d+\.?\d*)", raw)
+        if not num_match:
+            return None
+        value = float(num_match.group(1))
         if value < 0 or value > 10:
             return None
         return int(value * 10)
@@ -133,7 +167,8 @@ def parse_score(score: str) -> int | None:
 def parse_runtime(runtime: str) -> int | None:
     """Parse runtime string to minutes, returns None if unparseable
 
-    Handles: '120', '120min', '120分钟', '2h', '1h30m', '90 mins', etc.
+    Handles: '120', '120min', '120分钟', '2h', '1h30m', '90 mins',
+             '1小时30分钟', '1小时', '1时30分', etc.
     """
     import re
 
@@ -141,6 +176,10 @@ def parse_runtime(runtime: str) -> int | None:
         raw = str(runtime).strip()
         if not raw:
             return None
+
+        # Normalize Chinese hour/minute words to 'h'/'m'
+        raw = re.sub(r"(小时|時|时)\s*", "h", raw)
+        raw = re.sub(r"(分钟|分)\s*", "m", raw)
 
         # Pattern: "2h30m" or "1h"
         h_m_match = re.match(r"(\d+)\s*h\s*(\d+)\s*m", raw, re.IGNORECASE)
@@ -152,8 +191,8 @@ def parse_runtime(runtime: str) -> int | None:
         if h_match:
             return int(h_match.group(1)) * 60
 
-        # Pattern: "120min" / "120分钟" / "90 mins"
-        cleaned = re.sub(r"(分钟|mins?|minute)", "", raw, flags=re.IGNORECASE)
+        # Pattern: "120min" / "90 mins" (already normalized to "m")
+        cleaned = re.sub(r"m\w*", "", raw, flags=re.IGNORECASE)
         cleaned = cleaned.strip()
         if cleaned:
             return int(float(cleaned))
@@ -231,8 +270,6 @@ async def write_vsmeta(
     if not update:
         if not vsmeta_policy.should_download:
             if not vsmeta_policy.should_keep and await aiofiles.os.path.exists(vsmeta_file):
-                from ..utils.file import delete_file_async
-
                 await delete_file_async(vsmeta_file)
             return True
         LogBuffer.log().write(f"\n 🍀 VSMETA done! (old)({get_used_time(start_time)}s)")
@@ -242,13 +279,10 @@ async def write_vsmeta(
         if not await aiofiles.os.path.exists(output_dir):
             await aiofiles.os.makedirs(output_dir)
 
-        from ..utils.file import delete_file_async
-
         await delete_file_async(vsmeta_file)
 
         encoder = VSMetaEncoder()
         encoder.write_header(version=1)
-        written_tags: list[str] = []
 
         # Build display title
         if data.title and data.number:
@@ -264,90 +298,68 @@ async def write_vsmeta(
         if data.originaltitle and data.originaltitle != data.title:
             display_title += f" ({data.originaltitle})"
 
-        encoder.write_string_tag(VSMetaEncoder.TAG_TITLE, display_title)
-        written_tags.append("title")
+        encoder.write_string_tag(VSMetaEncoder.TAG_TITLE, display_title, label="title")
 
         # Write summary/plot
         summary = data.outline or data.originalplot or ""
-        if summary:
-            encoder.write_string_tag(VSMetaEncoder.TAG_SUMMARY, summary)
-            written_tags.append("summary")
+        encoder.write_string_tag(VSMetaEncoder.TAG_SUMMARY, summary, label="summary")
 
         # Write release date
         if data.release:
             parsed = parse_release_date(data.release)
             if parsed:
                 encoder.write_tag(VSMetaEncoder.TAG_RELEASE_DATE, encode_date(*parsed))
-                written_tags.append("release_date")
+                encoder._track("release_date")
         elif data.year:
             try:
                 year = int(data.year)
                 encoder.write_tag(VSMetaEncoder.TAG_RELEASE_DATE, encode_date(year, 1, 1))
-                written_tags.append("release_date(year)")
+                encoder._track("release_date(year)")
             except ValueError:
                 pass
 
         # Write tagline (use series or studio)
         tagline = data.series or data.studio or data.publisher or ""
-        if tagline:
-            encoder.write_string_tag(VSMetaEncoder.TAG_TAGLINE, tagline)
-            written_tags.append("tagline")
+        encoder.write_string_tag(VSMetaEncoder.TAG_TAGLINE, tagline, label="tagline")
 
         # Write rating
         rating = parse_score(data.score)
         if rating is not None:
-            encoder.write_int_tag(VSMetaEncoder.TAG_RATING, rating)
-            written_tags.append("rating")
+            encoder.write_int_tag(VSMetaEncoder.TAG_RATING, rating, label="rating")
 
         # Write runtime (in minutes)
         runtime = parse_runtime(data.runtime)
         if runtime is not None:
-            encoder.write_int_tag(VSMetaEncoder.TAG_RUNTIME, runtime)
-            written_tags.append("runtime")
+            encoder.write_int_tag(VSMetaEncoder.TAG_RUNTIME, runtime, label="runtime")
 
         # Write genres/tags
         if data.tags:
-            genre_str = ", ".join(data.tags[:10])  # Limit to first 10 tags
-            encoder.write_string_tag(VSMetaEncoder.TAG_GENRE, genre_str)
-            written_tags.append("genre")
+            encoder.write_string_tag(VSMetaEncoder.TAG_GENRE, ", ".join(data.tags[:10]), label="genre")
 
         # Write director
         if data.directors:
-            director_str = ", ".join(data.directors)
-            encoder.write_string_tag(VSMetaEncoder.TAG_DIRECTOR, director_str)
-            written_tags.append("director")
+            encoder.write_string_tag(VSMetaEncoder.TAG_DIRECTOR, ", ".join(data.directors), label="director")
 
         # Write actors (prefer all_actors for completeness)
         actor_list = data.all_actors if len(data.all_actors) > len(data.actors) else data.actors
         if actor_list:
-            actor_str = ", ".join(actor_list[:20])  # Limit to first 20 actors
-            encoder.write_string_tag(VSMetaEncoder.TAG_ACTOR, actor_str)
-            written_tags.append("actor")
+            encoder.write_string_tag(VSMetaEncoder.TAG_ACTOR, ", ".join(actor_list[:20]), label="actor")
 
         # Write studio
         if data.studio:
-            encoder.write_string_tag(VSMetaEncoder.TAG_STUDIO, data.studio)
-            written_tags.append("studio")
+            encoder.write_string_tag(VSMetaEncoder.TAG_STUDIO, data.studio, label="studio")
         elif data.publisher:
-            encoder.write_string_tag(VSMetaEncoder.TAG_STUDIO, data.publisher)
-            written_tags.append("studio(publisher)")
+            encoder.write_string_tag(VSMetaEncoder.TAG_STUDIO, data.publisher, label="studio(publisher)")
 
         # Write collection/series
-        if data.series:
-            encoder.write_string_tag(VSMetaEncoder.TAG_COLLECTION, data.series)
-            written_tags.append("collection")
+        encoder.write_string_tag(VSMetaEncoder.TAG_COLLECTION, data.series or "", label="collection")
 
         # Write images
-        encoder.write_image_tag(VSMetaEncoder.TAG_POSTER, poster_path)
-        if poster_path and poster_path.exists():
-            written_tags.append("poster")
-        encoder.write_image_tag(VSMetaEncoder.TAG_BACKDROP, backdrop_path)
-        if backdrop_path and backdrop_path.exists():
-            written_tags.append("backdrop")
+        encoder.write_image_tag(VSMetaEncoder.TAG_POSTER, poster_path, label="poster")
+        encoder.write_image_tag(VSMetaEncoder.TAG_BACKDROP, backdrop_path, label="backdrop")
 
         # Write locked flag (locked = true means don't auto-update metadata)
-        encoder.write_boolean_tag(VSMetaEncoder.TAG_LOCKED, True)
-        written_tags.append("locked")
+        encoder.write_boolean_tag(VSMetaEncoder.TAG_LOCKED, True, label="locked")
 
         # Save to file
         vsmeta_data = encoder.get_bytes()
@@ -355,7 +367,7 @@ async def write_vsmeta(
             await f.write(vsmeta_data)
 
         LogBuffer.log().write(
-            f"\n 🍀 VSMETA done! ({get_used_time(start_time)}s) [{len(vsmeta_data)}B] tags: {', '.join(written_tags)}"
+            f"\n 🍀 VSMETA done! ({get_used_time(start_time)}s) [{len(vsmeta_data)}B] tags: {', '.join(encoder.written_tags)}"
         )
         return True
 
