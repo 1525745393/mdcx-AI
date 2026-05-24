@@ -229,9 +229,17 @@ class TestScraperTaskExecution:
                     mock_flags.succ_count = 0
                     mock_flags.fail_count = 0
                     mock_flags.file_mode = MagicMock()
+                    mock_flags.json_data_dic = {}
+                    mock_flags.json_get_status = {}
 
-                    task = (Path("/test/TEST-001.mp4"), 1, 1)
-                    await scraper.process_one_file(task)
+                    with patch("mdcx.core.scraper.signal") as mock_signal:
+                        mock_signal.stop = False
+
+                        with patch("mdcx.core.scraper.manager") as mock_manager:
+                            mock_manager.config.main_mode = 4
+
+                            task = (Path("/test/TEST-001.mp4"), 1, 1)
+                            await scraper.process_one_file(task)
 
 
 class TestScraperConcurrency:

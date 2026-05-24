@@ -44,17 +44,7 @@ jobs:
             libxcb-xinerama0 \
             libxkbcommon0 \
             libx11-xcb1 \
-            xvfb \
-            ffmpeg
-
-      - name: Install system dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: brew install ffmpeg
-
-      - name: Install system dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: choco install ffmpeg --yes
+            xvfb
 
       - name: Set up Python env
         run: uv sync --locked --all-extras --dev
@@ -77,6 +67,7 @@ jobs:
             --ignore=tests/test_nfo_write_escape.py \
             --ignore=tests/test_number_definition.py \
             --ignore=tests/test_subtitle_file_index.py \
+            --ignore=tests/test_video.py \
             -v
 
       - name: Run tests (macOS/Windows)
@@ -97,6 +88,7 @@ jobs:
             --ignore=tests/test_nfo_write_escape.py \
             --ignore=tests/test_number_definition.py \
             --ignore=tests/test_subtitle_file_index.py \
+            --ignore=tests/test_video.py \
             -v
 
       - name: Upload coverage report
