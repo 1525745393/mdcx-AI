@@ -315,8 +315,17 @@ async def write_vsmeta(
             except ValueError:
                 pass
 
-        # Write tagline (use series or studio)
-        tagline = data.series or data.studio or data.publisher or ""
+        # Write tagline (use series/studio/publisher + mosaic)
+        tagline_parts = []
+        if data.series:
+            tagline_parts.append(data.series)
+        elif data.studio:
+            tagline_parts.append(data.studio)
+        elif data.publisher:
+            tagline_parts.append(data.publisher)
+        if data.mosaic:
+            tagline_parts.append(data.mosaic)
+        tagline = " / ".join(tagline_parts)
         encoder.write_string_tag(VSMetaEncoder.TAG_TAGLINE, tagline, label="tagline")
 
         # Write rating
@@ -329,10 +338,13 @@ async def write_vsmeta(
         if runtime is not None:
             encoder.write_int_tag(VSMetaEncoder.TAG_RUNTIME, runtime, label="runtime")
 
-        # Write genres/tags
-        if data.tags:
+        # Write genres/tags (with mosaic prefix for category filtering)
+        if data.tags or data.mosaic:
+            tag_items = list(data.tags)
+            if data.mosaic and data.mosaic not in tag_items:
+                tag_items.insert(0, data.mosaic)
             limit = manager.config.vsmeta_tag_limit
-            encoder.write_string_tag(VSMetaEncoder.TAG_GENRE, ", ".join(data.tags[:limit]), label="genre")
+            encoder.write_string_tag(VSMetaEncoder.TAG_GENRE, ", ".join(tag_items[:limit]), label="genre")
 
         # Write director
         if data.directors:
