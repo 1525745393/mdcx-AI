@@ -1,3 +1,22 @@
+## 220260532 (2026-05-24)
+
+### 新增
+- VSMETA 设置标签页：嵌入封面图/背景图开关、锁定元数据、图片尺寸/质量、数量限制
+- VSMETA 保留旧文件勾选框（设置→下载→保留旧文件）
+- VSMetaEncoder: 新增 `reset()` 方法支持实例复用
+- VSMetaEncoder: 写方法增加 `label` 参数，自动追踪已写入标签
+
+### 优化
+- `parse_release_date`: 支持非零填充日期 (2020-5-1, 2020/05/15)
+- `parse_score`: 支持中文后缀 (8.5分, ⭐8.5, 评分 8.5)
+- `parse_runtime`: 支持中文小时/分钟 (1小时30分钟, 1时30分)
+- `write_vsmeta`: 改为 tmp + rename 原子写入，防止写入失败丢失旧文件
+- 提取 `get_vsmeta_path()` 消除 scraper.py 中路径构建重复
+- `delete_file_async` 内联导入移至模块顶层
+
+### 修复
+- 修复 `should_update_vsmeta` 中 `KeepableFile.VSMETA` 通过 UI 无法设置的死代码问题
+
 ## 220260531 (2026-05-24)
 
 ### 修复
