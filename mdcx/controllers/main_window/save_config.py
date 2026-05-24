@@ -485,6 +485,14 @@ def save_config(self: "MyMAinWindow"):
     manager.config.trailer_simple_name = not self.Ui.radioButton_trailer_with_filename.isChecked()
     # VSMETA 命名规则
     manager.config.vsmeta_keep_ext = self.Ui.checkBox_vsmeta_keep_ext.isChecked()
+    # VSMETA 标签页配置
+    manager.config.vsmeta_include_poster = self.Ui.checkBox_vsmeta_include_poster.isChecked()
+    manager.config.vsmeta_include_backdrop = self.Ui.checkBox_vsmeta_include_backdrop.isChecked()
+    manager.config.vsmeta_locked = self.Ui.checkBox_vsmeta_locked.isChecked()
+    manager.config.vsmeta_image_max_dimension = self.Ui.spinBox_vsmeta_image_dimension.value()
+    manager.config.vsmeta_jpeg_quality = self.Ui.spinBox_vsmeta_jpeg_quality.value()
+    manager.config.vsmeta_actor_limit = self.Ui.spinBox_vsmeta_actor_limit.value()
+    manager.config.vsmeta_tag_limit = self.Ui.spinBox_vsmeta_tag_limit.value()
     manager.config.hd_name = "height" if self.Ui.radioButton_definition_height.isChecked() else "hd"
 
     # 分辨率获取方式

@@ -29,9 +29,6 @@ class VSMetaEncoder:
     # Magic header for VSMETA
     MAGIC_HEADER = b"vsmeta"
 
-    # Max image dimension for VSMETA (VS only needs thumbnail quality)
-    MAX_IMAGE_DIMENSION = 1920
-
     # Tags for metadata fields
     TAG_TITLE = 0x01
     TAG_SUMMARY = 0x02
@@ -96,10 +93,12 @@ class VSMetaEncoder:
         """Write an image tag from file path, optionally auto-track with label"""
         if image_path and image_path.exists():
             try:
+                max_dim = manager.config.vsmeta_image_max_dimension
+                quality = manager.config.vsmeta_jpeg_quality
                 with Image.open(image_path) as img:
                     # Resize if image exceeds max dimension
-                    if max(img.size) > self.MAX_IMAGE_DIMENSION:
-                        ratio = self.MAX_IMAGE_DIMENSION / max(img.size)
+                    if max(img.size) > max_dim:
+                        ratio = max_dim / max(img.size)
                         new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
                         img = img.resize(new_size, Image.LANCZOS)
 
@@ -107,7 +106,7 @@ class VSMetaEncoder:
                     img_buffer = BytesIO()
                     if img.mode in ("RGBA", "P"):
                         img = img.convert("RGB")
-                    img.save(img_buffer, format="JPEG", quality=90)
+                    img.save(img_buffer, format="JPEG", quality=quality)
                     img_data = img_buffer.getvalue()
                 self.write_tag(tag, encode_leb128(len(img_data)) + img_data)
                 if label:
@@ -332,7 +331,8 @@ async def write_vsmeta(
 
         # Write genres/tags
         if data.tags:
-            encoder.write_string_tag(VSMetaEncoder.TAG_GENRE, ", ".join(data.tags[:10]), label="genre")
+            limit = manager.config.vsmeta_tag_limit
+            encoder.write_string_tag(VSMetaEncoder.TAG_GENRE, ", ".join(data.tags[:limit]), label="genre")
 
         # Write director
         if data.directors:
@@ -341,7 +341,8 @@ async def write_vsmeta(
         # Write actors (prefer all_actors for completeness)
         actor_list = data.all_actors if len(data.all_actors) > len(data.actors) else data.actors
         if actor_list:
-            encoder.write_string_tag(VSMetaEncoder.TAG_ACTOR, ", ".join(actor_list[:20]), label="actor")
+            limit = manager.config.vsmeta_actor_limit
+            encoder.write_string_tag(VSMetaEncoder.TAG_ACTOR, ", ".join(actor_list[:limit]), label="actor")
 
         # Write studio
         if data.studio:
@@ -352,12 +353,14 @@ async def write_vsmeta(
         # Write collection/series
         encoder.write_string_tag(VSMetaEncoder.TAG_COLLECTION, data.series or "", label="collection")
 
-        # Write images
-        encoder.write_image_tag(VSMetaEncoder.TAG_POSTER, poster_path, label="poster")
-        encoder.write_image_tag(VSMetaEncoder.TAG_BACKDROP, backdrop_path, label="backdrop")
+        # Write images (conditionally based on config)
+        if manager.config.vsmeta_include_poster:
+            encoder.write_image_tag(VSMetaEncoder.TAG_POSTER, poster_path, label="poster")
+        if manager.config.vsmeta_include_backdrop:
+            encoder.write_image_tag(VSMetaEncoder.TAG_BACKDROP, backdrop_path, label="backdrop")
 
-        # Write locked flag (locked = true means don't auto-update metadata)
-        encoder.write_boolean_tag(VSMetaEncoder.TAG_LOCKED, True, label="locked")
+        # Write locked flag based on config
+        encoder.write_boolean_tag(VSMetaEncoder.TAG_LOCKED, manager.config.vsmeta_locked, label="locked")
 
         # Write to temp file then rename for atomicity
         tmp_file = vsmeta_file.with_suffix(".vsmeta.tmp")

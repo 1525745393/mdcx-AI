@@ -18770,6 +18770,224 @@
                 </widget>
               </widget>
             </widget>
+            <widget class="QWidget" name="tab_8">
+              <attribute name="title">
+                <string> VSMETA </string>
+              </attribute>
+              <widget class="QScrollArea" name="scrollArea_vsmeta">
+                <property name="geometry">
+                  <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>796</width>
+                    <height>658</height>
+                  </rect>
+                </property>
+                <property name="frameShape">
+                  <enum>QFrame::Box</enum>
+                </property>
+                <property name="lineWidth">
+                  <number>0</number>
+                </property>
+                <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                </property>
+                <property name="widgetResizable">
+                  <bool>false</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_vsmeta">
+                  <property name="geometry">
+                    <rect>
+                      <x>0</x>
+                      <y>0</y>
+                      <width>796</width>
+                      <height>450</height>
+                    </rect>
+                  </property>
+                  <widget class="QGroupBox" name="groupBox_vsmeta_config">
+                    <property name="geometry">
+                      <rect>
+                        <x>30</x>
+                        <y>20</y>
+                        <width>701</width>
+                        <height>391</height>
+                      </rect>
+                    </property>
+                    <property name="minimumSize">
+                      <size>
+                        <width>200</width>
+                        <height>0</height>
+                      </size>
+                    </property>
+                    <property name="maximumSize">
+                      <size>
+                        <width>739</width>
+                        <height>16777215</height>
+                      </size>
+                    </property>
+                    <property name="title">
+                      <string>VSMETA 生成选项 (Synology Video Station)</string>
+                    </property>
+                    <widget class="QWidget" name="gridLayoutWidget_vsmeta_config">
+                      <property name="geometry">
+                        <rect>
+                          <x>30</x>
+                          <y>30</y>
+                          <width>641</width>
+                          <height>341</height>
+                        </rect>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout_vsmeta_config">
+                        <item row="0" column="0" colspan="2">
+                          <widget class="QCheckBox" name="checkBox_vsmeta_include_poster">
+                            <property name="text">
+                              <string>嵌入封面图 (poster)</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="1" column="0" colspan="2">
+                          <widget class="QCheckBox" name="checkBox_vsmeta_include_backdrop">
+                            <property name="text">
+                              <string>嵌入背景图 (backdrop/fanart)</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="2" column="0" colspan="2">
+                          <widget class="QCheckBox" name="checkBox_vsmeta_locked">
+                            <property name="text">
+                              <string>锁定元数据 (禁止 Video Station 自动更新)</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="3" column="0">
+                          <widget class="QLabel" name="label_vsmeta_image_dimension">
+                            <property name="text">
+                              <string>图片最大尺寸 (像素):</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="3" column="1">
+                          <widget class="QSpinBox" name="spinBox_vsmeta_image_dimension">
+                            <property name="minimumSize">
+                              <size>
+                                <width>100</width>
+                                <height>0</height>
+                              </size>
+                            </property>
+                            <property name="minimum">
+                              <number>320</number>
+                            </property>
+                            <property name="maximum">
+                              <number>4096</number>
+                            </property>
+                            <property name="singleStep">
+                              <number>100</number>
+                            </property>
+                            <property name="value">
+                              <number>1920</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="4" column="0">
+                          <widget class="QLabel" name="label_vsmeta_jpeg_quality">
+                            <property name="text">
+                              <string>JPEG 质量 (1-100):</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="4" column="1">
+                          <widget class="QSpinBox" name="spinBox_vsmeta_jpeg_quality">
+                            <property name="minimumSize">
+                              <size>
+                                <width>100</width>
+                                <height>0</height>
+                              </size>
+                            </property>
+                            <property name="minimum">
+                              <number>10</number>
+                            </property>
+                            <property name="maximum">
+                              <number>100</number>
+                            </property>
+                            <property name="value">
+                              <number>90</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="5" column="0">
+                          <widget class="QLabel" name="label_vsmeta_actor_limit">
+                            <property name="text">
+                              <string>演员数量上限:</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="5" column="1">
+                          <widget class="QSpinBox" name="spinBox_vsmeta_actor_limit">
+                            <property name="minimumSize">
+                              <size>
+                                <width>100</width>
+                                <height>0</height>
+                              </size>
+                            </property>
+                            <property name="minimum">
+                              <number>0</number>
+                            </property>
+                            <property name="maximum">
+                              <number>50</number>
+                            </property>
+                            <property name="value">
+                              <number>20</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="6" column="0">
+                          <widget class="QLabel" name="label_vsmeta_tag_limit">
+                            <property name="text">
+                              <string>标签数量上限:</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="6" column="1">
+                          <widget class="QSpinBox" name="spinBox_vsmeta_tag_limit">
+                            <property name="minimumSize">
+                              <size>
+                                <width>100</width>
+                                <height>0</height>
+                              </size>
+                            </property>
+                            <property name="minimum">
+                              <number>0</number>
+                            </property>
+                            <property name="maximum">
+                              <number>30</number>
+                            </property>
+                            <property name="value">
+                              <number>10</number>
+                            </property>
+                          </widget>
+                        </item>
+                      </layout>
+                    </widget>
+                  </widget>
+                  <widget class="QLabel" name="label_vsmeta_tips">
+                    <property name="geometry">
+                      <rect>
+                        <x>30</x>
+                        <y>420</y>
+                        <width>701</width>
+                        <height>21</height>
+                      </rect>
+                    </property>
+                    <property name="styleSheet">
+                      <string notr="true">color: rgb(8, 128, 128);</string>
+                    </property>
+                    <property name="text">
+                      <string>VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响</string>
+                    </property>
+                  </widget>
+                </widget>
+              </widget>
+            </widget>
             <widget class="QWidget" name="tab_5">
               <attribute name="title">
                 <string> 演员 </string>

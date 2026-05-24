@@ -696,6 +696,14 @@ def load_config(self: "MyMAinWindow"):
         )
         # VSMETA 是否保留视频扩展名
         self.Ui.checkBox_vsmeta_keep_ext.setChecked(manager.config.vsmeta_keep_ext)
+        # VSMETA 标签页配置
+        self.Ui.checkBox_vsmeta_include_poster.setChecked(manager.config.vsmeta_include_poster)
+        self.Ui.checkBox_vsmeta_include_backdrop.setChecked(manager.config.vsmeta_include_backdrop)
+        self.Ui.checkBox_vsmeta_locked.setChecked(manager.config.vsmeta_locked)
+        self.Ui.spinBox_vsmeta_image_dimension.setValue(manager.config.vsmeta_image_max_dimension)
+        self.Ui.spinBox_vsmeta_jpeg_quality.setValue(manager.config.vsmeta_jpeg_quality)
+        self.Ui.spinBox_vsmeta_actor_limit.setValue(manager.config.vsmeta_actor_limit)
+        self.Ui.spinBox_vsmeta_tag_limit.setValue(manager.config.vsmeta_tag_limit)
         # 画质命名规则
         set_radio_buttons(
             manager.config.hd_name,
