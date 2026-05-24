@@ -13,56 +13,13 @@ from ..models.log_buffer import LogBuffer
 from ..models.types import CrawlersResult, FileInfo
 from ..signals import signal
 from ..utils import get_used_time
-
-
-def encode_leb128(value: int) -> bytes:
-    """Encode integer using LEB128 encoding"""
-    result = bytearray()
-    while True:
-        byte = value & 0x7F
-        value >>= 7
-        if value:
-            byte |= 0x80
-        result.append(byte)
-        if not value:
-            break
-    return bytes(result)
-
-
-def decode_leb128(data: bytes, offset: int = 0) -> tuple[int, int]:
-    """Decode LEB128 encoded integer"""
-    result = 0
-    shift = 0
-    i = offset
-    while i < len(data):
-        byte = data[i]
-        i += 1
-        result |= (byte & 0x7F) << shift
-        shift += 7
-        if not (byte & 0x80):
-            break
-    return result, i
-
-
-def encode_string(s: str) -> bytes:
-    """Encode string with LEB128 length prefix"""
-    utf8 = s.encode("utf-8")
-    return encode_leb128(len(utf8)) + utf8
-
-
-def encode_boolean(value: bool) -> bytes:
-    """Encode boolean value"""
-    return encode_leb128(1 if value else 0)
-
-
-def encode_int(value: int) -> bytes:
-    """Encode integer value using LEB128"""
-    return encode_leb128(value)
-
-
-def encode_date(year: int, month: int, day: int) -> bytes:
-    """Encode date as string YYYY-MM-DD"""
-    return encode_string(f"{year:04d}-{month:02d}-{day:02d}")
+from ..utils.leb128 import (
+    encode_boolean,
+    encode_date,
+    encode_int,
+    encode_leb128,
+    encode_string,
+)
 
 
 class VSMetaEncoder:
@@ -291,6 +248,7 @@ async def write_vsmeta(
 
         encoder = VSMetaEncoder()
         encoder.write_header(version=1)
+        written_tags: list[str] = []
 
         # Build display title
         if data.title and data.number:
@@ -302,22 +260,30 @@ async def write_vsmeta(
         else:
             display_title = file_info.file_name
 
+        # Append original title if different from display title
+        if data.originaltitle and data.originaltitle != data.title:
+            display_title += f" ({data.originaltitle})"
+
         encoder.write_string_tag(VSMetaEncoder.TAG_TITLE, display_title)
+        written_tags.append("title")
 
         # Write summary/plot
         summary = data.outline or data.originalplot or ""
         if summary:
             encoder.write_string_tag(VSMetaEncoder.TAG_SUMMARY, summary)
+            written_tags.append("summary")
 
         # Write release date
         if data.release:
             parsed = parse_release_date(data.release)
             if parsed:
                 encoder.write_tag(VSMetaEncoder.TAG_RELEASE_DATE, encode_date(*parsed))
+                written_tags.append("release_date")
         elif data.year:
             try:
                 year = int(data.year)
                 encoder.write_tag(VSMetaEncoder.TAG_RELEASE_DATE, encode_date(year, 1, 1))
+                written_tags.append("release_date(year)")
             except ValueError:
                 pass
 
@@ -325,56 +291,72 @@ async def write_vsmeta(
         tagline = data.series or data.studio or data.publisher or ""
         if tagline:
             encoder.write_string_tag(VSMetaEncoder.TAG_TAGLINE, tagline)
+            written_tags.append("tagline")
 
         # Write rating
         rating = parse_score(data.score)
         if rating is not None:
             encoder.write_int_tag(VSMetaEncoder.TAG_RATING, rating)
+            written_tags.append("rating")
 
         # Write runtime (in minutes)
         runtime = parse_runtime(data.runtime)
         if runtime is not None:
             encoder.write_int_tag(VSMetaEncoder.TAG_RUNTIME, runtime)
+            written_tags.append("runtime")
 
         # Write genres/tags
         if data.tags:
             genre_str = ", ".join(data.tags[:10])  # Limit to first 10 tags
             encoder.write_string_tag(VSMetaEncoder.TAG_GENRE, genre_str)
+            written_tags.append("genre")
 
         # Write director
         if data.directors:
             director_str = ", ".join(data.directors)
             encoder.write_string_tag(VSMetaEncoder.TAG_DIRECTOR, director_str)
+            written_tags.append("director")
 
         # Write actors (prefer all_actors for completeness)
         actor_list = data.all_actors if len(data.all_actors) > len(data.actors) else data.actors
         if actor_list:
             actor_str = ", ".join(actor_list[:20])  # Limit to first 20 actors
             encoder.write_string_tag(VSMetaEncoder.TAG_ACTOR, actor_str)
+            written_tags.append("actor")
 
         # Write studio
         if data.studio:
             encoder.write_string_tag(VSMetaEncoder.TAG_STUDIO, data.studio)
+            written_tags.append("studio")
         elif data.publisher:
             encoder.write_string_tag(VSMetaEncoder.TAG_STUDIO, data.publisher)
+            written_tags.append("studio(publisher)")
 
         # Write collection/series
         if data.series:
             encoder.write_string_tag(VSMetaEncoder.TAG_COLLECTION, data.series)
+            written_tags.append("collection")
 
         # Write images
         encoder.write_image_tag(VSMetaEncoder.TAG_POSTER, poster_path)
+        if poster_path and poster_path.exists():
+            written_tags.append("poster")
         encoder.write_image_tag(VSMetaEncoder.TAG_BACKDROP, backdrop_path)
+        if backdrop_path and backdrop_path.exists():
+            written_tags.append("backdrop")
 
         # Write locked flag (locked = true means don't auto-update metadata)
         encoder.write_boolean_tag(VSMetaEncoder.TAG_LOCKED, True)
+        written_tags.append("locked")
 
         # Save to file
         vsmeta_data = encoder.get_bytes()
         async with aiofiles.open(vsmeta_file, "wb") as f:
             await f.write(vsmeta_data)
 
-        LogBuffer.log().write(f"\n 🍀 VSMETA done! ({get_used_time(start_time)}s)")
+        LogBuffer.log().write(
+            f"\n 🍀 VSMETA done! ({get_used_time(start_time)}s) [{len(vsmeta_data)}B] tags: {', '.join(written_tags)}"
+        )
         return True
 
     except Exception as e:
