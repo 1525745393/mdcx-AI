@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            libegl1-mesa \
+            libegl1 \
             libxkbcommon-x11-0 \
             libxcb-cursor0 \
             libxcb-xinerama0 \
@@ -71,6 +71,7 @@ jobs:
 
       - name: Run tests (macOS/Windows)
         if: runner.os != 'Linux'
+        shell: bash
         run: |
           uv run python -m pytest tests/ \
             --ignore=tests/test_actor_stop.py \
