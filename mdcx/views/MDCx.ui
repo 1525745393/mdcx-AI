@@ -9546,6 +9546,13 @@
                             </property>
                           </widget>
                         </item>
+                        <item>
+                          <widget class="QCheckBox" name="checkBox_old_vsmeta">
+                            <property name="text">
+                              <string>vsmeta</string>
+                            </property>
+                          </widget>
+                        </item>
                       </layout>
                     </widget>
                     <widget class="QLabel" name="label_79">

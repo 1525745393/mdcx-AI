@@ -577,6 +577,7 @@ def load_config(self: "MyMAinWindow"):
             (self.Ui.checkBox_old_nfo, KeepableFile.NFO),
             (self.Ui.checkBox_old_extrafanart_copy, KeepableFile.EXTRAFANART_COPY),
             (self.Ui.checkBox_old_theme_videos, KeepableFile.THEME_VIDEOS),
+            (self.Ui.checkBox_old_vsmeta, KeepableFile.VSMETA),
         )
 
         # 下载高清图片 - 新配置直接使用枚举列表，不需要版本兼容性检查

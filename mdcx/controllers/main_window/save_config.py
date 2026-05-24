@@ -402,6 +402,7 @@ def save_config(self: "MyMAinWindow"):
         (self.Ui.checkBox_old_nfo, KeepableFile.NFO),
         (self.Ui.checkBox_old_extrafanart_copy, KeepableFile.EXTRAFANART_COPY),
         (self.Ui.checkBox_old_theme_videos, KeepableFile.THEME_VIDEOS),
+        (self.Ui.checkBox_old_vsmeta, KeepableFile.VSMETA),
     )
 
     manager.config.download_hd_pics = get_checkboxes(

@@ -4092,6 +4092,9 @@ class Ui_MDCx(object):
         self.checkBox_old_theme_videos = QtWidgets.QCheckBox(parent=self.horizontalLayoutWidget_18)
         self.checkBox_old_theme_videos.setObjectName("checkBox_old_theme_videos")
         self.horizontalLayout_23.addWidget(self.checkBox_old_theme_videos)
+        self.checkBox_old_vsmeta = QtWidgets.QCheckBox(parent=self.horizontalLayoutWidget_18)
+        self.checkBox_old_vsmeta.setObjectName("checkBox_old_vsmeta")
+        self.horizontalLayout_23.addWidget(self.checkBox_old_vsmeta)
         self.label_79 = QtWidgets.QLabel(parent=self.groupBox_33)
         self.label_79.setGeometry(QtCore.QRect(60, 70, 621, 51))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Fixed)
@@ -10687,6 +10690,7 @@ class Ui_MDCx(object):
         self.checkBox_old_nfo.setText(_translate("MDCx", "nfo"))
         self.checkBox_old_extrafanart_copy.setText(_translate("MDCx", "剧照副本"))
         self.checkBox_old_theme_videos.setText(_translate("MDCx", "主题视频"))
+        self.checkBox_old_vsmeta.setText(_translate("MDCx", "vsmeta"))
         self.label_79.setText(_translate("MDCx", "<p style=\'line-height:20px\'>勾选时，将使用本地文件（如有），不再重新下载。<br>\n"
 "                          ⚠️ 注意：不勾选时，本地旧文件将被删除！并根据上方设置的下载项重新下载！</p>"))
         self.groupBox_51.setTitle(_translate("MDCx", "创建主题视频"))
