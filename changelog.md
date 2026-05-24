@@ -1,3 +1,14 @@
+## 220260534 (2026-05-24)
+
+### 修复
+- **VSMETA 格式修复**：移除了多余的索引字节，确保完全符合 Synology Video Station 标准格式
+  - 移除 `TAG_GROUP2 (0x9A)` 和 `TAG_GROUP3 (0xAA)` 的 `index=0x01` 字节
+  - 修复 `write_poster()` 方法，使用 `write_string_field` 替代 `write_indexed_string_field`
+  - 移除海报相关字段的多余索引字节
+  - 添加类型安全检查，验证 `md5_hex is None` 时的处理
+
+---
+
 ## 220260533 (2026-05-24)
 
 ### 重大变更
