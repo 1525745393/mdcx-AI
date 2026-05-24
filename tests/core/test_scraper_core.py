@@ -219,21 +219,19 @@ class TestScraperTaskExecution:
             mock_file_info.file_path = Path("/test/TEST-001.mp4")
             mock_info.return_value = mock_file_info
 
-            with patch("mdcx.core.scraper.Scraper._process_one_file") as mock_process:
-                mock_process.return_value = (None, None)
+            with patch.object(scraper, "_check_stop"):
+                with patch("mdcx.core.scraper.Scraper._process_one_file") as mock_process:
+                    mock_process.return_value = (None, None)
 
-                with patch("mdcx.core.scraper.Flags") as mock_flags:
-                    mock_flags.counting_order = 0
-                    mock_flags.scrape_starting = 0
-                    mock_flags.scrape_started = 0
-                    mock_flags.succ_count = 0
-                    mock_flags.fail_count = 0
-                    mock_flags.file_mode = MagicMock()
-                    mock_flags.json_data_dic = {}
-                    mock_flags.json_get_status = {}
-
-                    with patch("mdcx.core.scraper.signal") as mock_signal:
-                        mock_signal.stop = False
+                    with patch("mdcx.core.scraper.Flags") as mock_flags:
+                        mock_flags.counting_order = 0
+                        mock_flags.scrape_starting = 0
+                        mock_flags.scrape_started = 0
+                        mock_flags.succ_count = 0
+                        mock_flags.fail_count = 0
+                        mock_flags.file_mode = MagicMock()
+                        mock_flags.json_data_dic = {}
+                        mock_flags.json_get_status = {}
 
                         with patch("mdcx.core.scraper.manager") as mock_manager:
                             mock_manager.config.main_mode = 4
