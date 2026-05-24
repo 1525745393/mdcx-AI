@@ -1,7 +1,7 @@
 import os
-from pathlib import Path
 import platform
 import traceback
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from PyQt6.QtCore import Qt
