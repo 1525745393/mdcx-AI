@@ -129,7 +129,8 @@ class VSMetaEncoder:
                     img_data = img_buffer.getvalue()
                 self.write_tag(tag, encode_leb128(len(img_data)) + img_data)
             except Exception:
-                pass
+                LogBuffer.log().write(f"\n ⚠️ VSMETA image tag failed: {image_path}")
+                signal.show_traceback_log(traceback.format_exc())
 
     def get_bytes(self) -> bytes:
         """Get the final VSMETA bytes"""
@@ -223,11 +224,6 @@ async def write_vsmeta(
         if data.release:
             year, month, day = parse_release_date(data.release)
             encoder.write_tag(VSMetaEncoder.TAG_RELEASE_DATE, encode_date(year, month, day))
-            if data.year:
-                try:
-                    encoder.write_int_tag(VSMetaEncoder.TAG_RELEASE_DATE, int(data.year))
-                except ValueError:
-                    pass
         elif data.year:
             try:
                 year = int(data.year)
