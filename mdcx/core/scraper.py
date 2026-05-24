@@ -42,7 +42,6 @@ from .file_crawler import FileScraper, classify_existing_scrape_result, classify
 from .image import add_mark
 from .media_resource import MediaResourceContext
 from .nfo import get_nfo_data, write_nfo
-from .vsmeta import write_vsmeta
 from .translate import translate_actor, translate_info, translate_title_outline
 from .utils import (
     add_definition_tag,
@@ -53,6 +52,7 @@ from .utils import (
     show_movie_info,
     show_result,
 )
+from .vsmeta import write_vsmeta
 from .web import (
     extrafanart_download,
     fanart_download,
