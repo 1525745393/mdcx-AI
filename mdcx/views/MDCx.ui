@@ -10128,13 +10128,13 @@
                 </property>
                 <widget class="QWidget" name="scrollAreaWidgetContents_mingming">
                   <property name="geometry">
-                    <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>760</width>
-                      <height>3660</height>
-                    </rect>
-                  </property>
+                      <rect>
+                        <x>0</x>
+                        <y>0</y>
+                        <width>760</width>
+                        <height>3200</height>
+                      </rect>
+                    </property>
                   <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -10535,7 +10535,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>2230</y>
+                        <y>2350</y>
                         <width>701</width>
                         <height>441</height>
                       </rect>
@@ -10977,7 +10977,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1320</y>
+                        <y>1480</y>
                         <width>701</width>
                         <height>351</height>
                       </rect>
@@ -11383,7 +11383,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>1690</y>
+                        <y>1830</y>
                         <width>701</width>
                         <height>521</height>
                       </rect>
@@ -11975,7 +11975,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>2690</y>
+                        <y>2790</y>
                         <width>701</width>
                         <height>121</height>
                       </rect>
@@ -12082,7 +12082,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>2830</y>
+                        <y>2910</y>
                         <width>701</width>
                         <height>121</height>
                       </rect>
@@ -12189,7 +12189,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>2980</y>
+                        <y>3030</y>
                         <width>701</width>
                         <height>121</height>
                       </rect>
@@ -12261,7 +12261,7 @@
                     <property name="geometry">
                       <rect>
                         <x>30</x>
-                        <y>890</y>
+                        <y>1070</y>
                         <width>701</width>
                         <height>411</height>
                       </rect>
