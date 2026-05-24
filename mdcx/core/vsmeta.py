@@ -496,7 +496,7 @@ async def write_vsmeta(
         if manager.config.vsmeta_include_poster:
             encoder.write_poster(poster_path, label="poster")
 
-        # ── 13. TAG_GROUP2 (0x9A + index 0x01): Series info + poster ──
+        # ── 13. TAG_GROUP2 (0x9A): Series info + poster ──
 
         def build_group2(sub):
             # Season / episode (always 0 for movies)
@@ -536,7 +536,7 @@ async def write_vsmeta(
 
         encoder.write_submessage(VSMetaEncoder.TAG_GROUP2, build_group2, label="group2")
 
-        # ── 14. TAG_GROUP3 (0xAA + index 0x01): Backdrop + timestamp (movies) ──
+        # ── 14. TAG_GROUP3 (0xAA): Backdrop + timestamp (movies) ──
 
         def build_group3(sub):
             # Backdrop image
