@@ -71,6 +71,9 @@ class VSMetaEncoder:
     # Magic header for VSMETA
     MAGIC_HEADER = b"vsmeta"
 
+    # Max image dimension for VSMETA (VS only needs thumbnail quality)
+    MAX_IMAGE_DIMENSION = 1920
+
     # Tags for metadata fields
     TAG_TITLE = 0x01
     TAG_SUMMARY = 0x02
@@ -121,6 +124,12 @@ class VSMetaEncoder:
         if image_path and image_path.exists():
             try:
                 with Image.open(image_path) as img:
+                    # Resize if image exceeds max dimension
+                    if max(img.size) > self.MAX_IMAGE_DIMENSION:
+                        ratio = self.MAX_IMAGE_DIMENSION / max(img.size)
+                        new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                        img = img.resize(new_size, Image.LANCZOS)
+
                     # Convert image to JPEG
                     img_buffer = BytesIO()
                     if img.mode in ("RGBA", "P"):
@@ -137,8 +146,8 @@ class VSMetaEncoder:
         return self.buffer.getvalue()
 
 
-def parse_release_date(release_str: str) -> tuple[int, int, int]:
-    """Parse release date string (YYYY-MM-DD)"""
+def parse_release_date(release_str: str) -> tuple[int, int, int] | None:
+    """Parse release date string (YYYY-MM-DD), returns None if unparseable"""
     try:
         if release_str and len(release_str) >= 10:
             year = int(release_str[0:4])
@@ -147,7 +156,21 @@ def parse_release_date(release_str: str) -> tuple[int, int, int]:
             return year, month, day
     except (ValueError, IndexError):
         pass
-    return 2000, 1, 1
+    return None
+
+
+def parse_score(score: str) -> int | None:
+    """Parse score string to VSMETA rating (0-100), returns None if unparseable"""
+    try:
+        raw = str(score).strip()
+        if not raw or raw.upper() in ("N/A", "NA", "NULL", "NONE", "-"):
+            return None
+        value = float(raw)
+        if value < 0 or value > 10:
+            return None
+        return int(value * 10)
+    except (ValueError, TypeError):
+        return None
 
 
 async def write_vsmeta(
@@ -222,8 +245,9 @@ async def write_vsmeta(
 
         # Write release date
         if data.release:
-            year, month, day = parse_release_date(data.release)
-            encoder.write_tag(VSMetaEncoder.TAG_RELEASE_DATE, encode_date(year, month, day))
+            parsed = parse_release_date(data.release)
+            if parsed:
+                encoder.write_tag(VSMetaEncoder.TAG_RELEASE_DATE, encode_date(*parsed))
         elif data.year:
             try:
                 year = int(data.year)
@@ -237,12 +261,9 @@ async def write_vsmeta(
             encoder.write_string_tag(VSMetaEncoder.TAG_TAGLINE, tagline)
 
         # Write rating
-        if data.score:
-            try:
-                score = float(data.score)
-                encoder.write_int_tag(VSMetaEncoder.TAG_RATING, int(score * 10))
-            except ValueError:
-                pass
+        rating = parse_score(data.score)
+        if rating is not None:
+            encoder.write_int_tag(VSMetaEncoder.TAG_RATING, rating)
 
         # Write runtime (in minutes)
         if data.runtime:
