@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import platform
 import traceback
 from typing import TYPE_CHECKING
@@ -1051,7 +1052,7 @@ def load_config(self: "MyMAinWindow"):
             if Switch.PASSTHROUGH in switch_on:
                 self.Ui.checkBox_highdpi_passthrough.setChecked(True)
                 if not os.path.isfile("highdpi_passthrough"):
-                    open("highdpi_passthrough", "w").close()
+                    Path("highdpi_passthrough").touch()
             else:
                 self.Ui.checkBox_highdpi_passthrough.setChecked(False)
                 if os.path.isfile("highdpi_passthrough"):

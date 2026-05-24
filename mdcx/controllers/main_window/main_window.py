@@ -2382,7 +2382,7 @@ class MyMAinWindow(QMainWindow):
         """
         self.pushButton_show_log_clicked()  # 点击按钮后跳转到日志页面
 
-        if Switch.COPY_NETDISK_NFO in manager.config.switch_on != self.Ui.checkBox_copy_netdisk_nfo.isChecked():
+        if (Switch.COPY_NETDISK_NFO in manager.config.switch_on) != self.Ui.checkBox_copy_netdisk_nfo.isChecked():
             self.pushButton_save_config_clicked()
 
         try:

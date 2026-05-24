@@ -444,9 +444,18 @@ def save_config(self: "MyMAinWindow"):
     release_rule = self.Ui.lineEdit_release_rule.text()  # 发行日期
     manager.config.release_rule = re.sub(r'[\\/:*?"<>|\r\n]+', "-", release_rule).strip()
 
-    manager.config.folder_name_max = int(self.Ui.lineEdit_folder_name_max.text())  # 长度命名规则-目录
-    manager.config.file_name_max = int(self.Ui.lineEdit_file_name_max.text())  # 长度命名规则-文件名
-    manager.config.actor_name_max = int(self.Ui.lineEdit_actor_name_max.text())  # 长度命名规则-演员数量
+    try:
+        manager.config.folder_name_max = int(self.Ui.lineEdit_folder_name_max.text())  # 长度命名规则-目录
+    except ValueError:
+        pass
+    try:
+        manager.config.file_name_max = int(self.Ui.lineEdit_file_name_max.text())  # 长度命名规则-文件名
+    except ValueError:
+        pass
+    try:
+        manager.config.actor_name_max = int(self.Ui.lineEdit_actor_name_max.text())  # 长度命名规则-演员数量
+    except ValueError:
+        pass
 
     manager.config.umr_style = self.Ui.lineEdit_umr_style.text()  # 无码破解版本命名
     manager.config.leak_style = self.Ui.lineEdit_leak_style.text()  # 无码流出版本命名
@@ -643,7 +652,10 @@ def save_config(self: "MyMAinWindow"):
     # endregion
 
     # region other
-    manager.config.rest_count = int(self.Ui.lineEdit_rest_count.text())  # 间歇刮削文件数量
+    try:
+        manager.config.rest_count = int(self.Ui.lineEdit_rest_count.text())  # 间歇刮削文件数量
+    except ValueError:
+        pass
 
     rest_time_text = self.Ui.lineEdit_rest_time.text()  # 格式: HH:MM:SS
     if re.match(r"^\d{2}:\d{2}:\d{2}$", rest_time_text):
