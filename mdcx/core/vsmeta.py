@@ -6,7 +6,7 @@ from pathlib import Path
 import aiofiles
 from PIL import Image
 
-from ..config.enums import DownloadableFile, KeepableFile
+from ..config.enums import DownloadableFile, KeepableFile, ReadMode, Switch
 from ..config.manager import manager
 from ..config.resource_policy import resource_policy
 from ..models.log_buffer import LogBuffer
@@ -173,6 +173,72 @@ def parse_score(score: str) -> int | None:
         return None
 
 
+def parse_runtime(runtime: str) -> int | None:
+    """Parse runtime string to minutes, returns None if unparseable
+
+    Handles: '120', '120min', '120分钟', '2h', '1h30m', '90 mins', etc.
+    """
+    import re
+
+    try:
+        raw = str(runtime).strip()
+        if not raw:
+            return None
+
+        # Pattern: "2h30m" or "1h"
+        h_m_match = re.match(r"(\d+)\s*h\s*(\d+)\s*m", raw, re.IGNORECASE)
+        if h_m_match:
+            return int(h_m_match.group(1)) * 60 + int(h_m_match.group(2))
+
+        # Pattern: "2h"
+        h_match = re.match(r"(\d+)\s*h", raw, re.IGNORECASE)
+        if h_match:
+            return int(h_match.group(1)) * 60
+
+        # Pattern: "120min" / "120分钟" / "90 mins"
+        cleaned = re.sub(r"(分钟|mins?|minute)", "", raw, flags=re.IGNORECASE)
+        cleaned = cleaned.strip()
+        if cleaned:
+            return int(float(cleaned))
+        return None
+    except (ValueError, TypeError):
+        return None
+
+
+def should_update_vsmeta(
+    main_mode: int,
+    switch_on: list[Switch],
+    download_files: list[DownloadableFile],
+    keep_files: list[KeepableFile],
+    is_nfo_existed: bool,
+    read_mode: list[ReadMode],
+) -> bool:
+    """Determine whether VSMETA should be written based on current mode and config
+
+    Returns True if VSMETA should be generated/updated, False otherwise.
+    Extracted from Scraper.process_one_file to improve testability.
+    """
+    # Mode 2 + "删除本地已下载的文件": never write vsmeta
+    if main_mode == 2 and Switch.SORT_DEL in switch_on:
+        return False
+
+    # Modes 1/2/3, or mode 4 with "无NFO时刮削"
+    if main_mode in [1, 2, 3] or (main_mode == 4 and not is_nfo_existed and ReadMode.NO_NFO_SCRAPE in read_mode):
+        if DownloadableFile.VSMETA not in download_files:
+            return False
+        if KeepableFile.VSMETA in keep_files and is_nfo_existed:
+            return False
+        return True
+
+    # Mode 4 (read-only): only write vsmeta when explicitly updating NFO
+    if main_mode == 4:
+        if is_nfo_existed and ReadMode.HAS_NFO_UPDATE in read_mode and ReadMode.READ_UPDATE_NFO in read_mode:
+            return True
+        return False
+
+    return True
+
+
 async def write_vsmeta(
     file_info: FileInfo,
     data: CrawlersResult,
@@ -266,13 +332,9 @@ async def write_vsmeta(
             encoder.write_int_tag(VSMetaEncoder.TAG_RATING, rating)
 
         # Write runtime (in minutes)
-        if data.runtime:
-            try:
-                runtime_str = str(data.runtime).replace(" ", "").replace("min", "")
-                runtime = int(float(runtime_str))
-                encoder.write_int_tag(VSMetaEncoder.TAG_RUNTIME, runtime)
-            except ValueError:
-                pass
+        runtime = parse_runtime(data.runtime)
+        if runtime is not None:
+            encoder.write_int_tag(VSMetaEncoder.TAG_RUNTIME, runtime)
 
         # Write genres/tags
         if data.tags:
@@ -284,9 +346,10 @@ async def write_vsmeta(
             director_str = ", ".join(data.directors)
             encoder.write_string_tag(VSMetaEncoder.TAG_DIRECTOR, director_str)
 
-        # Write actors
-        if data.actors:
-            actor_str = ", ".join(data.actors[:20])  # Limit to first 20 actors
+        # Write actors (prefer all_actors for completeness)
+        actor_list = data.all_actors if len(data.all_actors) > len(data.actors) else data.actors
+        if actor_list:
+            actor_str = ", ".join(actor_list[:20])  # Limit to first 20 actors
             encoder.write_string_tag(VSMetaEncoder.TAG_ACTOR, actor_str)
 
         # Write studio

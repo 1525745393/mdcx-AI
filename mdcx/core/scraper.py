@@ -52,7 +52,7 @@ from .utils import (
     show_movie_info,
     show_result,
 )
-from .vsmeta import write_vsmeta
+from .vsmeta import should_update_vsmeta, write_vsmeta
 from .web import (
     extrafanart_download,
     fanart_download,
@@ -615,28 +615,14 @@ class Scraper:
                 update_nfo = True
 
         # 判断是否write_vsmeta
-        update_vsmeta = True
-        # 不写vsmeta的情况：
-        if manager.config.main_mode == 2 and Switch.SORT_DEL in manager.config.switch_on:
-            # 2模式勾选“删除本地已下载的文件”
-            update_vsmeta = False
-        elif manager.config.main_mode in [1, 2, 3] or (
-            manager.config.main_mode == 4 and not is_nfo_existed and ReadMode.NO_NFO_SCRAPE in read_mode
-        ):
-            # 1、2、3模式，或4模式启用了“本地之前刮削失败和没有nfo的文件重新刮削
-            if DownloadableFile.VSMETA not in manager.config.download_files:
-                # [下载]处不勾选下载vsmeta时
-                update_vsmeta = False
-            if KeepableFile.VSMETA in manager.config.keep_files and is_nfo_existed:
-                # [下载]处勾选保留vsmeta且nfo存在时（这里假设nfo存在时vsmeta也存在，实际应该也存在）
-                update_vsmeta = False
-        elif manager.config.main_mode == 4:
-            # 4（读取）模式默认不写vsmeta
-            update_vsmeta = False
-            # 除非
-            if is_nfo_existed and ReadMode.HAS_NFO_UPDATE in read_mode and ReadMode.READ_UPDATE_NFO in read_mode:
-                # 启用"允许(使用本地 nfo)更新 nfo 文件"时，也更新vsmeta
-                update_vsmeta = True
+        update_vsmeta = should_update_vsmeta(
+            manager.config.main_mode,
+            manager.config.switch_on,
+            manager.config.download_files,
+            manager.config.keep_files,
+            is_nfo_existed,
+            read_mode,
+        )
 
         # 刮削json_data
         # 获取已刮削的json_data
