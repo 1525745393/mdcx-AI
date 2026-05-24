@@ -13,7 +13,7 @@ from ..models.log_buffer import LogBuffer
 from ..models.types import CrawlersResult, FileInfo
 from ..signals import signal
 from ..utils import get_used_time
-from ..utils.file import delete_file_async
+from ..utils.file import delete_file_async, move_file_async
 from ..utils.leb128 import (
     encode_boolean,
     encode_date,
@@ -279,8 +279,6 @@ async def write_vsmeta(
         if not await aiofiles.os.path.exists(output_dir):
             await aiofiles.os.makedirs(output_dir)
 
-        await delete_file_async(vsmeta_file)
-
         encoder = VSMetaEncoder()
         encoder.write_header(version=1)
 
@@ -361,10 +359,12 @@ async def write_vsmeta(
         # Write locked flag (locked = true means don't auto-update metadata)
         encoder.write_boolean_tag(VSMetaEncoder.TAG_LOCKED, True, label="locked")
 
-        # Save to file
+        # Write to temp file then rename for atomicity
+        tmp_file = vsmeta_file.with_suffix(".vsmeta.tmp")
         vsmeta_data = encoder.get_bytes()
-        async with aiofiles.open(vsmeta_file, "wb") as f:
+        async with aiofiles.open(tmp_file, "wb") as f:
             await f.write(vsmeta_data)
+        await move_file_async(tmp_file, vsmeta_file)
 
         LogBuffer.log().write(
             f"\n 🍀 VSMETA done! ({get_used_time(start_time)}s) [{len(vsmeta_data)}B] tags: {', '.join(encoder.written_tags)}"

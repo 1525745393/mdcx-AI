@@ -709,6 +709,13 @@ async def get_file_info_v2(file_path: Path, copy_sub: bool = True) -> FileInfo:
     )
 
 
+def get_vsmeta_path(file_new_path: Path, folder_new_path: Path) -> Path:
+    """根据配置决定 VSMETA 文件名是否保留视频扩展名"""
+    if manager.config.vsmeta_keep_ext:
+        return folder_new_path / (file_new_path.name + ".vsmeta")
+    return file_new_path.with_suffix(".vsmeta")
+
+
 async def deal_old_files(
     number: str,
     info: OtherInfo,

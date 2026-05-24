@@ -37,7 +37,7 @@ from ..utils import executor, get_current_time, get_real_time, get_used_time, sp
 from ..utils.dataclass import update
 from ..utils.file import copy_file_async, move_file_async
 from ..utils.path import is_any_descendant
-from .file import creat_folder, deal_old_files, get_file_info_v2, get_output_name, move_movie
+from .file import creat_folder, deal_old_files, get_file_info_v2, get_output_name, get_vsmeta_path, move_movie
 from .file_crawler import FileScraper, classify_existing_scrape_result, classify_scrape_task
 from .image import add_mark
 from .media_resource import MediaResourceContext
@@ -787,11 +787,7 @@ class Scraper:
             # 移动文件
             if await move_movie(other, file_info, file_path, file_new_path):
                 if Switch.SORT_DEL in manager.config.switch_on:
-                    # 根据配置决定 VSMETA 文件名是否保留视频扩展名
-                    if manager.config.vsmeta_keep_ext:
-                        vsmeta_new_path = folder_new_path / (file_new_path.name + ".vsmeta")
-                    else:
-                        vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
+                    vsmeta_new_path = get_vsmeta_path(file_new_path, folder_new_path)
                     await deal_old_files(
                         res.number,
                         other,
@@ -816,11 +812,7 @@ class Scraper:
                 return None, None
 
         # 清理旧的thumb、poster、fanart、extrafanart、nfo、vsmeta
-        # 根据配置决定 VSMETA 文件名是否保留视频扩展名
-        if manager.config.vsmeta_keep_ext:
-            vsmeta_new_path = folder_new_path / (file_new_path.name + ".vsmeta")
-        else:
-            vsmeta_new_path = file_new_path.with_suffix(".vsmeta")
+        vsmeta_new_path = get_vsmeta_path(file_new_path, folder_new_path)
 
         pic_final_catched, single_folder_catched = await deal_old_files(
             res.number,
