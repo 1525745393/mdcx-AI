@@ -1,6 +1,50 @@
 # MDCx
 
 ![python](https://img.shields.io/badge/Python-3.13-3776AB.svg?style=flat&logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![Tests](https://img.shields.io/badge/Tests-59%20passed-brightgreen.svg)
+
+## 简介
+
+MDCx 是一个现代化的视频元数据刮削和管理工具，支持从 40+ 个网站自动获取视频信息，生成符合 KODI/Emby 规范的 NFO 文件，并提供完整的图片处理和翻译功能。
+
+### 核心特性
+
+- 🤖 **智能刮削**: 支持 40+ 个数据源，自动识别番号
+- 📄 **NFO 生成**: 生成符合 KODI/Emby 规范的元数据文件
+- 🖼️ **图片处理**: 自动下载、裁剪、添加水印
+- 🌐 **多语言翻译**: 支持 Google/DeepL/LLM 翻译
+- 📁 **灵活命名**: Jinja2 模板系统，支持自定义命名规则
+- 🔍 **Amazon 集成**: 条码识别，自动匹配封面
+- ⚡ **异步处理**: 高效的并发刮削能力
+- 🧪 **全面测试**: 59+ 个单元测试，覆盖率 42%+
+
+## 文档
+
+- 📖 [API 文档](docs/api-documentation.md) - 完整的 API 参考
+- 🏗️ [架构设计](docs/architecture.md) - 系统架构和设计模式
+- 🔧 [CI/CD 指南](docs/ci-testing.md) - 持续集成和测试
+- 📝 [变更日志](changelog.md) - 版本更新历史
+
+## 快速开始
+
+### 安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/1525745393/mdcx-AI.git
+cd mdcx-AI
+
+# 安装依赖
+uv sync --locked --all-extras --dev
+
+# 运行应用
+uv run python mdcx/views/MDCx.py
+```
+
+### 从 Release 下载
+
+预编译版本可在 [Release](https://github.com/1525745393/mdcx-AI/releases/latest) 页面下载。
 
 ## 交流群
 
