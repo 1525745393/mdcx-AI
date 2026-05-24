@@ -186,7 +186,7 @@ class VSMetaEncoder:
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
         b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if b64_data is None:
+        if b64_data is None or md5_hex is None:
             return
         self.write_string_field(self.TAG_EPISODE_THUMB_DATA, b64_data, label=label)
         self.write_string_field(self.TAG_EPISODE_THUMB_MD5, md5_hex, label=f"{label}_md5")
@@ -198,7 +198,7 @@ class VSMetaEncoder:
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
         b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if b64_data is None:
+        if b64_data is None or md5_hex is None:
             return
         self.write_string_field(self.TAG2_POSTER_DATA, b64_data, label=label)
         self.write_string_field(self.TAG2_POSTER_MD5, md5_hex, label=f"{label}_md5")
@@ -210,7 +210,7 @@ class VSMetaEncoder:
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
         b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if b64_data is None:
+        if b64_data is None or md5_hex is None:
             return
         self.write_string_field(self.TAG3_BACKDROP_DATA, b64_data, label=label)
         self.write_string_field(self.TAG3_BACKDROP_MD5, md5_hex, label=f"{label}_md5")
