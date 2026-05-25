@@ -476,6 +476,7 @@ async def write_vsmeta(
             encoder.write_varint_field(VSMetaEncoder.TAG_EPISODE_LOCKED, 1, label="locked")
 
         # ── 7. TAG_CHAPTER_SUMMARY (0x42): Plot / summary ──
+        # 参考 NFO 的处理方式，同时显示翻译和原文
         summary_parts = []
         if data.outline:
             summary_parts.append(data.outline)
@@ -526,16 +527,12 @@ async def write_vsmeta(
         encoder.write_submessage(VSMetaEncoder.TAG_GROUP1, build_group1, label="group1")
 
         # ── 10. TAG_CLASSIFICATION (0x5A): Content rating / mosaic ──
-        if data.mosaic:
-            # 映射中文马赛克类型到标准分级
-            mosaic_lower = data.mosaic.lower()
-            if "无码" in mosaic_lower or "uncensored" in mosaic_lower:
-                classification = "R-18"  # 无码 = 18+
-            elif "有码" in mosaic_lower or "censored" in mosaic_lower:
-                classification = "R-18"  # 有码也是 18+
-            else:
-                classification = data.mosaic
-            encoder.write_string_field(VSMetaEncoder.TAG_CLASSIFICATION, classification, label="classification")
+        # 参考 NFO 的处理方式
+        if data.country == "JP":
+            classification = "JP-18+"
+        else:
+            classification = "NC-17"
+        encoder.write_string_field(VSMetaEncoder.TAG_CLASSIFICATION, classification, label="classification")
 
         # ── 11. TAG_RATING (0x60): Score ──
         encoder.write_rating(data.score, label="rating")
