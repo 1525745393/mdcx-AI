@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+import re
 import time
 import traceback
 from io import BytesIO
@@ -18,6 +19,39 @@ from ..signals import signal
 from ..utils import get_used_time
 from ..utils.file import delete_file_async, move_file_async
 from ..utils.leb128 import encode_varint
+
+
+def normalize_vsmeta_text(raw: str) -> str:
+    """Normalize text for VSMETA fields: remove invalid characters, normalize line breaks."""
+    if not raw:
+        return ""
+    # 先将已转义实体还原为实际字符
+    rep_word = {
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        "&apos;": "'",
+        "&quot;": '"',
+        "&lsquo;": "「",
+        "&rsquo;": "」",
+        "&hellip;": "…",
+    }
+    for key, value in rep_word.items():
+        raw = raw.replace(key, value)
+    # Normalize line breaks
+    raw = (
+        raw.replace("\r\n", "\n")
+        .replace("\r", "\n")
+        .replace("\\r\\n", "\n")
+        .replace("\\n", "\n")
+        .replace("\\r", "\n")
+    )
+    # Replace br tags with newline
+    raw = re.sub(r"(?i)&lt;\s*br\s*/?\s*&gt;", "\n", raw)
+    raw = re.sub(r"(?i)<\s*br\s*/?\s*>", "\n", raw)
+    # Remove control characters that can break protobuf encoding
+    # Allow tab, newline, carriage return
+    return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", raw)
 
 
 class VSMetaEncoder:
@@ -112,11 +146,13 @@ class VSMetaEncoder:
     def write_string_field(self, tag: int, value: str, label: str | None = None):
         """Write a string as a protobuf length-delimited field"""
         if value:
-            self.write_bytes_field(tag, value.encode("utf-8"), label=label)
+            cleaned_value = normalize_vsmeta_text(value)
+            self.write_bytes_field(tag, cleaned_value.encode("utf-8"), label=label)
 
     def write_indexed_string_field(self, tag: int, index: int, value: str, label: str | None = None):
         """Write a length-delimited field with a 1-byte index between tag and payload"""
-        data = value.encode("utf-8")
+        cleaned_value = normalize_vsmeta_text(value)
+        data = cleaned_value.encode("utf-8")
         self.buffer.write(bytes([tag]))
         self.buffer.write(bytes([index]))
         self.buffer.write(encode_varint(len(data)))

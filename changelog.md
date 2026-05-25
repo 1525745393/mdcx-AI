@@ -1,3 +1,14 @@
+## 220260536 (2026-05-25)
+
+### 修复
+- **VSMETA 翻译后字段识别修复**：修复了打开翻译功能后 VSMETA 文件无法被 Synology Video Station 正确识别的问题
+  - 添加了字符清理函数 `normalize_vsmeta_text()` 来处理翻译后的特殊字符
+  - 清理了可能破坏 protobuf 编码的控制字符
+  - 规范化了换行符和 XML 实体
+  - 在 `write_string_field()` 和 `write_indexed_string_field()` 中都使用了字符清理
+
+---
+
 ## 220260535 (2026-05-25)
 
 ### 修复
