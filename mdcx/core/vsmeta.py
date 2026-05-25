@@ -171,8 +171,8 @@ class VSMetaEncoder:
 
             md5_hex = hashlib.md5(raw).hexdigest()
             b64 = base64.b64encode(raw).decode("ascii")
-            # Wrap at 76 characters per line
-            b64_wrapped = "\n".join(b64[i : i + 76] for i in range(0, len(b64), 76))
+            # Wrap at 76 characters per line with CRLF line endings
+            b64_wrapped = "\r\n".join(b64[i : i + 76] for i in range(0, len(b64), 76))
             return b64_wrapped, md5_hex
         except Exception:
             LogBuffer.log().write(f"\n ⚠️ VSMETA image encode failed: {image_path}")
