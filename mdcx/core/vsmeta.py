@@ -527,7 +527,15 @@ async def write_vsmeta(
 
         # ── 10. TAG_CLASSIFICATION (0x5A): Content rating / mosaic ──
         if data.mosaic:
-            encoder.write_string_field(VSMetaEncoder.TAG_CLASSIFICATION, data.mosaic, label="classification")
+            # 映射中文马赛克类型到标准分级
+            mosaic_lower = data.mosaic.lower()
+            if "无码" in mosaic_lower or "uncensored" in mosaic_lower:
+                classification = "R-18"  # 无码 = 18+
+            elif "有码" in mosaic_lower or "censored" in mosaic_lower:
+                classification = "R-18"  # 有码也是 18+
+            else:
+                classification = data.mosaic
+            encoder.write_string_field(VSMetaEncoder.TAG_CLASSIFICATION, classification, label="classification")
 
         # ── 11. TAG_RATING (0x60): Score ──
         encoder.write_rating(data.score, label="rating")
