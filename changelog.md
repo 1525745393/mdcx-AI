@@ -1,3 +1,14 @@
+## 220260537 (2026-05-25)
+
+### 修复
+- **VSMETA 图片显示彻底修复**：完全修复了图片在 Synology Video Station 中不显示的问题
+  - 图片编码从 Base64 字符串改为直接写入原始 JPEG 二进制数据
+  - 修正了对 VSMETA 格式的误解，图片字段应该存储原始二进制而不是 Base64
+  - 修复了所有相关图片方法：`write_poster`、`write_poster_in_group2`、`write_backdrop_in_group3`
+  - MD5 校验仍然使用字符串字段，与 Synology 格式保持一致
+
+---
+
 ## 220260536 (2026-05-25)
 
 ### 修复

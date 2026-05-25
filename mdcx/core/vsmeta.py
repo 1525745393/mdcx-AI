@@ -188,10 +188,10 @@ class VSMetaEncoder:
     # ── Image encoding ──
 
     @staticmethod
-    def _encode_image(image_path: Path, max_dim: int, quality: int) -> tuple[str, str] | tuple[None, None]:
-        """Encode image to Base64 string (76-char line-wrapped) and MD5 hex digest
+    def _encode_image(image_path: Path, max_dim: int, quality: int) -> tuple[bytes, str] | tuple[None, None]:
+        """Encode image to raw JPEG binary data and MD5 hex digest
 
-        Returns (base64_data, md5_hex) or (None, None) on failure.
+        Returns (raw_jpeg_data, md5_hex) or (None, None) on failure.
         """
         try:
             with Image.open(image_path) as img:
@@ -206,25 +206,22 @@ class VSMetaEncoder:
                 raw = buf.getvalue()
 
             md5_hex = hashlib.md5(raw).hexdigest()
-            b64 = base64.b64encode(raw).decode("ascii")
-            # Wrap at 76 characters per line with CRLF line endings
-            b64_wrapped = "\r\n".join(b64[i : i + 76] for i in range(0, len(b64), 76))
-            return b64_wrapped, md5_hex
+            return raw, md5_hex
         except Exception:
             LogBuffer.log().write(f"\n ⚠️ VSMETA image encode failed: {image_path}")
             signal.show_traceback_log(traceback.format_exc())
             return None, None
 
     def write_poster(self, image_path: Path | None, label: str = "poster"):
-        """Write episode thumbnail (poster) with Base64 data + MD5"""
+        """Write episode thumbnail (poster) with raw JPEG data + MD5"""
         if not image_path or not image_path.exists():
             return
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
-        b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if b64_data is None or md5_hex is None:
+        raw_data, md5_hex = self._encode_image(image_path, max_dim, quality)
+        if raw_data is None or md5_hex is None:
             return
-        self.write_string_field(self.TAG_EPISODE_THUMB_DATA, b64_data, label=label)
+        self.write_bytes_field(self.TAG_EPISODE_THUMB_DATA, raw_data, label=label)
         self.write_string_field(self.TAG_EPISODE_THUMB_MD5, md5_hex, label=f"{label}_md5")
 
     def write_poster_in_group2(self, image_path: Path | None, label: str = "poster_g2"):
@@ -233,10 +230,10 @@ class VSMetaEncoder:
             return
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
-        b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if b64_data is None or md5_hex is None:
+        raw_data, md5_hex = self._encode_image(image_path, max_dim, quality)
+        if raw_data is None or md5_hex is None:
             return
-        self.write_string_field(self.TAG2_POSTER_DATA, b64_data, label=label)
+        self.write_bytes_field(self.TAG2_POSTER_DATA, raw_data, label=label)
         self.write_string_field(self.TAG2_POSTER_MD5, md5_hex, label=f"{label}_md5")
 
     def write_backdrop_in_group3(self, image_path: Path | None, label: str = "backdrop"):
@@ -245,10 +242,10 @@ class VSMetaEncoder:
             return
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
-        b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if b64_data is None or md5_hex is None:
+        raw_data, md5_hex = self._encode_image(image_path, max_dim, quality)
+        if raw_data is None or md5_hex is None:
             return
-        self.write_string_field(self.TAG3_BACKDROP_DATA, b64_data, label=label)
+        self.write_bytes_field(self.TAG3_BACKDROP_DATA, raw_data, label=label)
         self.write_string_field(self.TAG3_BACKDROP_MD5, md5_hex, label=f"{label}_md5")
 
     # ── Rating encoding ──
