@@ -470,7 +470,12 @@ async def write_vsmeta(
         encoder.write_header()
 
         # ── 1. TAG_SHOW_TITLE (0x12): Display title ──
-        if data.title and data.number:
+        # 使用 originaltitle（原始日文标题）作为主显示标题，以便 Video Station 能正确识别
+        if data.originaltitle and data.number:
+            display_title = f"[{data.number}] {data.originaltitle}"
+        elif data.originaltitle:
+            display_title = data.originaltitle
+        elif data.title and data.number:
             display_title = f"[{data.number}] {data.title}"
         elif data.title:
             display_title = data.title
@@ -478,9 +483,6 @@ async def write_vsmeta(
             display_title = data.number
         else:
             display_title = file_info.file_name
-
-        if data.originaltitle and data.originaltitle != data.title:
-            display_title += f" ({data.originaltitle})"
 
         encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE, display_title, label="showTitle")
 
