@@ -1,0 +1,585 @@
+Synology Video Station API 开发指南
+==================================================
+
+=== Page 1 ===
+1
+ 
+Developer's Guide for
+Video Info Plugin
+
+
+=== Page 2 ===
+Table of 
+Contents
+Introduction  01
+Information Retrieval Workflow  02
+File Requirement  03
+Plugin Response  06
+Pack Your Video Info Plugin  12
+Test Your Video Info Plugin  13
+Restricted Runtime Environment  15
+ 
+Find your information
+Synology publishes a wide range of supporting documentation.
+In Knowledge Base, you will find useful Help and FAQ articles, 
+as well as video tutorials breaking up processes into handy 
+steps.
+In Synology Documentation, you can find User's Guides, 
+Solution Guides, brochures, and White Papers. Experienced 
+users and administrators will find answers and guidance in 
+technical Administrator's Guides and Developer Guides.
+Got a problem and unable to find the solution in our official 
+documentation? Search hundreds of answers by users and 
+support staff in Synology Community or reach Synology 
+Support through the web form, email or telephone.
+
+=== Page 3 ===
+01
+Introduction
+About Video Info Plugin
+Starting with Video Station 3.0.0 for DSM 7.0 and 2.5.0 for DSM 6.0, you can upload plugins 
+to retrieve video information for movies and TV shows with the Video Info Plugin function. 
+This document specifies the information retrieval workflow, file requirements, packaging 
+instructions, and testing details for the Video Info Plugin. 
+Download sample codes here
+Introduction
+
+=== Page 4 ===
+02
+Information Retrieval Workflow
+To run the Video Info Plugin in Video Station, main steps are as follows:
+Step 1: Trigger video information search
+Once the “Search from Video Info Plugin” button in Video Station is clicked, a PluginSearch API 
+request will be sent to trigger a video information search. 
+Step 2: Parse the INFO file
+Video Station checks the plugin status and retrieves the information such as the plugin ID and 
+the entry file path from the INFO file.
+Step 3: Run the plugin
+Video Station locates the entry file (loader.sh) and runs it with the “nobody” privilege. Once the 
+information search is complete, Video Station will parse the plugin response and save it to the 
+database.
+Information Retrieval Workflow
+
+=== Page 5 ===
+03
+File Requirement
+INFO
+The INFO file provides the plugin ID, supported video types, entry file location, and test 
+examples to verify the plugin. The content must be encoded with UTF-8 in the JSON format, 
+which usually looks like the following:
+{
+    "id": "com.synology.TMDBExample",
+    "description": "",
+    "version": "1.0",
+    "site": "http://www.themoviedb.org/",
+    "entry_file": "loader.sh",
+    "type": ["movie", "tvshow"],
+    "language": ["enu"],
+    "test_example": {
+        "movie": {
+            "title": "Harry Potter",
+            "original_available": "2001-11-16"
+        },
+        "tvshow": {
+            "title": "Game of Thrones",
+            "original_available": "2011-04-17"
+        },
+        "tvshow_episode": {
+            "title": "Game of Thrones",
+            "original_available": "2011-04-17",
+            "season": 1,
+            "episode": 1
+        }
+    }
+}
+Table 1. Contents in the INFO file
+Key Type Description Mandatory
+id string The unique plugin ID, which should be the same as the plugin 
+folder name. If the plugin ID is duplicated, the plugin cannot be 
+uploaded.
+Mandatory
+entry_file string The relative file path of the entry file, loader.sh. Mandatory
+type array of string The supported video type of a plugin, which must be one of 
+the following: [“movie”], [“tvshow”], or [“movie”, “tvshow”].
+Mandatory
+File Requirement
+
+=== Page 6 ===
+04
+File Requirement
+Key Type Description Mandatory
+version string The version of a plugin. Optional
+description string The description of a plugin (e.g., “The Movie DB plugin”). Optional
+site string The information source of a plugin (e.g., “http://www.
+themoviedb.org/”).
+Optional
+language array of string The supported languages of a plugin (e.g., [“enu”, “cht”]). Optional
+test_example JSON object This value ensures that your plugin is available when you 
+upload it or test the connection of your plugin. Here is a test_
+example for a movie: 
+"movie": {
+   "title": "Harry Potter",
+   "original_available": "2001-11-16"
+}
+If the plugin supports the “tvshow” type of videos, you have 
+to provide a test_example for both “tvshow” and “tvshow_
+episode”. 
+"tvshow": {
+   "title": "Game of Thrones",
+   "original_available": "2011-04-17"
+},
+"tvshow_episode": {
+   "title": "Game of Thrones",
+   "original_available": "2011-04-17",
+   "season": 1,
+   "episode": 1
+}
+Mandatory
+loader.sh
+Video Station will execute loader.sh to retrieve video information. You can implement the 
+search algorithms using PHP or Python 3.x and run it in loader.sh. Video Station will run your 
+plugin with the following arguments: 
+/bin/bash loader.sh --type movie --lang enu --input "{\"title\":\"Toy 
+Story\", \"original_available\": \"1995-11-22\"}" --limit 1 --allowguess 
+false
+The table below explains the details of the arguments passed by Video Station:
+Table 2. Arguments sent to loader.sh
+Argument Type Description Mandatory
+input JSON object The query input must be a JSON object including the 
+following contents: title (mandatory) and original_
+available (optional).To search video information of 
+tvshow_episode, the query input must contain episode 
+and season as well.1
+Mandatory
+
+=== Page 7 ===
+05
+File Requirement
+Argument Type Description Mandatory
+lang string The preferred languages (must be any of the following: chs, 
+cht, csy, dan, enu, fre, ger, hun, ita, jpn, krn, nld, nor, plk, ptb, 
+ptg, rus, spn, sve, trk, tha).
+Mandatory
+type string The video type of the query, which must be one of the 
+following: movie, tvshow, tvshow_episode.
+Mandatory
+limit int The maximum number of search results allowed for a plugin. Mandatory
+allowguess boolean This is only available if the title guessing function is 
+supported.2
+Optional
+Notes:
+1. If the season value is 0, it means the video is a special episode. If you get only season but no episode for the input 
+query of the type tvshow_episode, it means you should return the information of all episodes in this season.
+2. The title guessing function should be implemented by the plugin. See our sample code searchinc.py get_
+guessing_names for details.
+
+=== Page 8 ===
+06
+Plugin Response
+All plugin responses should be encoded as JSON objects. The search result of the 
+plugin is represented by the key “success”, whose value can be true/false (boolean 
+value) depending on the status of the request.
+Success
+A successful response will contain the key “success“ with the value “true“ and the 
+key “result“ with a value described as a JSON array. The contents of JSON objects 
+contained in the JSON array varies with the video types (e.g., movies, TV shows, TV 
+show episodes) as described below.
+Movies
+The retrieval results for movies will include attributes as follows.
+{
+  "success": true,
+  "result": [
+    {
+      "title": "Toy Story",
+      "tagline": "",
+      "original_available": "1995-10-30",
+      "original_title": "Toy Story",
+      "summary": "Led by Woody, Andy's toys live happily in his 
+room until Andy's birthday brings Buzz Lightyear onto the scene. 
+Afraid of losing his place in Andy's heart, Woody plots against 
+Buzz. But when circumstances separate Buzz and Woody from their 
+owner, the duo eventually learns to put aside their differences.",
+      "certificate": "G",
+      "genre": [
+        "Animation",
+        "Adventure",
+        "Family",
+        "Comedy"
+      ],
+      "actor": ["Tom Hanks"],
+      "director": ["John Lasseter"],
+      "writer": ["Andrew Stanton"],
+      "extra": {
+Plugin Response
+
+=== Page 9 ===
+07
+Plugin Response
+        "com.synology.TMDBExample": {
+          "rating": {"com.synology.TMDBExample": 7.9},
+          "poster": ["https://image.tmdb.org/t/p/w500/
+uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg"],
+          "backdrop": ["https://image.tmdb.org/t/p/original/3Rfvhy1Nl6sSG
+Jwyjb0QiZzZYlB.jpg"]
+        }
+      }
+    }
+  ]
+}
+The table below shows the common keys for movie search results. 
+Table 3. Result objects for movies
+Key Type Description Mandatory
+title string The title of a movie. Mandatory
+tagline string The tagline of a movie. Optional
+original_
+available
+string The release date of a movie, which follows the format 
+“year-month-date” (YYYY-MM-DD).
+Mandatory
+summary string The summary of a movie. Mandatory
+genre array of string The genre of a movie, which should be listed in a JSON 
+array.
+Mandatory
+certificate string The motion picture content rating (e.g., “PG-13” in the 
+United States).
+Optional
+actor array of string The actors’ names of  a movie, which should be listed in a 
+JSON array.
+Mandatory
+writer array of string The screenwriters’ names of a movie, which should be 
+listed in a JSON array.
+Mandatory
+director array of string The directors’ names of a movie, which should be listed 
+in a JSON array.
+Mandatory
+extra JSON object backdrop A JSON array of strings containing 
+backdrop URLs.
+Optional
+poster A JSON array of strings containing poster 
+URLs.
+rating The rating value of the movie which 
+should be described in a JSON object. 
+The key should be your plugin ID and the 
+value should be in the double precision 
+floating-point format (e.g., {"com.synology.
+TMDBExample": 7.4}).
+
+=== Page 10 ===
+08
+Plugin Response
+TV Shows
+The search result of TV shows will include attributes as follows:
+{
+  "success": true,
+  "result": [
+    {
+      "title": "Elementary",
+      "original_available": "2012-09-27",
+      "original_title": "Elementary",
+      "summary": "A modern-day drama about a crime-solving duo 
+that cracks the NYPD's most impossible cases. Following his fall 
+from grace in London and a stint in rehab, eccentric Sherlock 
+escapes to Manhattan where his wealthy father forces him to live 
+with his worst nightmare - a sober companion, Dr. Watson.",
+      "extra": {
+        "com.synology.TMDBExample: {
+          "poster": [
+            "https://image.tmdb.org/t/p/w500/
+q9dObe29W4bDpgzUfOOH3ZnzDbR.jpg"
+          ],
+          "backdrop": [
+            "https://image.tmdb.org/t/p/original/7sJrNKwzyJWnFPFp
+DL9wnZ859LZ.jpg"
+          ]
+        }
+      }
+    }
+  ]
+}
+The table below explains the meaning of each attribute for TV shows.
+Table 4. Result objects for TV shows
+Key Type Description Mandatory
+title string The title of a TV show from the source. Mandatory
+original_
+available
+string The release date of a TV show, which should follow the 
+format“year-month-date” (YYYY-MM-DD)..
+Mandatory
+summary string The summary of a TV show. Mandatory
+extra JSON object backdrop A JSON array of strings containing 
+backdrop URLs. 
+Optional
+poster A JSON array of strings containing poster 
+URLs. 
+
+=== Page 11 ===
+09
+Plugin Response
+TV Show Episodes
+The search results for a particular episode of a TV show will include attributes as follows:
+{
+  "success": true,
+  "result": [
+    {
+      "title": "Elementary",
+      "tagline": "Pilot",
+      "original_available": "2012-09-27",
+      "summary": "Detective Sherlock Holmes, along with his sober 
+companion, Dr. Joan Watson, uses his uncanny ability to read people and 
+analyze crimes to assist the NYPD on some of their more difficult cases.",
+      "certificate": "TV-14",
+      "genre": ["Drama", "Mystery", "Crime"],
+      "actor": ["Jonny Lee Miller", "Lucy Liu"],
+      "director": ["Michael Cuesta"],
+      "writer": ["Robert Doherty"],
+      "season": 1,
+      "episode": 1,
+      "extra": {
+        "com.synology.TheMovieDb": {
+          "tvshow": {
+            "title": "Elementary",
+            "original_available": "2012-09-27",
+            "original_title": "Elementary",
+            "summary": "A modern-day drama about a crime-solving duo 
+that cracks the NYPD's most impossible cases. Following his fall from 
+grace in London and a stint in rehab, eccentric Sherlock escapes to 
+Manhattan where his wealthy father forces him to live with his worst 
+nightmare - a sober companion, Dr. Watson.",
+            "extra": {
+              "com.synology.TMDBExample": {
+                "poster": ["https://image.tmdb.org/t/p/w500/
+q9dObe29W4bDpgzUfOOH3ZnzDbR.jpg"],
+                "backdrop": ["https://image.tmdb.org/t/p/original/7sJrNK
+wzyJWnFPFpDL9wnZ859LZ.jpg"]
+              }
+            }
+          },
+          "poster": ["https://image.tmdb.org/t/p/w500/14PEsYWrZGYaQONPxQ
+HaHjqufK5.jpg"],
+          "rating": {"com.synology.TheMovieDb": 7.4}
+
+=== Page 12 ===
+10
+Plugin Response
+        }
+      }
+    }
+  ]
+}
+Description for each attribute is described in the following table:
+Table 5. JSON objects for TV show episodes
+Key Type Description Mandatory
+title string The title of a TV show. Mandatory
+tagline string The title of an episode. Optional
+original_
+available
+string The release date of an episode, which should follow the 
+format “year-month-date” (YYYY-MM-DD).
+Mandatory
+summary string The summary of an episode. Mandatory
+certificate string The television content rating (e.g., “TV-14” in the United 
+States).
+Optional
+genre array of string The genre of a TV show, which should be listed in a 
+JSON array.
+Mandatory
+actor array of string The actors’ names of an episode, which should be 
+listed in a JSON array.
+Mandatory
+directors array of string The directors’ names of an episode, which should be 
+listed in a JSON array.
+Mandatory
+writer array of string The writers’ names of an episode, which should be 
+listed in a JSON array.
+Mandatory
+episode int The episode number. Mandatory
+season int The season number. Mandatory
+extra JSON object tvshow The TV show information described in 
+Table 4. Result objects for TV shows.
+Mandatory
+poster A JSON array of strings containing poster 
+URLs. 
+Optional
+rating The rating value of an episode which 
+should be described in a JSON object. 
+The key should be your plugin ID and the 
+value should be in the double precision 
+floating-point format (e.g., {"com.
+synology.TheMovieDb": 7.4}).
+Optional
+Errors
+When an API request fails due to some search errors, the response will contain the 
+key “success” with the value “false” and an error code indicating the condition that 
+
+=== Page 13 ===
+11
+Plugin Response
+caused the failure.
+{"success":false,"error_code":1003}
+Depending on the type of error that occurred, the following status code is displayed:
+Table 6. Error codes
+Error code Description
+1003 The code indicates a search failed. For example, a plugin may fail to connect to the 
+source website or fail to retrieve data for the request. 
+1004 The code indicates the response result could not be parsed. This may be due to the 
+missing of mandatory information or other unexpected errors.
+You can use the following commands to pack your plugin. The compressed plugin file name 
+
+=== Page 14 ===
+12
+Pack Your Video Info Plugin
+should be the same as the folder name and your plugin ID. Video Station will extract 
+the .tar with tar and the .zip with 7z.
+System# tar --no-xattrs -cvf com.synology.TMDBExample.tar com.
+synology.TMDBExample
+System# 7z a com.synology.TMDBExample.zip com.synology.
+TMDBExample
+Pack Your Video Info Plugin
+
+=== Page 15 ===
+13
+Test Your Video Info Plugin
+During the development phase, you can use the plugin tester to check if your plugin works. 
+Quick Testing
+This method allows you to test the search functions of your plugin. To test your plugin 
+functions fully, please refer to the Full Testing section.
+1. Install Video Station where the plugin tester is located.
+2. Upload the plugin files to your Synology NAS using File Station.
+3. Enter the following commands using the “nobody” privilege to test your plugin. The 
+definition of each argument is described in Table 7. Plugin tester arguments.
+sudo -u nobody
+ /var/packages/VideoStation/target/plugins/syno_plugin_tester/loader.
+sh --type movie --lang enu --input "{\"title\":\"{movie title}\", 
+\"original_available\":\"2001-11-16\"}" --limit 1 --path "${entry file 
+path of your search plugin}" --pluginid ${your plugin id}
+4. If the plugin is verified, you will receive a successful response: {"success": true}
+5. Otherwise, the value of the success key will be false with an error code indicating the 
+condition that caused the failure:
+{"success": false, "error_code": 1004, "msg": "execute plugin fail"}.
+Table 7. Plugin tester arguments
+Argument Type Description Mandatory
+input JSON object The query input should be a JSON object 
+including the following contents : title 
+(mandatory) and original_available 
+(optional). To search video information for 
+tvshow_episode, the query input must 
+contain episode and season as well.1
+Mandatory
+lang string The preferred languages that must be any of 
+the following: chs, cht, csy, dan, enu, fre, ger, 
+hun, ita, jpn, krn, nld, nor, plk, ptb, ptg, rus, 
+spn, sve, trk, tha.
+Mandatory
+type string The query video type, which must be one 
+of the following: movie, tvshow, tvshow_
+episode.
+Mandatory
+Test Your Video Info Plugin
+
+=== Page 16 ===
+14
+Test Your Video Info Plugin
+Argument Type Description Mandatory
+limit int The maximum number of search results 
+allowed for this plugin.
+Mandatory
+path string The absolute file path of the entry file. Mandatory
+pluginid string The plugin ID. Mandatory
+Notes:
+1. If the season value is 0, it means the video is a special episode. If you get only season but no episode for the 
+input query of the type tvshow_episode, it means you should return the information of all episodes in this 
+season.
+Full Testing
+To fully test your plugin, you can upload your plugin to Video Station and use Chrome 
+DevTools to check the status of plugin upload.
+1. Launch Video Station in your browser.
+2. Press “F12” to open the DevTools of your browser and switch to the “Network” tab.
+3. Set the filter to “XHR” to filter out the API requests.
+4. Upload your plugin via Video Station > Settings > Video Info Plugin.
+5. You may check the plugin information at Headers > Form Data.
+6. Switch to the “Preview” or “Response” tab to check the error message if the plugin 
+upload failed.
+
+
+=== Page 17 ===
+15
+Restricted Runtime Environment
+The video information plugins are run with specific restrictions to protect your Synology 
+NAS from malicious scripts. The following restrictions apply to any files in your plugin run by 
+Video Station.
+Minimal Privilege
+The Video Info Plugin function is run using the “nobody” privilege.
+Timeout Limitation
+If the limit of the search result is 1, the search query should be completed within 10 seconds; 
+if the limit is more than 1, the search query should be completed within 40 seconds. 
+Otherwise, Video Station may terminate the process and return an empty result.
+File Limitation
+A Video Info Plugin should be compressed into a .tar or .zip file. The size of the plugin should 
+not exceed 10 MB before and after compression. All files should be regular files without any 
+extended attributes.
+Development Limitation
+The search logic can be developed in PHP or Python 3.x and executed in the entry file, loader.
+sh. All JSON objects, files (e.g., INFO), and the information retrieval results should be UTF-8 
+encoded.
+Since the binary path of python3 will be different between DSM 6.0 and DSM 7.0, we strongly 
+encourage you to use /usr/bin/env python3 to run your python files. See our sample 
+code loader.sh for details.
+All source codes should be in one folder with the same folder name as the plugin ID and the 
+compressed file name
+Document Revision History
+The table describes the changes to the Synology Video Station: Video Info Plugin Guide.
+Date Description
+May 7, 2021 First creation of this document. 
+Restricted Runtime Environment
+
+=== Page 18 ===
+16
+Restricted Runtime Environment
+synology.com
+SYNOLOGY 
+INC.
+9F, No. 1, Yuandong Rd. 
+Banqiao Dist., New Taipei City 220545 
+Taiwan    
+Tel: +886 2 2955 1814 
+SYNOLOGY
+AMERICA CORP.
+3535 Factoria Blvd SE, Suite #200, 
+Bellevue, WA 98006
+USA   
+Tel: +1 425 818 1587
+SYNOLOGY 
+FRANCE
+102 Terrasse Boieldieu (TOUR W)
+92800 Puteaux
+France
+Tel: +33 147 176288
+SYNOLOGY 
+GMBH
+Grafenberger Allee 295
+40237 Düsseldorf
+Deutschland
+Tel: +49 211 9666 9666
+SYNOLOGY 
+SHANGHAI
+200070, Room 201,
+No. 511 Tianmu W. Rd., 
+Jingan Dist., Shanghai, 
+China
+SYNOLOGY 
+UK LTD.
+Unit 5 Danbury Court, Linford Wood, 
+Milton Keynes, MK14 6PL
+United Kingdom 
+Tel.: +44 (0)1908048029
+Synology may make changes to specifications and product descriptions at any time, without notice. Copyright 
+© 2020 Synology Inc. All rights reserved. ® Synology and other names of Synology Products are proprietary 
+marks or registered trademarks of Synology Inc. Other products and company names mentioned herein are 
+trademarks of their respective holders. 
+SYNOLOGY
+JAPAN CO., LTD.
+4F, No. 3-1-2, Higashikanda,
+Chiyoda-ku, Tokyo, 101-0031
+Japan
+
+
