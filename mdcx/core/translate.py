@@ -302,8 +302,7 @@ async def translate_title_outline(json_data: CrawlersResult, cd_part: str, movie
                 )
                 continue
             if result.translated_title:
-                # 不覆盖原标题，把翻译结果保存到其他地方，或者只用于显示
-                # json_data.title = result.title  # 注释掉这一行，保留原始标题
+                json_data.title = result.title
                 title_translation_applied = True
             if result.translated_outline:
                 json_data.outline = result.outline
