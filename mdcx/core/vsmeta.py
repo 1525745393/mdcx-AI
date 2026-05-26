@@ -557,9 +557,14 @@ async def write_vsmeta(
 
         encoder.write_submessage(VSMetaEncoder.TAG_GROUP1, build_group1, label="group1")
 
-        # ── 10. TAG_CLASSIFICATION (0x5A): Content rating / mosaic ──
-        if data.mosaic:
-            encoder.write_string_field(VSMetaEncoder.TAG_CLASSIFICATION, data.mosaic, label="classification")
+        # ── 10. TAG_CLASSIFICATION (0x5A): Content rating ──
+        # 使用与 NFO 相同的年龄分级方式
+        country = data.country
+        if country == "JP":
+            classification = "JP-18+"
+        else:
+            classification = "NC-17"
+        encoder.write_string_field(VSMetaEncoder.TAG_CLASSIFICATION, classification, label="classification")
 
         # ── 11. TAG_RATING (0x60): Score ──
         encoder.write_rating(data.score, label="rating")
