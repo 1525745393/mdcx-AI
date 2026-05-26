@@ -12,6 +12,7 @@ MDCx 是一个现代化的视频元数据刮削和管理工具，支持从 40+ �
 
 - 🤖 **智能刮削**: 支持 40+ 个数据源，自动识别番号
 - 📄 **NFO 生成**: 生成符合 KODI/Emby 规范的元数据文件
+- 📺 **VSMETA 支持**: 完整实现 Synology Video Station 的 VSMETA 格式
 - 🖼️ **图片处理**: 自动下载、裁剪、添加水印
 - 🌐 **多语言翻译**: 支持 Google/DeepL/LLM 翻译
 - 📁 **灵活命名**: Jinja2 模板系统，支持自定义命名规则
@@ -24,6 +25,7 @@ MDCx 是一个现代化的视频元数据刮削和管理工具，支持从 40+ �
 - 📖 [API 文档](docs/api-documentation.md) - 完整的 API 参考
 - 🏗️ [架构设计](docs/architecture.md) - 系统架构和设计模式
 - 🔧 [CI/CD 指南](docs/ci-testing.md) - 持续集成和测试
+- 📺 [VSMETA 格式对比](VSMETA_COMPARISON.md) - Synology Video Station 元数据格式
 - 📝 [变更日志](changelog.md) - 版本更新历史
 
 ## 快速开始
