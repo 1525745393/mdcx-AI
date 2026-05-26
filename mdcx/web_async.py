@@ -126,8 +126,38 @@ def get_curl_error_description(error_code: int) -> tuple[str, str]:
     )
 
 
+OPENSSL_SPECIFIC_ERRORS: dict[str, tuple[str, str]] = {
+    "OPENSSL_internal:invalid library": ("OpenSSL 库配置错误", "OpenSSL 库配置损坏，请尝试重新安装或更新 curl_cffi"),
+    "OPENSSL_internal:WRONG_VERSION_NUMBER": ("TLS 版本不匹配", "服务器不支持当前 TLS 版本，请尝试更新 curl_cffi 或更换代理"),
+    "OPENSSL_internal:CERTIFICATE_VERIFY_FAILED": ("证书验证失败", "SSL 证书验证失败，可能是中间人攻击或证书过期"),
+    "OPENSSL_internal:UNABLE_TO_VERIFY_LEAF_SIGNATURE": ("叶子证书签名验证失败", "证书链验证失败"),
+    "OPENSSL_internal:UNABLE_TO_GET_ISSUER_CERT": ("无法获取颁发者证书", "证书颁发者不可信"),
+    "OPENSSL_internal:SELF_SIGNED_IN_CHAIN": ("自签名证书链", "证书链中包含自签名证书"),
+    "certificate verify failed": ("证书验证失败", "SSL 证书验证失败，请检查系统时间或更新根证书"),
+    "handshake failure": ("SSL 握手失败", "SSL/TLS 握手失败，可能是协议版本不兼容"),
+    "connection reset": ("连接被重置", "连接被服务器重置，请检查网络或更换代理"),
+    "connection refused": ("连接被拒绝", "服务器拒绝连接，请检查端口和防火墙设置"),
+    "no peer certificate available": ("无可用证书", "服务器没有提供 SSL 证书"),
+    "alert handshake failure": ("握手警告失败", "SSL 握手协商失败，请尝试更新 curl_cffi"),
+    "ssl3_get_record:wrong version number": ("SSL 版本错误", "服务器使用了非标准 SSL/TLS 版本"),
+}
+
+
+def get_openssl_error_description(error_str: str) -> tuple[str, str] | None:
+    """获取特定 OpenSSL 错误的描述"""
+    for key, value in OPENSSL_SPECIFIC_ERRORS.items():
+        if key.lower() in error_str.lower():
+            return value
+    return None
+
+
 def format_curl_error(error_str: str) -> str:
     """格式化curl错误信息，提取错误码并给出友好提示"""
+    openssl_desc = get_openssl_error_description(error_str)
+    if openssl_desc:
+        short_desc, long_desc = openssl_desc
+        return f"SSL/TLS错误 [{short_desc}]: {long_desc} - {error_str}"
+
     match = re.search(r"CURLE_(\w+)\s*\((\d+)\)", error_str, re.IGNORECASE)
     if match:
         error_name = match.group(1)
