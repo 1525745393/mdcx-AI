@@ -512,7 +512,22 @@ async def write_vsmeta(
             encoder.write_varint_field(VSMetaEncoder.TAG_EPISODE_LOCKED, 1, label="locked")
 
         # ── 7. TAG_CHAPTER_SUMMARY (0x42): Plot / summary ──
-        summary = data.outline or data.originalplot or ""
+        # Format: 日文标题 + 中文简介 + 日文简介
+        summary_parts = []
+        
+        # Japanese title (original title)
+        if data.originaltitle:
+            summary_parts.append(data.originaltitle)
+        
+        # Chinese outline
+        if data.outline:
+            summary_parts.append(data.outline)
+        
+        # Japanese original plot
+        if data.originalplot:
+            summary_parts.append(data.originalplot)
+        
+        summary = "\n".join(summary_parts) if summary_parts else ""
         encoder.write_string_field(VSMetaEncoder.TAG_CHAPTER_SUMMARY, summary, label="summary")
 
         # ── 8. TAG_EPISODE_META_JSON (0x4A): External IDs as JSON ──

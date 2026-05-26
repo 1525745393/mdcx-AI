@@ -445,7 +445,7 @@ Complete implementation of Synology Video Station's VSMETA binary format.
 | TAG_YEAR | 0x28 | 年份 | Year |
 | TAG_EPISODE_RELEASE_DATE | 0x32 | 发布日期 | Release date |
 | TAG_EPISODE_LOCKED | 0x38 | 锁定元数据 | Lock metadata |
-| TAG_CHAPTER_SUMMARY | 0x42 | 简介/剧情 | Plot/Summary |
+| TAG_CHAPTER_SUMMARY | 0x42 | 简介/剧情(日文标题+中文简介+日文简介) | Plot/Summary (Japanese title + Chinese outline + Japanese plot) |
 | TAG_EPISODE_META_JSON | 0x4A | 元数据 JSON | Metadata JSON |
 | TAG_GROUP1 | 0x52 | 演员、导演、类型 | Cast, director, genre |
 | TAG_CLASSIFICATION | 0x5A | 内容分级 | Content classification |
