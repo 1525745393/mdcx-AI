@@ -10,7 +10,7 @@ from pathlib import Path
 import aiofiles
 from PIL import Image
 
-from ..config.enums import DownloadableFile, KeepableFile, ReadMode, Switch
+from ..config.enums import DownloadableFile, KeepableFile, OutlineShow, ReadMode, Switch
 from ..config.manager import manager
 from ..config.resource_policy import resource_policy
 from ..models.log_buffer import LogBuffer
@@ -18,6 +18,7 @@ from ..models.types import CrawlersResult, FileInfo
 from ..signals import signal
 from ..utils import get_used_time
 from ..utils.file import delete_file_async, move_file_async
+from ..utils.language import is_japanese
 from ..utils.leb128 import encode_varint
 
 
@@ -512,22 +513,25 @@ async def write_vsmeta(
             encoder.write_varint_field(VSMetaEncoder.TAG_EPISODE_LOCKED, 1, label="locked")
 
         # ── 7. TAG_CHAPTER_SUMMARY (0x42): Plot / summary ──
-        # Format: 日文标题 + 中文简介 + 日文简介
-        summary_parts = []
+        outline_show = manager.config.outline_format
+        outline = data.outline
+        originalplot = data.originalplot
         
-        # Japanese title (original title)
+        if outline:
+            if originalplot and originalplot != outline:
+                if OutlineShow.SHOW_ZH_JP in outline_show:
+                    outline += f"\n\n{originalplot}"
+                elif OutlineShow.SHOW_JP_ZH in outline_show:
+                    outline = f"{originalplot}\n\n{outline}"
+        
+        # 构建完整的简介：日文标题 + 简介(中日或日中)
+        summary_parts = []
         if data.originaltitle:
             summary_parts.append(data.originaltitle)
+        if outline:
+            summary_parts.append(outline)
         
-        # Chinese outline
-        if data.outline:
-            summary_parts.append(data.outline)
-        
-        # Japanese original plot
-        if data.originalplot:
-            summary_parts.append(data.originalplot)
-        
-        summary = "\n".join(summary_parts) if summary_parts else ""
+        summary = "\n\n".join(summary_parts) if summary_parts else ""
         encoder.write_string_field(VSMetaEncoder.TAG_CHAPTER_SUMMARY, summary, label="summary")
 
         # ── 8. TAG_EPISODE_META_JSON (0x4A): External IDs as JSON ──
