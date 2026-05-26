@@ -194,20 +194,23 @@ class VSMetaEncoder:
         if img_size <= max_kb:
             return image_data
         
-        img_buf = BytesIO(image_data)
+        current_data = image_data
         while img_size > max_kb:
+            img_buf = BytesIO(current_data)
             img = Image.open(img_buf)
             x, y = img.size
             new_size = (int(x * scale_factor), int(y * scale_factor))
             resized = img.resize(new_size, Image.LANCZOS)
             img_buf.close()
-            img_buf = BytesIO()
-            resized.save(img_buf, format='JPEG')
-            img_size = len(img_buf.getvalue()) // 1024
+            
+            out_buf = BytesIO()
+            resized.save(out_buf, format='JPEG')
+            current_data = out_buf.getvalue()
+            out_buf.close()
+            
+            img_size = len(current_data) // 1024
         
-        result = img_buf.getvalue()
-        img_buf.close()
-        return result
+        return current_data
 
     @staticmethod
     def _encode_image(image_path: Path, max_dim: int, quality: int) -> tuple[str, str] | tuple[None, None]:
