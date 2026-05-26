@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import re
@@ -18,39 +19,6 @@ from ..signals import signal
 from ..utils import get_used_time
 from ..utils.file import delete_file_async, move_file_async
 from ..utils.leb128 import encode_varint
-
-
-def normalize_vsmeta_text(raw: str) -> str:
-    """Normalize text for VSMETA fields: remove invalid characters, normalize line breaks."""
-    if not raw:
-        return ""
-    # 先将已转义实体还原为实际字符
-    rep_word = {
-        "&amp;": "&",
-        "&lt;": "<",
-        "&gt;": ">",
-        "&apos;": "'",
-        "&quot;": '"',
-        "&lsquo;": "「",
-        "&rsquo;": "」",
-        "&hellip;": "…",
-    }
-    for key, value in rep_word.items():
-        raw = raw.replace(key, value)
-    # Normalize line breaks
-    raw = (
-        raw.replace("\r\n", "\n")
-        .replace("\r", "\n")
-        .replace("\\r\\n", "\n")
-        .replace("\\n", "\n")
-        .replace("\\r", "\n")
-    )
-    # Replace br tags with newline
-    raw = re.sub(r"(?i)&lt;\s*br\s*/?\s*&gt;", "\n", raw)
-    raw = re.sub(r"(?i)<\s*br\s*/?\s*>", "\n", raw)
-    # Remove control characters that can break protobuf encoding
-    # Allow tab, newline, carriage return
-    return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", raw)
 
 
 class VSMetaEncoder:
@@ -123,6 +91,39 @@ class VSMetaEncoder:
 
     # ── Protobuf wire-type writers ──
 
+    @staticmethod
+    def normalize_vsmeta_text(raw: str) -> str:
+        """Normalize text for VSMETA fields: remove invalid characters, normalize line breaks"""
+        if not raw:
+            return ""
+        # 先将已转义实体还原为实际字符
+        rep_word = {
+            "&amp;": "&",
+            "&lt;": "<",
+            "&gt;": ">",
+            "&apos;": "'",
+            "&quot;": '"',
+            "&lsquo;": "「",
+            "&rsquo;": "」",
+            "&hellip;": "…",
+        }
+        for key, value in rep_word.items():
+            raw = raw.replace(key, value)
+        # Normalize line breaks
+        raw = (
+            raw.replace("\r\n", "\n")
+            .replace("\r", "\n")
+            .replace("\\r\\n", "\n")
+            .replace("\\n", "\n")
+            .replace("\\r", "\n")
+        )
+        # Replace br tags with newline
+        raw = re.sub(r"(?i)&lt;\s*br\s*/?\s*&gt;", "\n", raw)
+        raw = re.sub(r"(?i)<\s*br\s*/?\s*>", "\n", raw)
+        # Remove control characters that can break protobuf encoding
+        # Allow tab, newline, carriage return
+        return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", raw)
+
     def write_header(self):
         """Write VSMETA file header (content type = movie)"""
         self.buffer.write(self.HEADER_MOVIE)
@@ -145,12 +146,12 @@ class VSMetaEncoder:
     def write_string_field(self, tag: int, value: str, label: str | None = None):
         """Write a string as a protobuf length-delimited field"""
         if value:
-            cleaned_value = normalize_vsmeta_text(value)
+            cleaned_value = self.normalize_vsmeta_text(value)
             self.write_bytes_field(tag, cleaned_value.encode("utf-8"), label=label)
 
     def write_indexed_string_field(self, tag: int, index: int, value: str, label: str | None = None):
         """Write a length-delimited field with a 1-byte index between tag and payload"""
-        cleaned_value = normalize_vsmeta_text(value)
+        cleaned_value = self.normalize_vsmeta_text(value)
         data = cleaned_value.encode("utf-8")
         self.buffer.write(bytes([tag]))
         self.buffer.write(bytes([index]))
@@ -187,10 +188,10 @@ class VSMetaEncoder:
     # ── Image encoding ──
 
     @staticmethod
-    def _encode_image(image_path: Path, max_dim: int, quality: int) -> tuple[bytes, str] | tuple[None, None]:
-        """Encode image to raw JPEG binary and MD5 hex digest
+    def _encode_image(image_path: Path, max_dim: int, quality: int) -> tuple[str, str] | tuple[None, None]:
+        """Encode image to Base64 string (76-char line-wrapped) and MD5 hex digest
 
-        Returns (raw_jpeg_bytes, md5_hex) or (None, None) on failure.
+        Returns (base64_data, md5_hex) or (None, None) on failure.
         """
         try:
             with Image.open(image_path) as img:
@@ -205,28 +206,26 @@ class VSMetaEncoder:
                 raw = buf.getvalue()
 
             md5_hex = hashlib.md5(raw).hexdigest()
-            return raw, md5_hex
+            b64 = base64.b64encode(raw).decode("ascii")
+            # Wrap at 76 characters per line
+            b64_wrapped = "\n".join(b64[i : i + 76] for i in range(0, len(b64), 76))
+            return b64_wrapped, md5_hex
         except Exception:
             LogBuffer.log().write(f"\n ⚠️ VSMETA image encode failed: {image_path}")
             signal.show_traceback_log(traceback.format_exc())
             return None, None
 
     def write_poster(self, image_path: Path | None, label: str = "poster"):
-        """Write episode thumbnail (poster) with raw JPEG data + MD5"""
+        """Write episode thumbnail (poster) with Base64 data + MD5"""
         if not image_path or not image_path.exists():
             return
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
-        raw_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if raw_data is None or md5_hex is None:
+        b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
+        if b64_data is None or md5_hex is None:
             return
-        # 使用带索引字节的字段写入
-        self.buffer.write(bytes([self.TAG_EPISODE_THUMB_DATA]))
-        self.buffer.write(bytes([0x01]))
-        self.buffer.write(encode_varint(len(raw_data)))
-        self.buffer.write(raw_data)
-        self._track(label)
-        self.write_indexed_string_field(self.TAG_EPISODE_THUMB_MD5, 0x01, md5_hex, label=f"{label}_md5")
+        self.write_string_field(self.TAG_EPISODE_THUMB_DATA, b64_data, label=label)
+        self.write_string_field(self.TAG_EPISODE_THUMB_MD5, md5_hex, label=f"{label}_md5")
 
     def write_poster_in_group2(self, image_path: Path | None, label: str = "poster_g2"):
         """Write poster image inside GROUP2 (without index byte)"""
@@ -234,10 +233,10 @@ class VSMetaEncoder:
             return
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
-        raw_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if raw_data is None or md5_hex is None:
+        b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
+        if b64_data is None or md5_hex is None:
             return
-        self.write_bytes_field(self.TAG2_POSTER_DATA, raw_data, label=label)
+        self.write_string_field(self.TAG2_POSTER_DATA, b64_data, label=label)
         self.write_string_field(self.TAG2_POSTER_MD5, md5_hex, label=f"{label}_md5")
 
     def write_backdrop_in_group3(self, image_path: Path | None, label: str = "backdrop"):
@@ -246,10 +245,10 @@ class VSMetaEncoder:
             return
         max_dim = manager.config.vsmeta_image_max_dimension
         quality = manager.config.vsmeta_jpeg_quality
-        raw_data, md5_hex = self._encode_image(image_path, max_dim, quality)
-        if raw_data is None or md5_hex is None:
+        b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
+        if b64_data is None or md5_hex is None:
             return
-        self.write_bytes_field(self.TAG3_BACKDROP_DATA, raw_data, label=label)
+        self.write_string_field(self.TAG3_BACKDROP_DATA, b64_data, label=label)
         self.write_string_field(self.TAG3_BACKDROP_MD5, md5_hex, label=f"{label}_md5")
 
     # ── Rating encoding ──
@@ -533,7 +532,7 @@ async def write_vsmeta(
         if manager.config.vsmeta_include_poster:
             encoder.write_poster(poster_path, label="poster")
 
-        # ── 13. TAG_GROUP2 (0x9A + index 0x01): Series info + poster ──
+        # ── 13. TAG_GROUP2 (0x9A): Series info + poster ──
 
         def build_group2(sub):
             # Season / episode (always 0 for movies)
@@ -571,9 +570,9 @@ async def write_vsmeta(
                 VSMetaEncoder.TAG2_TVSHOW_META_JSON, VSMetaEncoder.DEFAULT_META_JSON, label="tvshowMetaJson"
             )
 
-        encoder.write_submessage(VSMetaEncoder.TAG_GROUP2, build_group2, label="group2", index=0x01)
+        encoder.write_submessage(VSMetaEncoder.TAG_GROUP2, build_group2, label="group2")
 
-        # ── 14. TAG_GROUP3 (0xAA + index 0x01): Backdrop + timestamp (movies) ──
+        # ── 14. TAG_GROUP3 (0xAA): Backdrop + timestamp (movies) ──
 
         def build_group3(sub):
             # Backdrop image
@@ -583,7 +582,7 @@ async def write_vsmeta(
             # Timestamp (current Unix seconds)
             sub.write_varint_field(VSMetaEncoder.TAG3_TIMESTAMP, int(time.time()), label="timestamp")
 
-        encoder.write_submessage(VSMetaEncoder.TAG_GROUP3, build_group3, label="group3", index=0x01)
+        encoder.write_submessage(VSMetaEncoder.TAG_GROUP3, build_group3, label="group3")
 
         # ── Write atomically (tmp → rename) ──
         tmp_file = vsmeta_file.with_suffix(".vsmeta.tmp")
