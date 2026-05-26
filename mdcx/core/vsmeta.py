@@ -18,7 +18,6 @@ from ..models.types import CrawlersResult, FileInfo
 from ..signals import signal
 from ..utils import get_used_time
 from ..utils.file import delete_file_async, move_file_async
-from ..utils.language import is_japanese
 from ..utils.leb128 import encode_varint
 
 
