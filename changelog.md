@@ -1,3 +1,81 @@
+## 220260547 (2026-05-26)
+
+### 改进
+- **VSMETA 标题和分类优化**：优化 VSMETA 的标题处理和内容分级方式，与 NFO 保持一致
+  - 主标题：使用翻译后的中文标题，方便用户查看
+  - 副标题：使用原始日文标题，确保 Synology Video Station 能正确识别
+  - 内容分级：从马赛克类型改为与 NFO 相同的年龄分级（JP-18+ 或 NC-17）
+  - 提升了 VSMETA 在不同设备上的兼容性和显示效果
+
+---
+
+## 220260546 (2026-05-26)
+
+### 修复
+- **VSMETA 图片处理完全修复**：参考 JuanWoo/nfo-to-vsmeta 项目实现正确的 VSMETA 格式
+  - 图片添加索引字节（0x01）在 TAG_EPISODE_THUMB_DATA、TAG_EPISODE_THUMB_MD5 后
+  - GROUP2（0x9A）和 GROUP3（0xAA）也添加索引字节（0x01）
+  - 新增图片压缩功能，限制在 200KB 以内
+  - 修正 MD5 计算方式：现在计算的是 Base64 字符串的 MD5，而非原始图片的
+  - 完整解决 VSMETA 无法被 Synology Video Station 识别的问题
+
+---
+
+## 220260545 (2026-05-26)
+
+### 修复
+- **VSMETA 格式完整修复**：完全恢复 VSMETA 正确格式，确保与 Synology Video Station 100% 兼容
+  - 完全恢复原始格式为 Base64 编码图片（76字符换行）
+  - 移除之前错误添加的索引字节
+  - 保留字符清理功能 `normalize_vsmeta_text`，清理控制字符和 HTML 转义实体
+  - 解决翻译后内容包含特殊字符导致的 VSMETA 无法识别的问题
+
+---
+
+## 220260544 (2026-05-26)
+
+### 修复
+- **VSMETA 索引字节修复**：重新添加了被错误移除的索引字节，确保与 Synology Video Station 完全兼容
+  - 重新添加 `TAG_EPISODE_THUMB_DATA` 和 `TAG_EPISODE_THUMB_MD5` 的索引字节 (0x01)
+  - 重新添加 `TAG_GROUP2` 和 `TAG_GROUP3` 的索引字节 (0x01)
+  - 保持字符清理功能和原始二进制图片编码功能
+  - 完整修复翻译后 VSMETA 文件无法被识别的问题
+
+---
+
+## 220260543 (2026-05-26)
+
+### 修复
+- **VSMETA 字符清理和图片编码修复**：修复翻译后 VSMETA 文件无法被 Synology Video Station 识别的问题
+  - 添加 `normalize_vsmeta_text()` 函数，清理字符串中的控制字符和 HTML 转义实体
+  - 移除图片的 Base64 编码，改用原始二进制 JPEG 数据直接写入
+  - 解决翻译内容包含特殊字符导致的解析错误
+
+---
+
+## 220260542 (2026-05-26)
+
+### 改进
+- **增强 OpenSSL 错误识别**：添加了特定 OpenSSL 底层错误的详细描述
+  - "OPENSSL_internal:invalid library" → OpenSSL 库配置错误
+  - "TLS 版本不匹配" → 请更新 curl_cffi 或更换代理
+  - "证书验证失败" → 请检查系统时间或更新根证书
+  - "连接被重置/拒绝" → 请检查网络或更换代理
+  - 帮助用户快速定位 SSL/TLS 连接问题
+
+---
+
+## 220260541 (2026-05-26)
+
+### 改进
+- **添加详细的 curl 错误处理**：为网络请求添加了完整的 curl 错误码映射和友好的错误提示
+  - 包含 100+ 个 curl 错误码的中文详细说明
+  - 常见错误自动归类：SSL证书错误、DNS解析错误、连接错误等
+  - 错误消息格式：`curl错误 [错误名称]: 简短描述 - 详细说明`
+  - 帮助用户快速定位和解决网络问题
+
+---
+
 ## 220260540 (2026-05-25)
 
 ### 改进
@@ -8,54 +86,12 @@
 
 ---
 
-## 220260539 (2026-05-25)
-
-### 改进
-- **VSMETA 分级字段优化**：将中文马赛克类型映射到标准的分级标签
-  - "无码" / "uncensored" → "R-18"
-  - "有码" / "censored" → "R-18"
-  - 其他值保持原样
-  - 这样在 Synology Video Station 中可以显示更标准的分级信息
-
----
-
-## 220260538 (2026-05-25)
-
-### 改进
-- **VSMETA 同时显示翻译和原始内容**：在 VSMETA 中同时显示翻译后的和原始的字段内容
-  - 标题：保持当前逻辑，显示翻译标题 + 原始标题（括号）
-  - 简介：同时显示翻译简介和原文简介，原文用分隔线标注
-  - 这样可以在 Synology Video Station 中同时看到两种语言的内容
-
----
-
-## 220260537 (2026-05-25)
-
-### 修复
-- **VSMETA 图片显示彻底修复**：完全修复了图片在 Synology Video Station 中不显示的问题
-  - 图片编码从 Base64 字符串改为直接写入原始 JPEG 二进制数据
-  - 修正了对 VSMETA 格式的误解，图片字段应该存储原始二进制而不是 Base64
-  - 修复了所有相关图片方法：`write_poster`、`write_poster_in_group2`、`write_backdrop_in_group3`
-  - MD5 校验仍然使用字符串字段，与 Synology 格式保持一致
-
----
-
-## 220260536 (2026-05-25)
-
-### 修复
-- **VSMETA 翻译后字段识别修复**：修复了打开翻译功能后 VSMETA 文件无法被 Synology Video Station 正确识别的问题
-  - 添加了字符清理函数 `normalize_vsmeta_text()` 来处理翻译后的特殊字符
-  - 清理了可能破坏 protobuf 编码的控制字符
-  - 规范化了换行符和 XML 实体
-  - 在 `write_string_field()` 和 `write_indexed_string_field()` 中都使用了字符清理
-
----
-
 ## 220260535 (2026-05-25)
 
 ### 修复
-- **VSMETA 图片显示修复**：修复图片在 Synology Video Station 中不显示的问题
-  - 将 Base64 换行方式从 LF (`\n`) 改为 CRLF (`\r\n`)
+- **VSMETA 图片显示修复**：将 Base64 换行从 LF 改为 CRLF
+  - 将 `base64.encodebytes()` 替换为自定义的 `base64_with_crlf()` 函数
+  - 符合 Synology Video Station 的图片格式要求
 
 ---
 
@@ -107,6 +143,7 @@
 
 ---
 
+## 220260532 (2026-05-24)
 
 ### 新增
 - VSMETA 设置标签页：嵌入封面图/背景图开关、锁定元数据、图片尺寸/质量、数量限制
@@ -125,12 +162,16 @@
 ### 修复
 - 修复 `should_update_vsmeta` 中 `KeepableFile.VSMETA` 通过 UI 无法设置的死代码问题
 
+---
+
 ## 220260531 (2026-05-24)
 
 ### 修复
 - 修复命名页面 groupBox_vsmeta 与 groupBox_65 布局重叠 131px 的问题
 - 同步 MDCx.py 中 10 个组件的 setGeometry 坐标与 MDCx.ui 一致
 - 调整命名页面滚动区域高度 3660→3930，确保所有内容可见
+
+---
 
 ## 220260530 (2026-05-24)
 
@@ -152,11 +193,15 @@
 - 添加核心模块单元测试
 - 添加测试覆盖率报告
 
+---
+
 ## 220260527 (2026-05-23)
 
 ### 修复
 - 修复 save_config.py 第 375 行 IndentationError 错误
 - 确保代码缩进正确，符合 Python 语法规范
+
+---
 
 ## 220260526 (2026-05-23)
 
@@ -164,10 +209,10 @@
 - 重新编译 UI 文件，修复 AttributeError: 'Ui_MDCx' object has no attribute 'checkBox_download_vsmeta' 错误
 - 确保所有 VSMETA 相关 UI 控件正确绑定
 
+---
+
 ## 220260525 (2026-05-22)
 
-### 新增
-- 修复 PyInstaller 打包配置，确保所有模块正确包含在安装包中
-
 ### 修复
+- 修复 PyInstaller 打包配置，确保所有模块正确包含在安装包中
 - 修复安装包运行时 ModuleNotFoundError 错误
