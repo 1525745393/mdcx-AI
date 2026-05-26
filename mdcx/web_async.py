@@ -34,7 +34,6 @@ from .network_fingerprint import (
 )
 from .utils import collapse_inline_script_splits
 
-
 CURL_ERROR_MESSAGES: dict[int, tuple[str, str]] = {
     1: ("不支持的协议", "URL使用的协议不被支持，可能是拼写错误或协议未启用"),
     2: ("初始化失败", "curl初始化失败，可能是内部错误或资源问题"),
