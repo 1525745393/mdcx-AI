@@ -427,6 +427,8 @@ def classify_scrape_task(task_input: CrawlTask, config: Config, ...) -> ScrapeCl
 
 完整实现 Synology Video Station 专用的 VSMETA 二进制格式。
 
+Complete implementation of Synology Video Station's VSMETA binary format.
+
 #### 核心特性 (Core Features)
 - 📺 **Protobuf 风格编码**: 使用 protobuf 风格的标签编码
 - 🖼️ **图片嵌入**: 支持嵌入海报和背景图，自动压缩至 200KB 以内
