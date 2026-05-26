@@ -470,15 +470,15 @@ async def write_vsmeta(
         encoder.write_header()
 
         # ── 1. TAG_SHOW_TITLE (0x12): Display title ──
-        # 主标题使用原始日文标题（data.originaltitle）—— 保证Video Station能正确识别
-        if data.originaltitle and data.number:
-            display_title = f"[{data.number}] {data.originaltitle}"
-        elif data.originaltitle:
-            display_title = data.originaltitle
-        elif data.title and data.number:
+        # 主标题使用翻译后的中文标题（data.title）
+        if data.title and data.number:
             display_title = f"[{data.number}] {data.title}"
         elif data.title:
             display_title = data.title
+        elif data.originaltitle and data.number:
+            display_title = f"[{data.number}] {data.originaltitle}"
+        elif data.originaltitle:
+            display_title = data.originaltitle
         elif data.number:
             display_title = data.number
         else:
@@ -487,8 +487,8 @@ async def write_vsmeta(
         encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE, display_title, label="showTitle")
 
         # ── 2. TAG_SHOW_TITLE2 (0x1A): Sort / alternative title ──
-        # 副标题使用翻译后的中文标题（data.title）—— 方便用户看中文标语
-        show_title2 = data.title or data.studio or data.publisher or ""
+        # 副标题使用原始日文标题（data.originaltitle）
+        show_title2 = data.originaltitle or data.studio or data.publisher or ""
         encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE2, show_title2, label="showTitle2")
 
         # ── 3. TAG_EPISODE_TITLE (0x22): Short title (number) ──
