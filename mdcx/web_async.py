@@ -126,26 +126,6 @@ def get_curl_error_description(error_code: int) -> tuple[str, str]:
     )
 
 
-NON_RETRYABLE_ERRORS: set[str] = {
-    "OPENSSL_internal:invalid library",
-    "OPENSSL_internal",
-    "invalid library",
-    "certificate verify failed",
-    "CERTIFICATE_VERIFY_FAILED",
-    "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
-    "tlsv1 alert",
-    "ssl3_get_record",
-}
-
-
-def is_non_retryable_error(error_str: str) -> bool:
-    """检查是否是不可重试的错误，这类错误重试没有意义"""
-    if not error_str:
-        return False
-    error_lower = error_str.lower()
-    return any(pattern.lower() in error_lower for pattern in NON_RETRYABLE_ERRORS)
-
-
 OPENSSL_SPECIFIC_ERRORS: dict[str, tuple[str, str]] = {
     "OPENSSL_internal:invalid library": ("OpenSSL 库配置错误", "OpenSSL 库配置损坏，请尝试重新安装或更新 curl_cffi"),
     "OPENSSL_internal:WRONG_VERSION_NUMBER": ("TLS 版本不匹配", "服务器不支持当前 TLS 版本，请尝试更新 curl_cffi 或更换代理"),
@@ -1575,23 +1555,20 @@ class AsyncWebClient:
                     retry = True  # 超时错误进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except ConnectionError as e:
-                    error_full = f"连接错误 (ConnectionError): {str(e)}"
-                    error_msg = format_curl_error(error_full)
-                    retry = not is_non_retryable_error(error_full)  # 不可恢复的错误不重试
+                    error_msg = format_curl_error(f"连接错误 (ConnectionError): {str(e)}")
+                    retry = True  # 连接错误进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except RequestException as e:
-                    error_full = f"请求异常 (RequestException): {str(e)} {getattr(e, 'code', '')}".strip()
-                    error_msg = format_curl_error(error_full)
-                    retry = not is_non_retryable_error(error_full)  # 不可恢复的错误不重试
+                    error_msg = format_curl_error(f"请求异常 (RequestException): {str(e)} {getattr(e, 'code', '')}".strip())
+                    retry = True  # 请求异常进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except TimeoutError:
                     error_msg = "请求等待超时 (TimeoutError)"
                     retry = True
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except Exception as e:
-                    error_full = f"curl-cffi 异常: {str(e)}"
-                    error_msg = format_curl_error(error_full)
-                    retry = not is_non_retryable_error(error_full)  # 不可恢复的错误不重试
+                    error_msg = format_curl_error(f"curl-cffi 异常: {str(e)}")
+                    retry = True
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 if not retry:
                     if stream:
