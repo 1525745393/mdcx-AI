@@ -188,6 +188,28 @@ class VSMetaEncoder:
     # ── Image encoding ──
 
     @staticmethod
+    def _compress_pic(image_data: bytes, max_kb: int = 200, scale_factor: float = 0.8) -> bytes:
+        """Compress image to be under max_kb limit using scaling"""
+        img_size = len(image_data) // 1024
+        if img_size <= max_kb:
+            return image_data
+        
+        img_buf = BytesIO(image_data)
+        while img_size > max_kb:
+            img = Image.open(img_buf)
+            x, y = img.size
+            new_size = (int(x * scale_factor), int(y * scale_factor))
+            resized = img.resize(new_size, Image.LANCZOS)
+            img_buf.close()
+            img_buf = BytesIO()
+            resized.save(img_buf, format='JPEG')
+            img_size = len(img_buf.getvalue()) // 1024
+        
+        result = img_buf.getvalue()
+        img_buf.close()
+        return result
+
+    @staticmethod
     def _encode_image(image_path: Path, max_dim: int, quality: int) -> tuple[str, str] | tuple[None, None]:
         """Encode image to Base64 string (76-char line-wrapped) and MD5 hex digest
 
@@ -204,11 +226,18 @@ class VSMetaEncoder:
                 buf = BytesIO()
                 img.save(buf, format="JPEG", quality=quality)
                 raw = buf.getvalue()
-
-            md5_hex = hashlib.md5(raw).hexdigest()
-            b64 = base64.b64encode(raw).decode("ascii")
+            
+            # 压缩到 200KB 以内
+            compressed_raw = VSMetaEncoder._compress_pic(raw)
+            
+            # 转换为 Base64
+            b64 = base64.b64encode(compressed_raw).decode("ascii")
             # Wrap at 76 characters per line
             b64_wrapped = "\n".join(b64[i : i + 76] for i in range(0, len(b64), 76))
+            
+            # MD5 是计算 Base64 字符串的 MD5！
+            md5_hex = hashlib.md5(b64_wrapped.encode("utf-8")).hexdigest()
+            
             return b64_wrapped, md5_hex
         except Exception:
             LogBuffer.log().write(f"\n ⚠️ VSMETA image encode failed: {image_path}")
@@ -216,7 +245,7 @@ class VSMetaEncoder:
             return None, None
 
     def write_poster(self, image_path: Path | None, label: str = "poster"):
-        """Write episode thumbnail (poster) with Base64 data + MD5"""
+        """Write episode thumbnail (poster) with Base64 data + MD5 (with index byte)"""
         if not image_path or not image_path.exists():
             return
         max_dim = manager.config.vsmeta_image_max_dimension
@@ -224,11 +253,12 @@ class VSMetaEncoder:
         b64_data, md5_hex = self._encode_image(image_path, max_dim, quality)
         if b64_data is None or md5_hex is None:
             return
-        self.write_string_field(self.TAG_EPISODE_THUMB_DATA, b64_data, label=label)
-        self.write_string_field(self.TAG_EPISODE_THUMB_MD5, md5_hex, label=f"{label}_md5")
+        # 使用带索引字节的字段写入
+        self.write_indexed_string_field(self.TAG_EPISODE_THUMB_DATA, 0x01, b64_data, label=label)
+        self.write_indexed_string_field(self.TAG_EPISODE_THUMB_MD5, 0x01, md5_hex, label=f"{label}_md5")
 
     def write_poster_in_group2(self, image_path: Path | None, label: str = "poster_g2"):
-        """Write poster image inside GROUP2 (without index byte)"""
+        """Write poster image inside GROUP2"""
         if not image_path or not image_path.exists():
             return
         max_dim = manager.config.vsmeta_image_max_dimension
@@ -240,7 +270,7 @@ class VSMetaEncoder:
         self.write_string_field(self.TAG2_POSTER_MD5, md5_hex, label=f"{label}_md5")
 
     def write_backdrop_in_group3(self, image_path: Path | None, label: str = "backdrop"):
-        """Write backdrop image inside GROUP3 (without index byte)"""
+        """Write backdrop image inside GROUP3 (with index byte)"""
         if not image_path or not image_path.exists():
             return
         max_dim = manager.config.vsmeta_image_max_dimension
@@ -570,7 +600,7 @@ async def write_vsmeta(
                 VSMetaEncoder.TAG2_TVSHOW_META_JSON, VSMetaEncoder.DEFAULT_META_JSON, label="tvshowMetaJson"
             )
 
-        encoder.write_submessage(VSMetaEncoder.TAG_GROUP2, build_group2, label="group2")
+        encoder.write_submessage(VSMetaEncoder.TAG_GROUP2, build_group2, index=0x01, label="group2")
 
         # ── 14. TAG_GROUP3 (0xAA): Backdrop + timestamp (movies) ──
 
@@ -582,7 +612,7 @@ async def write_vsmeta(
             # Timestamp (current Unix seconds)
             sub.write_varint_field(VSMetaEncoder.TAG3_TIMESTAMP, int(time.time()), label="timestamp")
 
-        encoder.write_submessage(VSMetaEncoder.TAG_GROUP3, build_group3, label="group3")
+        encoder.write_submessage(VSMetaEncoder.TAG_GROUP3, build_group3, index=0x01, label="group3")
 
         # ── Write atomically (tmp → rename) ──
         tmp_file = vsmeta_file.with_suffix(".vsmeta.tmp")

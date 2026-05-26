@@ -1,3 +1,15 @@
+## 220260546 (2026-05-26)
+
+### 修复
+- **VSMETA 图片处理完全修复**：参考 JuanWoo/nfo-to-vsmeta 项目实现正确的 VSMETA 格式
+  - 图片添加索引字节（0x01）在 TAG_EPISODE_THUMB_DATA、TAG_EPISODE_THUMB_MD5 后
+  - GROUP2（0x9A）和 GROUP3（0xAA）也添加索引字节（0x01）
+  - 新增图片压缩功能，限制在 200KB 以内
+  - 修正 MD5 计算方式：现在计算的是 Base64 字符串的 MD5，而非原始图片的
+  - 完整解决 VSMETA 无法被 Synology Video Station 识别的问题
+
+---
+
 ## 220260545 (2026-05-26)
 
 ### 修复
