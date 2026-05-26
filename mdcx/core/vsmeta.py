@@ -524,7 +524,7 @@ async def write_vsmeta(
                 elif OutlineShow.SHOW_JP_ZH in outline_show:
                     outline = f"{originalplot}\n\n{outline}"
         
-        # 构建完整的简介：日文标题 + 简介(中日或日中)
+        # 构建完整的简介：日文标题在最前面
         summary_parts = []
         if data.originaltitle:
             summary_parts.append(data.originaltitle)
