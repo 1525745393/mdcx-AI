@@ -6,11 +6,12 @@
 3. [核心模块详解](#核心模块详解)
 4. [爬虫框架](#爬虫框架)
 5. [业务流程](#业务流程)
-6. [配置管理](#配置管理)
-7. [数据模型](#数据模型)
-8. [依赖关系](#依赖关系)
-9. [项目运行方式](#项目运行方式)
-10. [开发指南](#开发指南)
+6. [VSMETA 生成](#vsmeta-生成-synology-video-station)
+7. [配置管理](#配置管理)
+8. [数据模型](#数据模型)
+9. [依赖关系](#依赖关系)
+10. [项目运行方式](#项目运行方式)
+11. [开发指南](#开发指南)
 
 ---
 
@@ -24,6 +25,7 @@ MDCx 是一个现代化的视频元数据刮削和管理工具，用于从 40+ �
 
 - 🤖 **智能刮削**: 支持 40+ 个数据源，自动识别番号
 - 📄 **NFO 生成**: 生成符合 KODI/Emby 规范的元数据文件
+- 📺 **VSMETA 支持**: 完整实现 Synology Video Station 的 VSMETA 格式
 - 🖼️ **图片处理**: 自动下载、裁剪、添加水印
 - 🌐 **多语言翻译**: 支持 Google/DeepL/LLM 翻译
 - 📁 **灵活命名**: Jinja2 模板系统，支持自定义命名规则
@@ -418,6 +420,72 @@ def classify_scrape_task(task_input: CrawlTask, config: Config, ...) -> ScrapeCl
 ### 5. NFO 生成
 
 生成符合 KODI/Emby 规范的 XML 元数据文件。
+
+### 6. VSMETA 生成 (Synology Video Station)
+
+**关键文件**: [core/vsmeta.py](file:///workspace/mdcx/core/vsmeta.py)
+
+完整实现 Synology Video Station 专用的 VSMETA 二进制格式。
+
+#### 核心特性 (Core Features)
+- 📺 **Protobuf 风格编码**: 使用 protobuf 风格的标签编码
+- 🖼️ **图片嵌入**: 支持嵌入海报和背景图，自动压缩至 200KB 以内
+- 🔒 **元数据锁定**: 可配置是否禁止 Video Station 自动更新
+- ⚙️ **高度可配置**: 图片尺寸、JPEG 质量、演员数量等均可配置
+- 💾 **原子写入**: 使用临时文件确保写入不会损坏数据
+
+#### 主要标签 (Main Tags)
+| Tag | Hex | 说明 | Description |
+|-----|-----|------|-------------|
+| TAG_SHOW_TITLE | 0x12 | 显示标题 | Display title |
+| TAG_SHOW_TITLE2 | 0x1A | 排序/备用标题 | Sort/alternative title |
+| TAG_EPISODE_TITLE | 0x22 | 简短标题(番号) | Short title (number) |
+| TAG_YEAR | 0x28 | 年份 | Year |
+| TAG_EPISODE_RELEASE_DATE | 0x32 | 发布日期 | Release date |
+| TAG_EPISODE_LOCKED | 0x38 | 锁定元数据 | Lock metadata |
+| TAG_CHAPTER_SUMMARY | 0x42 | 简介/剧情 | Plot/Summary |
+| TAG_EPISODE_META_JSON | 0x4A | 元数据 JSON | Metadata JSON |
+| TAG_GROUP1 | 0x52 | 演员、导演、类型 | Cast, director, genre |
+| TAG_CLASSIFICATION | 0x5A | 内容分级 | Content classification |
+| TAG_RATING | 0x60 | 评分(×10) | Rating (×10) |
+| TAG_EPISODE_THUMB_DATA | 0x8A | 海报数据 | Poster data |
+| TAG_EPISODE_THUMB_MD5 | 0x92 | 海报 MD5 | Poster MD5 |
+| TAG_GROUP2 | 0x9A | 剧集信息+海报 | Series info + poster |
+| TAG_GROUP3 | 0xAA | 背景图+时间戳 | Backdrop + timestamp |
+
+#### 核心类 (Core Class)
+```python
+class VSMetaEncoder:
+    """VSMETA protobuf encoder for Synology Video Station"""
+    
+    def write_header(self):
+        """写入头部 (Write header)"""
+    
+    def write_string_field(self, tag: int, value: str, label: str | None = None):
+        """写入字符串字段 (Write string field)"""
+    
+    def write_poster(self, image_path: Path | None, label: str = "poster"):
+        """写入海报 (Write poster)"""
+    
+    def write_submessage(self, tag: int, build_func, label: str | None = None, index: int | None = None):
+        """写入子消息 (Write submessage)"""
+```
+
+#### 配置选项 (Configuration Options)
+**关键文件**: [config/models.py](file:///workspace/mdcx/config/models.py#L538-L545)
+```python
+vsmeta_keep_ext: bool              # 保留视频扩展名 (Keep video extension)
+vsmeta_include_poster: bool        # 嵌入封面图 (Include poster)
+vsmeta_include_backdrop: bool      # 嵌入背景图 (Include backdrop)
+vsmeta_locked: bool                # 锁定元数据 (Lock metadata)
+vsmeta_image_max_dimension: int    # 图片最大尺寸 (Max image dimension)
+vsmeta_jpeg_quality: int           # JPEG 质量 (JPEG quality)
+vsmeta_actor_limit: int            # 演员数量上限 (Actor limit)
+vsmeta_tag_limit: int              # 标签数量上限 (Tag limit)
+```
+
+#### 相关文档 (Related Documents)
+- [VSMETA_COMPARISON.md](file:///workspace/VSMETA_COMPARISON.md) - 格式对比文档
 
 ---
 
