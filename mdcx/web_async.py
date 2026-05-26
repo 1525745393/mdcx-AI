@@ -35,6 +35,123 @@ from .network_fingerprint import (
 from .utils import collapse_inline_script_splits
 
 
+CURL_ERROR_MESSAGES: dict[int, tuple[str, str]] = {
+    1: ("不支持的协议", "URL使用的协议不被支持，可能是拼写错误或协议未启用"),
+    2: ("初始化失败", "curl初始化失败，可能是内部错误或资源问题"),
+    3: ("URL格式错误", "URL格式不正确"),
+    5: ("代理解析失败", "无法解析代理服务器地址"),
+    6: ("DNS解析失败", "无法解析目标主机地址，请检查网络连接"),
+    7: ("连接失败", "无法连接到服务器，请检查网络或服务器状态"),
+    8: ("服务器响应解析失败", "服务器返回的数据无法解析"),
+    9: ("访问被拒绝", "没有权限访问该资源"),
+    10: ("FTP连接失败", "FTP主动模式连接失败"),
+    11: ("FTP密码响应错误", "服务器返回的密码响应异常"),
+    12: ("FTP连接超时", "FTP连接等待超时"),
+    13: ("FTP PASV命令失败", "FTP PASV命令响应异常"),
+    15: ("FTP主机查询失败", "无法查询FTP主机"),
+    16: ("HTTP/2协议错误", "HTTP/2帧层出现问题"),
+    17: ("FTP传输模式设置失败", "无法设置FTP传输模式"),
+    18: ("文件传输大小不匹配", "传输的文件大小与预期不符"),
+    21: ("FTP QUOTE命令错误", "FTP自定义命令返回错误"),
+    22: ("HTTP错误响应", "服务器返回HTTP错误状态码(>=400)"),
+    23: ("写入数据失败", "写入本地文件失败或回调返回错误"),
+    25: ("上传启动失败", "FTP服务器拒绝上传请求"),
+    26: ("读取本地文件失败", "无法读取本地文件或路径不存在"),
+    27: ("内存分配失败", "内存分配请求失败，这是严重错误"),
+    28: ("操作超时", "请求超时，请检查网络连接或增加超时时间"),
+    30: ("FTP PORT命令失败", "FTP PORT命令返回错误"),
+    31: ("FTP REST命令失败", "FTP REST命令返回错误"),
+    33: ("服务器不支持范围请求", "Range请求不被支持"),
+    35: ("SSL/TLS握手失败", "SSL证书问题，可能是证书格式、路径、密码或证书不受信任"),
+    36: ("下载恢复失败", "无法从指定位置恢复下载"),
+    37: ("文件无法打开", "file://协议的文件无法打开，检查文件路径和权限"),
+    38: ("LDAP绑定失败", "LDAP绑定操作失败"),
+    39: ("LDAP搜索失败", "LDAP搜索失败"),
+    42: ("请求被回调中止", "回调函数返回中止信号"),
+    43: ("函数参数错误", "调用函数时使用了错误的参数"),
+    45: ("网络接口错误", "无法使用指定的网络接口"),
+    47: ("重定向次数过多", "跟随重定向次数超过限制"),
+    48: ("未知选项", "curl不支持的选项被传递"),
+    49: ("选项格式错误", "setopt选项格式不正确"),
+    52: ("服务器无响应", "服务器没有返回任何数据"),
+    53: ("加密引擎未找到", "指定的加密引擎不存在"),
+    54: ("加密引擎设置失败", "无法将选定的加密引擎设为默认值"),
+    55: ("发送网络数据失败", "发送数据失败"),
+    56: ("接收网络数据失败", "接收数据失败"),
+    57: ("客户端证书问题", "本地客户端证书有问题"),
+    58: ("SSL证书错误", "SSL证书问题，可能是格式、路径或权限问题"),
+    59: ("SSL加密套件错误", "无法使用指定的加密算法"),
+    60: ("SSL证书验证失败", "远程服务器SSL证书不被信任"),
+    61: ("内容编码错误", "无法识别传输编码"),
+    63: ("文件大小超限", "文件大小超过限制"),
+    64: ("SSL级别失败", "请求的FTP SSL级别失败"),
+    65: ("数据Rewind失败", "重传时需要回退数据但失败"),
+    66: ("SSL引擎初始化失败", "SSL引擎初始化失败"),
+    67: ("登录被拒绝", "远程服务器拒绝登录"),
+    68: ("TFTP文件未找到", "TFTP服务器上找不到文件"),
+    69: ("TFTP权限问题", "TFTP服务器权限问题"),
+    70: ("服务器磁盘满", "服务器磁盘空间不足"),
+    71: ("TFTP非法操作", "非法的TFTP操作"),
+    72: ("TFTP传输ID未知", "TFTP传输ID不存在"),
+    73: ("远程文件已存在", "文件已存在且无法覆盖"),
+    77: ("SSL CA证书错误", "读取SSL CA证书有问题，检查路径和权限"),
+    78: ("远程资源不存在", "URL指向的资源不存在"),
+    79: ("SSH会话错误", "SSH会话发生未知错误"),
+    80: ("SSL关闭失败", "SSL连接关闭失败"),
+    81: ("Socket未就绪", "Socket未准备好发送/接收，等待后重试"),
+    82: ("CRL文件加载失败", "无法加载CRL文件"),
+    83: ("证书颁发者验证失败", "证书颁发者检查失败"),
+    84: ("FTP PRET命令失败", "FTP服务器不支持PRET命令"),
+    85: ("RTSP CSeq错误", "RTSP CSeq编号不匹配"),
+    86: ("RTSP会话错误", "RTSP会话标识符不匹配"),
+    87: ("FTP文件列表解析失败", "无法解析FTP文件列表"),
+    88: ("分块回调错误", "分块回调报告错误"),
+    90: ("SSL公钥不匹配", "与指定的SSL公钥不匹配"),
+    91: ("SSL证书状态错误", "SSL证书状态验证失败"),
+    92: ("HTTP/2流错误", "HTTP/2帧层流错误"),
+    94: ("认证错误", "认证函数返回错误"),
+    95: ("HTTP/3协议错误", "HTTP/3层出现问题"),
+    96: ("QUIC连接错误", "QUIC连接错误，可能由SSL库错误引起"),
+    97: ("代理握手错误", "代理握手失败"),
+    98: ("需要客户端证书", "SSL客户端证书未提供"),
+    99: ("内部轮询错误", "内部poll()或select()调用返回不可恢复错误"),
+    100: ("数据字段过大", "值或数据字段增长过大"),
+}
+
+
+def get_curl_error_description(error_code: int) -> tuple[str, str]:
+    """获取curl错误码的详细描述"""
+    return CURL_ERROR_MESSAGES.get(
+        error_code, ("未知错误", f"未知的curl错误码: {error_code}")
+    )
+
+
+def format_curl_error(error_str: str) -> str:
+    """格式化curl错误信息，提取错误码并给出友好提示"""
+    match = re.search(r"CURLE_(\w+)\s*\((\d+)\)", error_str, re.IGNORECASE)
+    if match:
+        error_name = match.group(1)
+        try:
+            error_code = int(match.group(2))
+            short_desc, long_desc = get_curl_error_description(error_code)
+            return f"curl错误 [{error_name}]: {short_desc} - {long_desc}"
+        except ValueError:
+            pass
+
+    if "certificate" in error_str.lower() or "ssl" in error_str.lower():
+        return f"SSL/证书错误 - {error_str}"
+    if "timeout" in error_str.lower():
+        return f"请求超时 - {error_str}"
+    if "connection" in error_str.lower():
+        return f"连接错误 - {error_str}"
+    if "resolve" in error_str.lower():
+        return f"DNS解析错误 - {error_str}"
+    if "proxy" in error_str.lower():
+        return f"代理错误 - {error_str}"
+
+    return error_str
+
+
 class AsyncWebLimiters:
     def __init__(self):
         self.limiters: dict[str, AsyncLimiter] = {
@@ -1404,23 +1521,23 @@ class AsyncWebClient:
                         await self._record_transport_success(pool_key=pool_key)
                         return resp, ""
                 except Timeout:
-                    error_msg = "连接超时"
+                    error_msg = "连接超时 (Timeout)"
                     retry = True  # 超时错误进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except ConnectionError as e:
-                    error_msg = f"连接错误: {str(e)}"
+                    error_msg = format_curl_error(f"连接错误 (ConnectionError): {str(e)}")
                     retry = True  # 连接错误进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except RequestException as e:
-                    error_msg = f"请求异常: {str(e)} {getattr(e, 'code', '')}".strip()
+                    error_msg = format_curl_error(f"请求异常 (RequestException): {str(e)} {getattr(e, 'code', '')}".strip())
                     retry = True  # 请求异常进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except TimeoutError:
-                    error_msg = "请求等待超时"
+                    error_msg = "请求等待超时 (TimeoutError)"
                     retry = True
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except Exception as e:
-                    error_msg = f"curl-cffi 异常: {str(e)}"
+                    error_msg = format_curl_error(f"curl-cffi 异常: {str(e)}")
                     retry = True
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 if not retry:
