@@ -76,7 +76,10 @@ uv run python mdcx/views/MDCx.py
 
 ### VSMETA 格式
 
-特别感谢 [JuanWoo/nfo-to-vsmeta](https://github.com/JuanWoo/nfo-to-vsmeta) 项目，本项目的 VSMETA 实现基于该项目的格式规范，确保与 Synology Video Station 完全兼容。
+特别感谢以下项目对 VSMETA 格式实现的贡献：
+
+- [JuanWoo/nfo-to-vsmeta](https://github.com/JuanWoo/nfo-to-vsmeta): 本项目的 VSMETA 实现基于该项目的格式规范，确保与 Synology Video Station 完全兼容
+- [nfo-vsmeta](https://github.com/JuanWoo/nfo-to-vsmeta): 提供了 VSMETA 格式的参考实现和格式说明
 
 ### 格式逆向工程
 
