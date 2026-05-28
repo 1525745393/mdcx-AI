@@ -8,9 +8,10 @@
 4. [数据模型](#数据模型)
 5. [配置系统](#配置系统)
 6. [爬虫系统](#爬虫系统)
-7. [工具类与辅助函数](#工具类与辅助函数)
-8. [项目运行方式](#项目运行方式)
-9. [依赖关系](#依赖关系)
+7. [VSMETA 生成](#vsmeta-生成)
+8. [工具类与辅助函数](#工具类与辅助函数)
+9. [项目运行方式](#项目运行方式)
+10. [依赖关系](#依赖关系)
 
 ---
 
@@ -358,6 +359,171 @@ main.py
 - 调用多个网站爬虫
 - 整合各网站结果
 - 字段优先级处理
+
+---
+
+## VSMETA 生成
+
+### 概述
+
+VSMETA 是 **Synology Video Station** 使用的二进制元数据格式，用于在群晖 NAS 上为视频文件提供元数据（如标题、演员、海报、评分等）。MDCx 完整实现了该格式，确保与 Synology Video Station 完全兼容。
+
+### 核心文件
+
+- **[mdcx/core/vsmeta.py](file:///workspace/mdcx/core/vsmeta.py)**：VSMETA 编码器核心实现
+
+### 格式规范
+
+VSMETA 采用 **Protobuf 风格**的二进制编码：
+
+| 特性 | 说明 |
+|------|------|
+| **头部标识** | `0x08 0x01`（field 1, wire 0, value 1 = movie） |
+| **标签编码** | `(field_number << 3) | wire_type` |
+| **Wire Type 0** | Varint 整数 |
+| **Wire Type 2** | Length-delimited（字符串、字节数组、子消息） |
+| **图片格式** | Base64 编码的 JPEG，最大 200KB |
+| **Base64 换行** | 每 76 字符换行 |
+| **MD5 校验** | 基于 Base64 字符串计算 |
+
+### 主要标签详解
+
+#### 顶层标签
+
+| 标签名 | 十六进制 | Field | Wire | 数据类型 | 说明 | 示例内容 |
+|--------|----------|-------|------|----------|------|----------|
+| `TAG_SHOW_TITLE` | 0x12 | 2 | 2 | string | 显示标题 | `[ABP-123] 作品标题` |
+| `TAG_SHOW_TITLE2` | 0x1A | 3 | 2 | string | 排序/备用标题 | `Original Title` |
+| `TAG_EPISODE_TITLE` | 0x22 | 4 | 2 | string | 简短标题（番号） | `ABP-123` |
+| `TAG_YEAR` | 0x28 | 5 | 0 | varint | 年份 | `2024` |
+| `TAG_EPISODE_RELEASE_DATE` | 0x32 | 6 | 2 | string | 发布日期 | `2024-01-15` |
+| `TAG_EPISODE_LOCKED` | 0x38 | 7 | 0 | varint | 锁定元数据 | `1`（锁定） |
+| `TAG_CHAPTER_SUMMARY` | 0x42 | 8 | 2 | string | 简介/剧情 | 日文标题+中日简介 |
+| `TAG_EPISODE_META_JSON` | 0x4A | 9 | 2 | string | 外部 ID JSON | `{"external_ids": {...}}` |
+| `TAG_GROUP1` | 0x52 | 10 | 2 | submessage | 演员、导演、类型 | 嵌套结构 |
+| `TAG_CLASSIFICATION` | 0x5A | 11 | 2 | string | 内容分级 | `有码` / `无码` |
+| `TAG_RATING` | 0x60 | 12 | 0 | special | 评分（×10） | `85`（表示 8.5 分） |
+| `TAG_EPISODE_THUMB_DATA` | 0x8A | 17 | 2 | string | 海报数据（含索引） | Base64 图片 |
+| `TAG_EPISODE_THUMB_MD5` | 0x92 | 18 | 2 | string | 海报 MD5（含索引） | MD5 十六进制 |
+| `TAG_GROUP2` | 0x9A | 19 | 2 | submessage | 剧集信息+海报 | 嵌套结构 |
+| `TAG_GROUP3` | 0xAA | 21 | 2 | submessage | 背景图+时间戳 | 嵌套结构 |
+
+#### GROUP1 内部标签（演员/导演/类型）
+
+| 标签名 | 十六进制 | Field | Wire | 数据类型 | 说明 |
+|--------|----------|-------|------|----------|------|
+| `TAG1_CAST` | 0x0A | 1 | 2 | string (repeated) | 演员列表 |
+| `TAG1_DIRECTOR` | 0x12 | 2 | 2 | string (repeated) | 导演列表 |
+| `TAG1_GENRE` | 0x1A | 3 | 2 | string (repeated) | 类型/标签列表 |
+| `TAG1_WRITER` | 0x22 | 4 | 2 | string (repeated) | 编剧列表（保留） |
+
+#### GROUP2 内部标签（剧集信息）
+
+| 标签名 | 十六进制 | Field | Wire | 数据类型 | 说明 |
+|--------|----------|-------|------|----------|------|
+| `TAG2_SEASON` | 0x08 | 1 | 0 | varint | 季数（电影为 0） |
+| `TAG2_EPISODE` | 0x10 | 2 | 0 | varint | 集数（电影为 0） |
+| `TAG2_TV_SHOW_YEAR` | 0x18 | 3 | 0 | varint | 电视剧年份 |
+| `TAG2_RELEASE_DATE_TV_SHOW` | 0x22 | 4 | 2 | string | 电视剧发布日期 |
+| `TAG2_LOCKED` | 0x28 | 5 | 0 | varint | 锁定电视剧元数据 |
+| `TAG2_TVSHOW_SUMMARY` | 0x32 | 6 | 2 | string | 系列名称 |
+| `TAG2_POSTER_DATA` | 0x3A | 7 | 2 | string | 海报 Base64 数据 |
+| `TAG2_POSTER_MD5` | 0x42 | 8 | 2 | string | 海报 MD5 |
+| `TAG2_TVSHOW_META_JSON` | 0x4A | 9 | 2 | string | 电视剧元数据 JSON |
+
+#### GROUP3 内部标签（背景图）
+
+| 标签名 | 十六进制 | Field | Wire | 数据类型 | 说明 |
+|--------|----------|-------|------|----------|------|
+| `TAG3_BACKDROP_DATA` | 0x0A | 1 | 2 | string | 背景图 Base64 数据 |
+| `TAG3_BACKDROP_MD5` | 0x12 | 2 | 2 | string | 背景图 MD5 |
+| `TAG3_TIMESTAMP` | 0x18 | 3 | 0 | varint | Unix 时间戳 |
+
+### 核心类：VSMetaEncoder
+
+**主要方法**：
+
+| 方法 | 功能 | 示例 |
+|------|------|------|
+| `write_header()` | 写入文件头部 `0x08 0x01` | - |
+| `write_string_field(tag, value)` | 写入字符串字段 | `write_string_field(0x12, "标题")` |
+| `write_varint_field(tag, value)` | 写入 Varint 整数字段 | `write_varint_field(0x28, 2024)` |
+| `write_bytes_field(tag, data)` | 写入字节字段 | `write_bytes_field(0x8A, b"...")` |
+| `write_indexed_string_field(tag, index, value)` | 写入带索引的字符串（用于海报等） | `write_indexed_string_field(0x8A, 0x01, base64_data)` |
+| `write_poster(image_path)` | 写入海报图片（自动处理 Base64 和 MD5） | `write_poster(Path("poster.jpg"))` |
+| `write_submessage(tag, build_func, index)` | 写入嵌套子消息 | `write_submessage(0x52, build_group1)` |
+| `normalize_vsmeta_text(text)` | 清理文本中的控制字符和 HTML 实体 | - |
+| `get_bytes()` | 获取最终的 VSMETA 字节数据 | - |
+
+### 简介格式详解
+
+VSMETA 的简介字段（`TAG_CHAPTER_SUMMARY`）格式如下：
+
+```
+日文标题（originaltitle）
+
+简介内容（根据 outline_show 配置显示）
+  - SHOW_ZH_JP：中文简介 + 日文简介
+  - SHOW_JP_ZH：日文简介 + 中文简介
+```
+
+**实际示例**（SHOW_ZH_JP 模式）：
+```
+美しい花
+
+この作品は美しい花に関する物語です。
+
+This is a story about beautiful flowers.
+```
+
+### 配置选项
+
+在 `Config` 类中提供了丰富的 VSMETA 配置：
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `vsmeta_include_poster` | bool | `True` | 是否在 VSMETA 中嵌入封面图 |
+| `vsmeta_include_backdrop` | bool | `True` | 是否在 VSMETA 中嵌入背景图 |
+| `vsmeta_locked` | bool | `True` | 是否锁定元数据（禁止 Video Station 自动更新） |
+| `vsmeta_image_max_dimension` | int | `1920` | 图片最大尺寸（像素） |
+| `vsmeta_jpeg_quality` | int | `90` | JPEG 质量（1-100） |
+| `vsmeta_actor_limit` | int | `20` | 演员数量上限 |
+| `vsmeta_tag_limit` | int | `10` | 标签数量上限 |
+| `vsmeta_keep_ext` | bool | `False` | 生成的 VSMETA 文件是否保留视频扩展名 |
+
+### 关键特性
+
+1. **格式兼容性**：与 JuanWoo/nfo-to-vsmeta 项目完全一致，确保被 Synology Video Station 识别
+2. **字符清理**：自动清理控制字符和 HTML 转义实体（`normalize_vsmeta_text`）
+3. **图片压缩**：自动将图片压缩至 200KB 以内
+4. **原子写入**：使用临时文件 → 重命名的方式确保写入不会损坏
+5. **完整错误处理**：完善的异常处理和日志记录
+6. **高度可配置**：多项配置选项满足不同需求
+
+### 格式对比
+
+参考文档：[VSMETA_COMPARISON.md](file:///workspace/VSMETA_COMPARISON.md)
+
+### 实际生成的 VSMETA 结构示例
+
+```
+0x08 0x01                              # HEADER_MOVIE (field 1, value 1)
+0x12 len(title) [title bytes]           # TAG_SHOW_TITLE
+0x1A len(title2) [title2 bytes]         # TAG_SHOW_TITLE2  
+0x22 len(number) [number bytes]         # TAG_EPISODE_TITLE
+0x28 [year varint]                      # TAG_YEAR
+0x32 len(date) [date bytes]             # TAG_EPISODE_RELEASE_DATE
+0x38 0x01                              # TAG_EPISODE_LOCKED (locked)
+0x42 len(summary) [summary bytes]       # TAG_CHAPTER_SUMMARY
+0x4A len(json) [json bytes]             # TAG_EPISODE_META_JSON
+0x52 len(group1) [group1 bytes]         # TAG_GROUP1 (cast/director/genre)
+0x5A len(classification) [...]          # TAG_CLASSIFICATION
+0x60 [rating byte]                      # TAG_RATING
+0x8A 0x01 len(data) [base64 data]       # TAG_EPISODE_THUMB_DATA (with index)
+0x92 0x01 len(md5) [md5 bytes]          # TAG_EPISODE_THUMB_MD5 (with index)
+0x9A 0x01 len(group2) [group2 bytes]   # TAG_GROUP2 (with index)
+0xAA 0x01 len(group3) [group3 bytes]   # TAG_GROUP3 (with index)
+```
 
 ---
 
