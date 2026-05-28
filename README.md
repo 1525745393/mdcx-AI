@@ -12,6 +12,12 @@ MDCx 是一个现代化的视频元数据刮削和管理工具，支持从 40+ �
 
 - 🤖 **智能刮削**: 支持 40+ 个数据源，自动识别番号
 - 📄 **NFO 生成**: 生成符合 KODI/Emby 规范的元数据文件
+- 📺 **VSMETA 支持**: 完整实现 Synology Video Station 的 VSMETA 二进制格式
+  - 与 [JuanWoo/nfo-to-vsmeta](https://github.com/JuanWoo/nfo-to-vsmeta) 完全兼容
+  - 支持嵌入海报、背景图，自动压缩至 200KB
+  - 可配置的简介格式（日文标题+中日/日中双语）
+  - 完整的错误处理和原子写入，确保文件完整性
+  - 高度可配置：图片尺寸、JPEG 质量、演员/标签数量限制等
 - 🖼️ **图片处理**: 自动下载、裁剪、添加水印
 - 🌐 **多语言翻译**: 支持 Google/DeepL/LLM 翻译
 - 📁 **灵活命名**: Jinja2 模板系统，支持自定义命名规则
@@ -65,6 +71,16 @@ uv run python mdcx/views/MDCx.py
 * 本项目基于 [@sqzw-x/mdcx](https://github.com/sqzw-x/mdcx), 继续进行维护及优化.
 
 向相关开发者表示敬意.
+
+## 特别致谢
+
+### VSMETA 格式
+
+特别感谢 [JuanWoo/nfo-to-vsmeta](https://github.com/JuanWoo/nfo-to-vsmeta) 项目，本项目的 VSMETA 实现基于该项目的格式规范，确保与 Synology Video Station 完全兼容。
+
+### 格式逆向工程
+
+感谢 soywiz / Carlos Ballesteros Velasco 对 VSMETA 格式的逆向工程研究，为我们提供了格式解析的基础。
 
 ## 构建
 
