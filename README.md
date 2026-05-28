@@ -82,6 +82,13 @@ uv run python mdcx/views/MDCx.py
 
 感谢 soywiz / Carlos Ballesteros Velasco 对 VSMETA 格式的逆向工程研究，为我们提供了格式解析的基础。
 
+### 文档贡献
+
+感谢 Trae AI Agent 对本项目文档的完善，包括：
+- 生成完整的 Code Wiki 技术文档
+- 详细的 VSMETA 格式说明和标签文档
+- README 文档的优化和更新
+
 ## 构建
 
 > 一般情况请勿自行构建, 至 [Release](https://github.com/sqzw-x/mdcx/releases) 下载最新版
