@@ -469,24 +469,13 @@ async def write_vsmeta(
         encoder = VSMetaEncoder()
         encoder.write_header()
 
-        # ── 1. TAG_SHOW_TITLE (0x12): Display title ──
-        if data.title and data.number:
-            display_title = f"[{data.number}] {data.title}"
-        elif data.title:
-            display_title = data.title
-        elif data.number:
-            display_title = data.number
-        else:
-            display_title = file_info.file_name
-
-        if data.originaltitle and data.originaltitle != data.title:
-            display_title += f" ({data.originaltitle})"
-
+        # ── 1. TAG_SHOW_TITLE (0x12): Chinese translated title ──
+        display_title = data.title or data.number or file_info.file_name
         encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE, display_title, label="showTitle")
 
-        # ── 2. TAG_SHOW_TITLE2 (0x1A): Sort / alternative title ──
-        show_title2 = data.originaltitle or data.studio or data.publisher or ""
-        encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE2, show_title2, label="showTitle2")
+        # ── 2. TAG_SHOW_TITLE2 (0x1A): Japanese original title ──
+        if data.originaltitle:
+            encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE2, data.originaltitle, label="showTitle2")
 
         # ── 3. TAG_EPISODE_TITLE (0x22): Short title (number) ──
         encoder.write_string_field(VSMetaEncoder.TAG_EPISODE_TITLE, data.number, label="episodeTitle")
@@ -511,8 +500,15 @@ async def write_vsmeta(
         if manager.config.vsmeta_locked:
             encoder.write_varint_field(VSMetaEncoder.TAG_EPISODE_LOCKED, 1, label="locked")
 
-        # ── 7. TAG_CHAPTER_SUMMARY (0x42): Plot / summary ──
-        summary = data.outline or data.originalplot or ""
+        # ── 7. TAG_CHAPTER_SUMMARY (0x42): Japanese title + Chinese summary + Japanese plot ──
+        summary_parts = []
+        if data.originaltitle:
+            summary_parts.append(data.originaltitle)
+        if data.outline:
+            summary_parts.append(data.outline)
+        if data.originalplot and data.originalplot != data.outline:
+            summary_parts.append(data.originalplot)
+        summary = "\n\n".join(summary_parts) if summary_parts else ""
         encoder.write_string_field(VSMetaEncoder.TAG_CHAPTER_SUMMARY, summary, label="summary")
 
         # ── 8. TAG_EPISODE_META_JSON (0x4A): External IDs as JSON ──
