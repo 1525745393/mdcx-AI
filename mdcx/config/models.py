@@ -29,6 +29,9 @@ from .enums import (
     Switch,
     TagInclude,
     Translator,
+    VsmetaShowTitle,
+    VsmetaShowTitle2,
+    VsmetaSummary,
     Website,
 )
 from .migrations import migrate_config_data
@@ -543,6 +546,9 @@ class Config(BaseModel):
     vsmeta_jpeg_quality: int = Field(default=90, title="VSMETA图片JPEG质量")
     vsmeta_actor_limit: int = Field(default=20, title="VSMETA演员数量上限")
     vsmeta_tag_limit: int = Field(default=10, title="VSMETA标签数量上限")
+    vsmeta_show_title: VsmetaShowTitle = Field(default=VsmetaShowTitle.TITLE, title="VSMETA 标题内容")
+    vsmeta_show_title2: VsmetaShowTitle2 = Field(default=VsmetaShowTitle2.ORIGINALTITLE, title="VSMETA 副标题内容")
+    vsmeta_summary: VsmetaSummary = Field(default=VsmetaSummary.JP_ZH_JP, title="VSMETA 简介内容")
     hd_name: Literal["height", "hd"] = Field(default="height", title="高清名称")
     hd_get: Literal["video", "path", "none"] = Field(default="video", title="获取高清")
     folder_moword: bool = Field(default=True, title="目录版本字符")

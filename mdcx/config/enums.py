@@ -57,6 +57,48 @@ class OutlineShow(Enum):
         return ["显示来源", "显示中日", "显示日中"]
 
 
+class VsmetaShowTitle(str, Enum):
+    TITLE = "title"
+    NUMBER_TITLE = "number_title"
+
+    @classmethod
+    def names(cls):
+        return ["中文翻译标题", "番号 + 中文翻译标题"]
+
+
+class VsmetaShowTitle2(str, Enum):
+    ORIGINALTITLE = "originaltitle"
+    PUBLISHER = "publisher"
+    STUDIO = "studio"
+    NONE = "none"
+
+    @classmethod
+    def names(cls):
+        return ["日文原始标题", "制作商", "工作室", "不写入"]
+
+
+class VsmetaSummary(str, Enum):
+    JP_ZH_JP = "jp_zh_jp"
+    OUTLINE = "outline"
+    ORIGINALPLOT = "originalplot"
+    ZH_JP = "zh_jp"
+    JP_ZH = "jp_zh"
+    TITLE_ONLY = "title_only"
+    NONE = "none"
+
+    @classmethod
+    def names(cls):
+        return [
+            "日文标题 + 中文简介 + 日文简介",
+            "中文简介",
+            "日文简介",
+            "中文简介 + 日文简介",
+            "日文标题 + 中文简介",
+            "仅日文标题",
+            "不写入",
+        ]
+
+
 class TagInclude(Enum):
     ACTOR = "actor"
     LETTERS = "letters"

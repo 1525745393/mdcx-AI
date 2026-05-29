@@ -10,7 +10,15 @@ from pathlib import Path
 import aiofiles
 from PIL import Image
 
-from ..config.enums import DownloadableFile, KeepableFile, ReadMode, Switch
+from ..config.enums import (
+    DownloadableFile,
+    KeepableFile,
+    ReadMode,
+    Switch,
+    VsmetaShowTitle,
+    VsmetaShowTitle2,
+    VsmetaSummary,
+)
 from ..config.manager import manager
 from ..config.resource_policy import resource_policy
 from ..models.log_buffer import LogBuffer
@@ -469,13 +477,26 @@ async def write_vsmeta(
         encoder = VSMetaEncoder()
         encoder.write_header()
 
-        # ── 1. TAG_SHOW_TITLE (0x12): Chinese translated title ──
-        display_title = data.title or data.number or file_info.file_name
+        # ── 1. TAG_SHOW_TITLE (0x12): Title content based on config ──
+        show_title_mode = manager.config.vsmeta_show_title
+        if show_title_mode == VsmetaShowTitle.NUMBER_TITLE and data.title and data.number:
+            display_title = f"[{data.number}] {data.title}"
+        else:
+            display_title = data.title or data.number or file_info.file_name
         encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE, display_title, label="showTitle")
 
-        # ── 2. TAG_SHOW_TITLE2 (0x1A): Japanese original title ──
-        if data.originaltitle:
-            encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE2, data.originaltitle, label="showTitle2")
+        # ── 2. TAG_SHOW_TITLE2 (0x1A): Content based on config ──
+        title2_mode = manager.config.vsmeta_show_title2
+        if title2_mode == VsmetaShowTitle2.ORIGINALTITLE:
+            title2_value = data.originaltitle
+        elif title2_mode == VsmetaShowTitle2.PUBLISHER:
+            title2_value = data.publisher
+        elif title2_mode == VsmetaShowTitle2.STUDIO:
+            title2_value = data.studio
+        else:
+            title2_value = None
+        if title2_value:
+            encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE2, title2_value, label="showTitle2")
 
         # ── 3. TAG_EPISODE_TITLE (0x22): Short title (number) ──
         encoder.write_string_field(VSMetaEncoder.TAG_EPISODE_TITLE, data.number, label="episodeTitle")
@@ -500,16 +521,38 @@ async def write_vsmeta(
         if manager.config.vsmeta_locked:
             encoder.write_varint_field(VSMetaEncoder.TAG_EPISODE_LOCKED, 1, label="locked")
 
-        # ── 7. TAG_CHAPTER_SUMMARY (0x42): Japanese title + Chinese summary + Japanese plot ──
+        # ── 7. TAG_CHAPTER_SUMMARY (0x42): Summary content based on config ──
+        summary_mode = manager.config.vsmeta_summary
         summary_parts = []
-        if data.originaltitle:
-            summary_parts.append(data.originaltitle)
-        if data.outline:
-            summary_parts.append(data.outline)
-        if data.originalplot and data.originalplot != data.outline:
-            summary_parts.append(data.originalplot)
-        summary = "\n\n".join(summary_parts) if summary_parts else ""
-        encoder.write_string_field(VSMetaEncoder.TAG_CHAPTER_SUMMARY, summary, label="summary")
+        if summary_mode == VsmetaSummary.JP_ZH_JP:
+            if data.originaltitle:
+                summary_parts.append(data.originaltitle)
+            if data.outline:
+                summary_parts.append(data.outline)
+            if data.originalplot and data.originalplot != data.outline:
+                summary_parts.append(data.originalplot)
+        elif summary_mode == VsmetaSummary.OUTLINE:
+            if data.outline:
+                summary_parts.append(data.outline)
+        elif summary_mode == VsmetaSummary.ORIGINALPLOT:
+            if data.originalplot:
+                summary_parts.append(data.originalplot)
+        elif summary_mode == VsmetaSummary.ZH_JP:
+            if data.outline:
+                summary_parts.append(data.outline)
+            if data.originalplot and data.originalplot != data.outline:
+                summary_parts.append(data.originalplot)
+        elif summary_mode == VsmetaSummary.JP_ZH:
+            if data.originaltitle:
+                summary_parts.append(data.originaltitle)
+            if data.outline:
+                summary_parts.append(data.outline)
+        elif summary_mode == VsmetaSummary.TITLE_ONLY:
+            if data.originaltitle:
+                summary_parts.append(data.originaltitle)
+        summary = "\n\n".join(summary_parts) if summary_parts else None
+        if summary:
+            encoder.write_string_field(VSMetaEncoder.TAG_CHAPTER_SUMMARY, summary, label="summary")
 
         # ── 8. TAG_EPISODE_META_JSON (0x4A): External IDs as JSON ──
         if data.external_ids:
