@@ -664,8 +664,14 @@ async def write_vsmeta(
             await f.write(vsmeta_data)
         await move_file_async(tmp_file, vsmeta_file)
 
+        log_parts = []
+        log_parts.append(f"标题: {display_title[:50]}{'...' if len(display_title) > 50 else ''}")
+        if title2_value:
+            log_parts.append(f"副标题: {title2_value[:30]}{'...' if len(title2_value) > 30 else ''}")
+        if summary:
+            log_parts.append(f"简介: {len(summary)}字")
         LogBuffer.log().write(
-            f"\n 🍀 VSMETA done! ({get_used_time(start_time)}s) [{len(vsmeta_data)}B] tags: {', '.join(encoder.written_tags)}"
+            f"\n 🍀 VSMETA done! (new)({get_used_time(start_time)}s) - {vsmeta_file.name} [{len(vsmeta_data)}B] " + " | ".join(log_parts)
         )
         return True
 
