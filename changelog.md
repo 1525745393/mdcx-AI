@@ -1,3 +1,13 @@
+## 220260550 (2026-05-28)
+
+### 修复
+- **VSMETA 标签字段修正**：严格遵循语义分离 TAG_SHOW_TITLE 和 TAG_SHOW_TITLE2
+  - TAG_SHOW_TITLE：仅写入中文翻译标题（去除番号前缀和日文标题后缀）
+  - TAG_SHOW_TITLE2：仅写入日文原始标题（去除 studio/publisher 回退逻辑）
+  - TAG_CHAPTER_SUMMARY：组合为「日文原始标题 + 中文简介 + 日文简介」三段式
+
+---
+
 ## 220260549 (2026-05-28)
 
 ### 文档更新
