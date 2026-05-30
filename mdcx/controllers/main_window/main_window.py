@@ -87,6 +87,7 @@ from ..cut_window import CutWindow
 from .handlers import show_netstatus
 from .init import Init_QSystemTrayIcon, Init_Singal, Init_Ui, init_QTreeWidget
 from .load_config import load_config
+from .performance_dialog import open_performance_dialog
 from .save_config import save_config
 from .site_priority_dialog import apply_site_priority_theme
 from .style import apply_application_palette, build_menu_style, set_dark_style, set_style
@@ -922,6 +923,13 @@ class MyMAinWindow(QMainWindow):
     def label_version_clicked(self, ev):
         try:
             webbrowser.open(GITHUB_RELEASES_URL)
+        except Exception:
+            signal_qt.show_traceback_log(traceback.format_exc())
+
+    # 点性能监控按钮
+    def pushButton_performance_monitor_clicked(self):
+        try:
+            open_performance_dialog(self)
         except Exception:
             signal_qt.show_traceback_log(traceback.format_exc())
 

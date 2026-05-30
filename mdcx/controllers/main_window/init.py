@@ -256,6 +256,7 @@ def Init_Singal(self: "MyMAinWindow"):
     self.Ui.pushButton_show_tips_close.clicked.connect(self.Ui.widget_show_tips.hide)
     self.Ui.pushButton_nfo_close.clicked.connect(self.Ui.widget_nfo.hide)
     self.Ui.pushButton_nfo_save.clicked.connect(self.save_nfo_info)
+    self.Ui.pushButton_performance_monitor.clicked.connect(self.pushButton_performance_monitor_clicked)
     # endregion
 
     # region 鼠标点击

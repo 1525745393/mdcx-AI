@@ -1585,7 +1585,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>760</width>
-                  <height>1260</height>
+                  <height>1400</height>
                 </rect>
               </property>
               <property name="autoFillBackground">
@@ -2298,8 +2298,34 @@
                 </widget>
               </widget>
             </widget>
+              <widget class="QGroupBox" name="groupBox_22">
+                <property name="geometry">
+                  <rect>
+                    <x>30</x>
+                    <y>1250</y>
+                    <width>701</width>
+                    <height>100</height>
+                  </rect>
+                </property>
+                <property name="title">
+                  <string>性能监控（监控刮削性能和爬虫健康状态）</string>
+                </property>
+                <widget class="QPushButton" name="pushButton_performance_monitor">
+                  <property name="geometry">
+                    <rect>
+                      <x>140</x>
+                      <y>40</y>
+                      <width>351</width>
+                      <height>40</height>
+                    </rect>
+                  </property>
+                  <property name="text">
+                    <string>打开性能监控</string>
+                  </property>
+                </widget>
+              </widget>
+            </widget>
           </widget>
-        </widget>
         <widget class="QWidget" name="page_setting">
           <widget class="QTabWidget" name="tabWidget">
             <property name="geometry">
