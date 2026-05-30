@@ -354,7 +354,7 @@ def parse_score(score: str) -> int | None:
         raw = str(score).strip()
         if not raw or raw.upper() in ("N/A", "NA", "NULL", "NONE", "-"):
             return None
-        num_match = re.search(r"(\d+\.?\d*)", raw)
+        num_match = re.search(r"(-?\d+\.?\d*)", raw)
         if not num_match:
             return None
         value = float(num_match.group(1))
