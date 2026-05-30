@@ -120,14 +120,15 @@ CURL_ERROR_MESSAGES: dict[int, tuple[str, str]] = {
 
 def get_curl_error_description(error_code: int) -> tuple[str, str]:
     """获取curl错误码的详细描述"""
-    return CURL_ERROR_MESSAGES.get(
-        error_code, ("未知错误", f"未知的curl错误码: {error_code}")
-    )
+    return CURL_ERROR_MESSAGES.get(error_code, ("未知错误", f"未知的curl错误码: {error_code}"))
 
 
 OPENSSL_SPECIFIC_ERRORS: dict[str, tuple[str, str]] = {
     "OPENSSL_internal:invalid library": ("OpenSSL 库配置错误", "OpenSSL 库配置损坏，请尝试重新安装或更新 curl_cffi"),
-    "OPENSSL_internal:WRONG_VERSION_NUMBER": ("TLS 版本不匹配", "服务器不支持当前 TLS 版本，请尝试更新 curl_cffi 或更换代理"),
+    "OPENSSL_internal:WRONG_VERSION_NUMBER": (
+        "TLS 版本不匹配",
+        "服务器不支持当前 TLS 版本，请尝试更新 curl_cffi 或更换代理",
+    ),
     "OPENSSL_internal:CERTIFICATE_VERIFY_FAILED": ("证书验证失败", "SSL 证书验证失败，可能是中间人攻击或证书过期"),
     "OPENSSL_internal:UNABLE_TO_VERIFY_LEAF_SIGNATURE": ("叶子证书签名验证失败", "证书链验证失败"),
     "OPENSSL_internal:UNABLE_TO_GET_ISSUER_CERT": ("无法获取颁发者证书", "证书颁发者不可信"),
@@ -1558,7 +1559,9 @@ class AsyncWebClient:
                     retry = True  # 连接错误进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except RequestException as e:
-                    error_msg = format_curl_error(f"请求异常 (RequestException): {str(e)} {getattr(e, 'code', '')}".strip())
+                    error_msg = format_curl_error(
+                        f"请求异常 (RequestException): {str(e)} {getattr(e, 'code', '')}".strip()
+                    )
                     retry = True  # 请求异常进行重试
                     await self._record_transport_failure(error_msg, pool_key=pool_key)
                 except TimeoutError:

@@ -201,7 +201,7 @@ class VSMetaEncoder:
         img_size = len(image_data) // 1024
         if img_size <= max_kb:
             return image_data
-        
+
         current_data = image_data
         while img_size > max_kb:
             img_buf = BytesIO(current_data)
@@ -210,14 +210,14 @@ class VSMetaEncoder:
             new_size = (int(x * scale_factor), int(y * scale_factor))
             resized = img.resize(new_size, Image.LANCZOS)
             img_buf.close()
-            
+
             out_buf = BytesIO()
-            resized.save(out_buf, format='JPEG')
+            resized.save(out_buf, format="JPEG")
             current_data = out_buf.getvalue()
             out_buf.close()
-            
+
             img_size = len(current_data) // 1024
-        
+
         return current_data
 
     @staticmethod
@@ -237,18 +237,18 @@ class VSMetaEncoder:
                 buf = BytesIO()
                 img.save(buf, format="JPEG", quality=quality)
                 raw = buf.getvalue()
-            
+
             # 压缩到 200KB 以内
             compressed_raw = VSMetaEncoder._compress_pic(raw)
-            
+
             # 转换为 Base64
             b64 = base64.b64encode(compressed_raw).decode("ascii")
             # Wrap at 76 characters per line
             b64_wrapped = "\n".join(b64[i : i + 76] for i in range(0, len(b64), 76))
-            
+
             # MD5 是计算 Base64 字符串的 MD5！
             md5_hex = hashlib.md5(b64_wrapped.encode("utf-8")).hexdigest()
-            
+
             return b64_wrapped, md5_hex
         except Exception:
             LogBuffer.log().write(f"\n ⚠️ VSMETA image encode failed: {image_path}")
@@ -671,7 +671,8 @@ async def write_vsmeta(
         if summary:
             log_parts.append(f"简介: {len(summary)}字")
         LogBuffer.log().write(
-            f"\n 🍀 VSMETA done! (new)({get_used_time(start_time)}s) - {vsmeta_file.name} [{len(vsmeta_data)}B] " + " | ".join(log_parts)
+            f"\n 🍀 VSMETA done! (new)({get_used_time(start_time)}s) - {vsmeta_file.name} [{len(vsmeta_data)}B] "
+            + " | ".join(log_parts)
         )
         return True
 

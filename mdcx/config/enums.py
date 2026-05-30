@@ -57,7 +57,7 @@ class OutlineShow(Enum):
         return ["显示来源", "显示中日", "显示日中"]
 
 
-class VsmetaShowTitle(str, Enum):
+class VsmetaShowTitle(Enum):
     TITLE = "title"
     NUMBER_TITLE = "number_title"
 
@@ -66,7 +66,7 @@ class VsmetaShowTitle(str, Enum):
         return ["中文翻译标题", "番号 + 中文翻译标题"]
 
 
-class VsmetaShowTitle2(str, Enum):
+class VsmetaShowTitle2(Enum):
     ORIGINALTITLE = "originaltitle"
     PUBLISHER = "publisher"
     STUDIO = "studio"
@@ -77,7 +77,7 @@ class VsmetaShowTitle2(str, Enum):
         return ["日文原始标题", "制作商", "工作室", "不写入"]
 
 
-class VsmetaSummary(str, Enum):
+class VsmetaSummary(Enum):
     JP_ZH_JP = "jp_zh_jp"
     OUTLINE = "outline"
     ORIGINALPLOT = "originalplot"
