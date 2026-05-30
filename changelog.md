@@ -1,3 +1,14 @@
+## 220260553 (2026-05-30)
+
+### 修复
+- **AttributeError 错误**：修复程序启动时出现的属性错误
+  - 移除了对已删除 UI 控件 `comboBox_vsmeta_show_title` 的引用
+  - 移除了对已删除 UI 控件 `comboBox_vsmeta_show_title2` 的引用
+  - 移除了对已删除 UI 控件 `comboBox_vsmeta_summary` 的引用
+  - 配置字段保留默认值功能，确保 VSMETA 功能正常工作
+
+---
+
 ## 220260552 (2026-05-30)
 
 ### 修复
