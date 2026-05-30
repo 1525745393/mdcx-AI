@@ -24,9 +24,6 @@ from mdcx.config.enums import (
     Switch,
     TagInclude,
     Translator,
-    VsmetaShowTitle,
-    VsmetaShowTitle2,
-    VsmetaSummary,
     Website,
 )
 from mdcx.config.extend import get_movie_path_setting
@@ -707,13 +704,6 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.spinBox_vsmeta_jpeg_quality.setValue(manager.config.vsmeta_jpeg_quality)
         self.Ui.spinBox_vsmeta_actor_limit.setValue(manager.config.vsmeta_actor_limit)
         self.Ui.spinBox_vsmeta_tag_limit.setValue(manager.config.vsmeta_tag_limit)
-        self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(
-            list(VsmetaShowTitle).index(manager.config.vsmeta_show_title)
-        )
-        self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(
-            list(VsmetaShowTitle2).index(manager.config.vsmeta_show_title2)
-        )
-        self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(manager.config.vsmeta_summary))
         # 画质命名规则
         set_radio_buttons(
             manager.config.hd_name,
