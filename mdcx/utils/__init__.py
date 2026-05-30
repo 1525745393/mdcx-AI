@@ -494,8 +494,8 @@ def convert_half(string: str) -> str:
 from .perf import (
     PerformanceMonitor,
     PerfRecord,
-    perf_monitor,
     get_performance_report,
+    perf_monitor,
     reset_performance_monitor,
 )
 

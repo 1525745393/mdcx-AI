@@ -1,35 +1,38 @@
-import time
 import statistics
+import time
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 
 @dataclass
 class PerfRecord:
     """单个性能记录"""
+
     name: str
     start_time: float
     end_time: float
     duration: float
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class ActiveTimer:
     """活跃计时器信息"""
+
     name: str
     start_time: float
-    category: Optional[str] = None
+    category: str | None = None
 
 
 class PerformanceMonitor:
     """性能监控器，用于跟踪和分析代码执行时间"""
 
     def __init__(self):
-        self._records: List[PerfRecord] = []
-        self._active_timers: Dict[str, ActiveTimer] = {}
-        self._category_records: Dict[str, List[PerfRecord]] = defaultdict(list)
+        self._records: list[PerfRecord] = []
+        self._active_timers: dict[str, ActiveTimer] = {}
+        self._category_records: dict[str, list[PerfRecord]] = defaultdict(list)
         self._enabled: bool = True
         self._timer_counter: int = 0
 
@@ -45,7 +48,7 @@ class PerformanceMonitor:
         """检查是否启用"""
         return self._enabled
 
-    def start(self, name: str, category: Optional[str] = None) -> str:
+    def start(self, name: str, category: str | None = None) -> str:
         """
         开始计时
 
@@ -61,14 +64,10 @@ class PerformanceMonitor:
 
         self._timer_counter += 1
         timer_id = f"timer_{self._timer_counter}"
-        self._active_timers[timer_id] = ActiveTimer(
-            name=name,
-            start_time=time.time(),
-            category=category
-        )
+        self._active_timers[timer_id] = ActiveTimer(name=name, start_time=time.time(), category=category)
         return timer_id
 
-    def end(self, timer_id: str, category: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> Optional[float]:
+    def end(self, timer_id: str, category: str | None = None, metadata: dict[str, Any] | None = None) -> float | None:
         """
         结束计时并记录结果
 
@@ -98,7 +97,7 @@ class PerformanceMonitor:
             start_time=active_timer.start_time,
             end_time=end_time,
             duration=duration,
-            metadata=metadata or {}
+            metadata=metadata or {},
         )
 
         self._records.append(record)
@@ -107,7 +106,7 @@ class PerformanceMonitor:
 
         return duration
 
-    def timeit(self, name: str, category: Optional[str] = None):
+    def timeit(self, name: str, category: str | None = None):
         """
         上下文管理器，用于监控代码块执行时间
 
@@ -117,7 +116,7 @@ class PerformanceMonitor:
         """
         return _TimerContext(self, name, category)
 
-    def measure(self, func: Callable, *args, **kwargs) -> Tuple[Any, float]:
+    def measure(self, func: Callable, *args, **kwargs) -> tuple[Any, float]:
         """
         测量函数执行时间
 
@@ -138,7 +137,7 @@ class PerformanceMonitor:
             self.end(timer_id)
             raise
 
-    def get_statistics(self, name: Optional[str] = None, category: Optional[str] = None) -> Dict[str, Any]:
+    def get_statistics(self, name: str | None = None, category: str | None = None) -> dict[str, Any]:
         """
         获取性能统计信息
 
@@ -166,7 +165,7 @@ class PerformanceMonitor:
             "stdev": round(statistics.stdev(durations) if len(durations) > 1 else 0.0, 4),
         }
 
-    def get_all_statistics(self) -> Dict[str, Dict[str, Any]]:
+    def get_all_statistics(self) -> dict[str, dict[str, Any]]:
         """
         获取所有统计信息（按名称分组）
 
@@ -179,7 +178,7 @@ class PerformanceMonitor:
             stats[name] = self.get_statistics(name=name)
         return stats
 
-    def get_category_statistics(self) -> Dict[str, Dict[str, Any]]:
+    def get_category_statistics(self) -> dict[str, dict[str, Any]]:
         """
         获取按分类分组的统计信息
 
@@ -197,7 +196,7 @@ class PerformanceMonitor:
         self._active_timers.clear()
         self._category_records.clear()
 
-    def _filter_records(self, name: Optional[str] = None, category: Optional[str] = None) -> List[PerfRecord]:
+    def _filter_records(self, name: str | None = None, category: str | None = None) -> list[PerfRecord]:
         """内部方法：过滤记录"""
         records = self._records
 
@@ -238,7 +237,9 @@ class PerformanceMonitor:
         if category_stats:
             lines.append("\nBy Category:")
             lines.append("-" * 80)
-            lines.append(f"{'Category':<30} {'Count':<6} {'Total':<10} {'Mean':<10} {'Median':<10} {'Min':<10} {'Max':<10}")
+            lines.append(
+                f"{'Category':<30} {'Count':<6} {'Total':<10} {'Mean':<10} {'Median':<10} {'Min':<10} {'Max':<10}"
+            )
             lines.append("-" * 80)
             for category, stats in sorted(category_stats.items(), key=lambda x: -x[1]["total"]):
                 lines.append(
@@ -253,11 +254,11 @@ class PerformanceMonitor:
 class _TimerContext:
     """性能计时器的上下文管理器"""
 
-    def __init__(self, monitor: PerformanceMonitor, name: str, category: Optional[str] = None):
+    def __init__(self, monitor: PerformanceMonitor, name: str, category: str | None = None):
         self.monitor = monitor
         self.name = name
         self.category = category
-        self.timer_id: Optional[str] = None
+        self.timer_id: str | None = None
 
     def __enter__(self):
         self.timer_id = self.monitor.start(self.name, self.category)
