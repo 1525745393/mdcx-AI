@@ -18860,7 +18860,7 @@
                           <x>30</x>
                           <y>30</y>
                           <width>641</width>
-                          <height>341</height>
+                          <height>500</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_vsmeta_config">
