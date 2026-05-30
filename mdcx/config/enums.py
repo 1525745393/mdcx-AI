@@ -491,7 +491,7 @@ class Switch(Enum):
     HIDE_CLOSE = "hide_close"
     HIDE_MINI = "hide_mini"
     HIDE_NONE = "hide_none"
-    # deperated
+    # deprecated
     IPV4_ONLY = "ipv4_only"
 
     @classmethod
