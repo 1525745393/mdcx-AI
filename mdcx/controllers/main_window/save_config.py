@@ -27,6 +27,9 @@ from mdcx.config.enums import (
     Switch,
     TagInclude,
     Translator,
+    VsmetaShowTitle,
+    VsmetaShowTitle2,
+    VsmetaSummary,
     Website,
 )
 from mdcx.config.extend import get_movie_path_setting
@@ -493,7 +496,9 @@ def save_config(self: "MyMAinWindow"):
     manager.config.vsmeta_jpeg_quality = self.Ui.spinBox_vsmeta_jpeg_quality.value()
     manager.config.vsmeta_actor_limit = self.Ui.spinBox_vsmeta_actor_limit.value()
     manager.config.vsmeta_tag_limit = self.Ui.spinBox_vsmeta_tag_limit.value()
-    # vsmeta_show_title, vsmeta_show_title2, vsmeta_summary 使用配置中的默认值
+    manager.config.vsmeta_show_title = list(VsmetaShowTitle)[self.Ui.comboBox_vsmeta_show_title.currentIndex()]
+    manager.config.vsmeta_show_title2 = list(VsmetaShowTitle2)[self.Ui.comboBox_vsmeta_show_title2.currentIndex()]
+    manager.config.vsmeta_summary = list(VsmetaSummary)[self.Ui.comboBox_vsmeta_summary.currentIndex()]
     manager.config.hd_name = "height" if self.Ui.radioButton_definition_height.isChecked() else "hd"
 
     # 分辨率获取方式
