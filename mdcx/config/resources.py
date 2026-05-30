@@ -12,6 +12,7 @@ from ..manual import ManualConfig
 from ..signals import signal
 from ..utils import singleton
 from ..utils.file import copy_file_sync
+from ..utils.perf import perf_monitor
 from .manager import manager
 
 
@@ -75,9 +76,22 @@ class Resources:
         self.actor_mapping_data = None  # 演员映射表数据
         self.info_mapping_data = None  # 信息映射表数据
 
+        # 性能优化：索引缓存
+        self._actor_index: dict[str, dict] = {}
+        self._info_index: dict[str, dict] = {}
+        self._actor_cache: dict[str, dict] = {}
+        self._info_cache: dict[str, dict] = {}
+
         self._get_or_generate_local_data()
         self._get_mark_icon()
         zhconv.loaddict(str(self.r("zhconv/zhcdict.json")))  # 加载繁简转换字典
+
+    def _normalize_key(self, key: str) -> str:
+        """将字符串规范化为统一的查找键"""
+        key = key.upper()
+        for each in ManualConfig.FULL_HALF_CHAR:
+            key = key.replace(each[0], each[1])
+        return key
 
     def r(self, relative_path: str | Path):
         return self._resources_base / relative_path
@@ -90,77 +104,66 @@ class Resources:
         return self._userdata_base / relative_path
 
     def get_actor_data(self, actor):
-        # 初始化数据
-        actor_data = {
-            "zh_cn": actor,
-            "zh_tw": actor,
-            "jp": actor,
-            "keyword": [actor],
-            "href": "",
-            "has_name": False,
-        }
+        with perf_monitor.timeit("get_actor_data", category="mapping"):
+            # 快速路径：检查缓存
+            cache_key = actor
+            if cache_key in self._actor_cache:
+                return self._actor_cache[cache_key].copy()
 
-        # 查询映射表
-        xml_actor = self.actor_mapping_data
-        if xml_actor is not None and len(xml_actor):
-            actor_name = f",{actor.upper()},"
-            for each in ManualConfig.FULL_HALF_CHAR:
-                actor_name = actor_name.replace(each[0], each[1])
-            actor_ob = xml_actor.xpath(
-                '//a[contains(translate(@keyword, "abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·"), $name)]',
-                name=actor_name,
-            )
-            if actor_ob:
-                actor_ob = actor_ob[0]
-                actor_data["zh_cn"] = actor_ob.get("zh_cn")
-                actor_data["zh_tw"] = actor_ob.get("zh_tw")
-                actor_data["jp"] = actor_ob.get("jp")
-                actor_data["keyword"] = actor_ob.get("keyword").strip(",").split(",")
-                actor_data["href"] = actor_ob.get("href")
+            # 初始化数据
+            actor_data = {
+                "zh_cn": actor,
+                "zh_tw": actor,
+                "jp": actor,
+                "keyword": [actor],
+                "href": "",
+                "has_name": False,
+            }
+
+            # 优化路径：使用预构建的索引
+            normalized_actor = self._normalize_key(actor)
+            actor_key = f",{normalized_actor},"
+
+            if actor_key in self._actor_index:
+                actor_data = self._actor_index[actor_key].copy()
                 actor_data["has_name"] = True
-        return actor_data
+
+            # 缓存结果
+            self._actor_cache[cache_key] = actor_data.copy()
+            return actor_data
 
     def get_info_data(self, info):
-        # 初始化数据
-        info_data = {
-            "zh_cn": info,
-            "zh_tw": info,
-            "jp": info,
-            "keyword": [info],
-            "has_name": False,
-        }
+        with perf_monitor.timeit("get_info_data", category="mapping"):
+            # 快速路径：检查缓存
+            cache_key = info
+            if cache_key in self._info_cache:
+                return self._info_cache[cache_key].copy()
 
-        # 查询映射表
-        xml_info = self.info_mapping_data
-        if xml_info is not None and len(xml_info):
-            info_key = info.upper()
-            for each in ManualConfig.FULL_HALF_CHAR:
-                info_key = info_key.replace(each[0], each[1])
-            info_name = f",{info_key},"
-            info_ob = xml_info.xpath(
-                "//a[contains(translate(@keyword, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·"), $name) '
-                "or translate(@zh_cn, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·") = $key '
-                "or translate(@zh_tw, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·") = $key '
-                "or translate(@jp, "
-                '"abcdefghijklmnopqrstuvwxyzａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ・", '
-                '"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ·") = $key]',
-                name=info_name,
-                key=info_key,
-            )
-            if info_ob:
-                info_ob = info_ob[0]
-                info_data["zh_cn"] = info_ob.get("zh_cn").replace("删除", "")
-                info_data["zh_tw"] = info_ob.get("zh_tw").replace("删除", "")
-                info_data["jp"] = info_ob.get("jp").replace("删除", "")
-                info_data["keyword"] = info_ob.get("keyword").strip(",").split(",")
+            # 初始化数据
+            info_data = {
+                "zh_cn": info,
+                "zh_tw": info,
+                "jp": info,
+                "keyword": [info],
+                "has_name": False,
+            }
+
+            # 优化路径：使用预构建的索引
+            normalized_info = self._normalize_key(info)
+            info_key = f",{normalized_info},"
+
+            # 检查各种可能的匹配
+            match = self._info_index.get(info_key)
+            if match is None:
+                match = self._info_index.get(normalized_info)
+
+            if match is not None:
+                info_data = match.copy()
                 info_data["has_name"] = True
-        return info_data
+
+            # 缓存结果
+            self._info_cache[cache_key] = info_data.copy()
+            return info_data
 
     def get_fonts(self):
         font_folder_path = self.qtr("fonts")
@@ -186,6 +189,10 @@ class Resources:
             with open(info_map_local_path, encoding="utf-8") as f:
                 content = f.read()
             self.info_mapping_data = etree.HTML(content.encode("utf-8"), parser=parser)
+
+            # 性能优化：预构建索引
+            self._build_actor_index()
+            self._build_info_index()
         except Exception as e:
             signal.show_log_text(
                 f" {actor_map_local_path} 读取失败！请检查该文件是否存在问题！如需重置请删除该文件！错误信息：\n{str(e)}"
@@ -193,6 +200,74 @@ class Resources:
             signal.show_traceback_log(traceback.format_exc())
             signal.show_log_text(traceback.format_exc())
             self.actor_mapping_data = None
+
+    def _build_actor_index(self):
+        """预构建演员映射表的索引"""
+        if self.actor_mapping_data is None:
+            return
+
+        with perf_monitor.timeit("build_actor_index", category="mapping"):
+            actor_elements = self.actor_mapping_data.xpath("//a")
+            for elem in actor_elements:
+                keyword = elem.get("keyword", "")
+                if keyword:
+                    # 构建所有可能的匹配键
+                    normalized_keywords = []
+                    for kw in keyword.strip(",").split(","):
+                        normalized_kw = self._normalize_key(kw)
+                        normalized_keywords.append(normalized_kw)
+
+                    actor_data = {
+                        "zh_cn": elem.get("zh_cn", ""),
+                        "zh_tw": elem.get("zh_tw", ""),
+                        "jp": elem.get("jp", ""),
+                        "keyword": keyword.strip(",").split(","),
+                        "href": elem.get("href", ""),
+                        "has_name": False,
+                    }
+
+                    # 索引：keyword 列表中的每一项
+                    for kw in normalized_keywords:
+                        self._actor_index[f",{kw},"] = actor_data
+
+    def _build_info_index(self):
+        """预构建信息映射表的索引"""
+        if self.info_mapping_data is None:
+            return
+
+        with perf_monitor.timeit("build_info_index", category="mapping"):
+            info_elements = self.info_mapping_data.xpath("//a")
+            for elem in info_elements:
+                zh_cn = elem.get("zh_cn", "")
+                zh_tw = elem.get("zh_tw", "")
+                jp = elem.get("jp", "")
+                keyword = elem.get("keyword", "")
+
+                # 移除标记
+                zh_cn_clean = zh_cn.replace("删除", "")
+                zh_tw_clean = zh_tw.replace("删除", "")
+                jp_clean = jp.replace("删除", "")
+
+                info_data = {
+                    "zh_cn": zh_cn_clean,
+                    "zh_tw": zh_tw_clean,
+                    "jp": jp_clean,
+                    "keyword": keyword.strip(",").split(",") if keyword else [],
+                    "has_name": False,
+                }
+
+                # 索引：keyword 列表中的每一项
+                if keyword:
+                    for kw in keyword.strip(",").split(","):
+                        normalized_kw = self._normalize_key(kw)
+                        self._info_index[f",{normalized_kw},"] = info_data
+                        self._info_index[normalized_kw] = info_data
+
+                # 索引：zh_cn、zh_tw、jp
+                for name in [zh_cn_clean, zh_tw_clean, jp_clean]:
+                    if name:
+                        normalized_name = self._normalize_key(name)
+                        self._info_index[normalized_name] = info_data
 
     def _get_mark_icon(self):
         mark_folder = self.u("watermark")
