@@ -488,3 +488,37 @@ def convert_half(string: str) -> str:
         string = string.replace(each[0], each[1])
     # 去除空格等符号
     return re.sub(r"[\W_]", "", string).upper()
+
+
+# 性能监控模块导出
+from .perf import (
+    PerformanceMonitor,
+    PerfRecord,
+    perf_monitor,
+    get_performance_report,
+    reset_performance_monitor,
+)
+
+__all__ = [
+    "AsyncBackgroundExecutor",
+    "executor",
+    "get_current_time",
+    "get_used_time",
+    "get_real_time",
+    "collapse_inline_script_splits",
+    "add_html",
+    "add_html_plain_text",
+    "clean_list",
+    "kill_a_thread",
+    "get_random_headers",
+    "singleton",
+    "nfd2c",
+    "split_path",
+    "get_new_release",
+    "convert_half",
+    "PerformanceMonitor",
+    "PerfRecord",
+    "perf_monitor",
+    "get_performance_report",
+    "reset_performance_monitor",
+]
