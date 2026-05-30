@@ -8002,10 +8002,10 @@ class Ui_MDCx(object):
         self.scrollArea_vsmeta.setWidgetResizable(False)
         self.scrollArea_vsmeta.setObjectName("scrollArea_vsmeta")
         self.scrollAreaWidgetContents_vsmeta = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_vsmeta.setGeometry(QtCore.QRect(0, 0, 796, 800))
+        self.scrollAreaWidgetContents_vsmeta.setGeometry(QtCore.QRect(0, 0, 796, 1000))
         self.scrollAreaWidgetContents_vsmeta.setObjectName("scrollAreaWidgetContents_vsmeta")
         self.groupBox_vsmeta_config = QtWidgets.QGroupBox(parent=self.scrollAreaWidgetContents_vsmeta)
-        self.groupBox_vsmeta_config.setGeometry(QtCore.QRect(30, 20, 701, 730))
+        self.groupBox_vsmeta_config.setGeometry(QtCore.QRect(30, 20, 701, 930))
         self.groupBox_vsmeta_config.setMinimumSize(QtCore.QSize(200, 0))
         self.groupBox_vsmeta_config.setMaximumSize(QtCore.QSize(739, 16777215))
         self.groupBox_vsmeta_config.setObjectName("groupBox_vsmeta_config")
@@ -8182,8 +8182,46 @@ class Ui_MDCx(object):
         
         self.gridLayout_vsmeta_config.addLayout(self.horizontalLayout_vsmeta_presets, 14, 0, 1, 2)
         
+        # 预览区域
+        self.label_vsmeta_preview = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.label_vsmeta_preview.setFont(font)
+        self.label_vsmeta_preview.setStyleSheet("color: #333; padding: 5px; border-bottom: 2px solid #ddd; margin-top: 15px;")
+        self.label_vsmeta_preview.setObjectName("label_vsmeta_preview")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_preview, 15, 0, 1, 2)
+        
+        # 预览内容区域
+        self.groupBox_vsmeta_preview = QtWidgets.QGroupBox(parent=self.gridLayoutWidget_vsmeta_config)
+        self.groupBox_vsmeta_preview.setObjectName("groupBox_vsmeta_preview")
+        self.verticalLayout_vsmeta_preview = QtWidgets.QVBoxLayout(self.groupBox_vsmeta_preview)
+        
+        # 标题预览
+        self.label_preview_title = QtWidgets.QLabel(parent=self.groupBox_vsmeta_preview)
+        font_title = QtGui.QFont()
+        font_title.setBold(True)
+        self.label_preview_title.setFont(font_title)
+        self.label_preview_title.setStyleSheet("color: #1976D2; font-size: 14px;")
+        self.label_preview_title.setObjectName("label_preview_title")
+        self.verticalLayout_vsmeta_preview.addWidget(self.label_preview_title)
+        
+        # 副标题预览
+        self.label_preview_title2 = QtWidgets.QLabel(parent=self.groupBox_vsmeta_preview)
+        self.label_preview_title2.setStyleSheet("color: #666; font-size: 12px;")
+        self.label_preview_title2.setObjectName("label_preview_title2")
+        self.verticalLayout_vsmeta_preview.addWidget(self.label_preview_title2)
+        
+        # 简介预览
+        self.label_preview_summary = QtWidgets.QLabel(parent=self.groupBox_vsmeta_preview)
+        self.label_preview_summary.setWordWrap(True)
+        self.label_preview_summary.setStyleSheet("color: #333; font-size: 11px; padding-top: 5px;")
+        self.label_preview_summary.setObjectName("label_preview_summary")
+        self.verticalLayout_vsmeta_preview.addWidget(self.label_preview_summary)
+        
+        self.gridLayout_vsmeta_config.addWidget(self.groupBox_vsmeta_preview, 16, 0, 1, 2)
+        
         self.label_vsmeta_tips = QtWidgets.QLabel(parent=self.scrollAreaWidgetContents_vsmeta)
-        self.label_vsmeta_tips.setGeometry(QtCore.QRect(30, 750, 701, 21))
+        self.label_vsmeta_tips.setGeometry(QtCore.QRect(30, 960, 701, 21))
         self.label_vsmeta_tips.setStyleSheet("color: rgb(8, 128, 128);")
         self.label_vsmeta_tips.setObjectName("label_vsmeta_tips")
         self.scrollArea_vsmeta.setWidget(self.scrollAreaWidgetContents_vsmeta)
@@ -11410,6 +11448,11 @@ class Ui_MDCx(object):
         self.comboBox_vsmeta_summary.setItemText(6, _translate("MDCx", "中文简介 + 制作信息"))
         self.comboBox_vsmeta_summary.setItemText(7, _translate("MDCx", "番号 + 标题"))
         self.comboBox_vsmeta_summary.setItemText(8, _translate("MDCx", "不写入"))
+        self.label_vsmeta_preview.setText(_translate("MDCx", "📊 实时预览"))
+        self.groupBox_vsmeta_preview.setTitle(_translate("MDCx", "VSMETA 内容预览（示例数据）"))
+        self.label_preview_title.setText(_translate("MDCx", "预览标题"))
+        self.label_preview_title2.setText(_translate("MDCx", "预览副标题"))
+        self.label_preview_summary.setText(_translate("MDCx", "这是预览简介区域，会实时显示配置后的内容效果。"))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))
         self.groupBox_43.setTitle(_translate("MDCx", "Emby/Jellyfin 设置"))

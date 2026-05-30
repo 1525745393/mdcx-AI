@@ -266,6 +266,10 @@ def Init_Singal(self: "MyMAinWindow"):
     self.Ui.slider_vsmeta_jpeg_quality.valueChanged.connect(self.slider_vsmeta_jpeg_quality_valueChanged)
     # VSMETA 帮助按钮
     self.Ui.pushButton_vsmeta_help.clicked.connect(self.pushButton_vsmeta_help_clicked)
+    # VSMETA 预览更新事件
+    self.Ui.comboBox_vsmeta_show_title.currentIndexChanged.connect(self.update_vsmeta_preview)
+    self.Ui.comboBox_vsmeta_show_title2.currentIndexChanged.connect(self.update_vsmeta_preview)
+    self.Ui.comboBox_vsmeta_summary.currentIndexChanged.connect(self.update_vsmeta_preview)
     # endregion
 
     # region 鼠标点击
