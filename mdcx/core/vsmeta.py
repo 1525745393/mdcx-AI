@@ -398,6 +398,50 @@ def parse_runtime(runtime: str) -> int | None:
         return None
 
 
+def render_template(template: str, data: CrawlersResult) -> str:
+    """Render a template string using data from CrawlersResult
+    
+    Supported placeholders:
+    - {number}: 番号
+    - {title}: 中文标题
+    - {originaltitle}: 日文原始标题
+    - {publisher}: 制作商
+    - {studio}: 工作室
+    - {series}: 系列名称
+    - {actors}: 演员列表（逗号分隔，最多显示3个）
+    - {outline}: 中文简介
+    - {originalplot}: 日文简介
+    - {year}: 年份
+    - {release}: 发布日期
+    """
+    import re
+
+    if not template:
+        return ""
+
+    # 准备数据
+    context = {
+        "number": data.number or "",
+        "title": data.title or "",
+        "originaltitle": data.originaltitle or "",
+        "publisher": data.publisher or "",
+        "studio": data.studio or "",
+        "series": data.series or "",
+        "actors": ", ".join((data.all_actors if len(data.all_actors) > len(data.actors) else data.actors)[:3]) if (data.actors or data.all_actors) else "",
+        "outline": data.outline or "",
+        "originalplot": data.originalplot or "",
+        "year": data.year or "",
+        "release": data.release or "",
+    }
+
+    # 简单的模板渲染
+    result = template
+    for key, value in context.items():
+        result = result.replace(f"{{{key}}}", str(value))
+
+    return result
+
+
 def should_update_vsmeta(
     main_mode: int,
     switch_on: list[Switch],
@@ -479,7 +523,9 @@ async def write_vsmeta(
 
         # ── 1. TAG_SHOW_TITLE (0x12): Title content based on config ──
         show_title_mode = manager.config.vsmeta_show_title
-        if show_title_mode == VsmetaShowTitle.NUMBER_TITLE and data.title and data.number:
+        if show_title_mode == VsmetaShowTitle.CUSTOM:
+            display_title = render_template(manager.config.vsmeta_custom_title, data)
+        elif show_title_mode == VsmetaShowTitle.NUMBER_TITLE and data.title and data.number:
             display_title = f"[{data.number}] {data.title}"
         elif show_title_mode == VsmetaShowTitle.NUMBER_ONLY and data.number:
             display_title = data.number
@@ -495,7 +541,9 @@ async def write_vsmeta(
 
         # ── 2. TAG_SHOW_TITLE2 (0x1A): Content based on config ──
         title2_mode = manager.config.vsmeta_show_title2
-        if title2_mode == VsmetaShowTitle2.ORIGINALTITLE:
+        if title2_mode == VsmetaShowTitle2.CUSTOM:
+            title2_value = render_template(manager.config.vsmeta_custom_title2, data)
+        elif title2_mode == VsmetaShowTitle2.ORIGINALTITLE:
             title2_value = data.originaltitle
         elif title2_mode == VsmetaShowTitle2.PUBLISHER:
             title2_value = data.publisher
@@ -544,49 +592,52 @@ async def write_vsmeta(
         # ── 7. TAG_CHAPTER_SUMMARY (0x42): Summary content based on config ──
         summary_mode = manager.config.vsmeta_summary
         summary_parts = []
-        if summary_mode == VsmetaSummary.JP_ZH_JP:
-            if data.originaltitle:
-                summary_parts.append(data.originaltitle)
-            if data.outline:
-                summary_parts.append(data.outline)
-            if data.originalplot and data.originalplot != data.outline:
-                summary_parts.append(data.originalplot)
-        elif summary_mode == VsmetaSummary.OUTLINE:
-            if data.outline:
-                summary_parts.append(data.outline)
-        elif summary_mode == VsmetaSummary.ORIGINALPLOT:
-            if data.originalplot:
-                summary_parts.append(data.originalplot)
-        elif summary_mode == VsmetaSummary.ZH_JP:
-            if data.outline:
-                summary_parts.append(data.outline)
-            if data.originalplot and data.originalplot != data.outline:
-                summary_parts.append(data.originalplot)
-        elif summary_mode == VsmetaSummary.JP_ZH:
-            if data.originaltitle:
-                summary_parts.append(data.originaltitle)
-            if data.outline:
-                summary_parts.append(data.outline)
-        elif summary_mode == VsmetaSummary.TITLE_ONLY:
-            if data.originaltitle:
-                summary_parts.append(data.originaltitle)
-        elif summary_mode == VsmetaSummary.OUTLINE_PUBLISHER:
-            if data.outline:
-                summary_parts.append(data.outline)
-            info_parts = []
-            if data.publisher:
-                info_parts.append(f"制作商: {data.publisher}")
-            if data.studio and data.studio != data.publisher:
-                info_parts.append(f"工作室: {data.studio}")
-            if info_parts:
-                summary_parts.append("---")
-                summary_parts.append("\n".join(info_parts))
-        elif summary_mode == VsmetaSummary.NUMBER_TITLE:
-            if data.number:
-                summary_parts.append(f"番号: {data.number}")
-            if data.title:
-                summary_parts.append(data.title)
-        summary = "\n\n".join(summary_parts) if summary_parts else None
+        if summary_mode == VsmetaSummary.CUSTOM:
+            summary = render_template(manager.config.vsmeta_custom_summary, data)
+        else:
+            if summary_mode == VsmetaSummary.JP_ZH_JP:
+                if data.originaltitle:
+                    summary_parts.append(data.originaltitle)
+                if data.outline:
+                    summary_parts.append(data.outline)
+                if data.originalplot and data.originalplot != data.outline:
+                    summary_parts.append(data.originalplot)
+            elif summary_mode == VsmetaSummary.OUTLINE:
+                if data.outline:
+                    summary_parts.append(data.outline)
+            elif summary_mode == VsmetaSummary.ORIGINALPLOT:
+                if data.originalplot:
+                    summary_parts.append(data.originalplot)
+            elif summary_mode == VsmetaSummary.ZH_JP:
+                if data.outline:
+                    summary_parts.append(data.outline)
+                if data.originalplot and data.originalplot != data.outline:
+                    summary_parts.append(data.originalplot)
+            elif summary_mode == VsmetaSummary.JP_ZH:
+                if data.originaltitle:
+                    summary_parts.append(data.originaltitle)
+                if data.outline:
+                    summary_parts.append(data.outline)
+            elif summary_mode == VsmetaSummary.TITLE_ONLY:
+                if data.originaltitle:
+                    summary_parts.append(data.originaltitle)
+            elif summary_mode == VsmetaSummary.OUTLINE_PUBLISHER:
+                if data.outline:
+                    summary_parts.append(data.outline)
+                info_parts = []
+                if data.publisher:
+                    info_parts.append(f"制作商: {data.publisher}")
+                if data.studio and data.studio != data.publisher:
+                    info_parts.append(f"工作室: {data.studio}")
+                if info_parts:
+                    summary_parts.append("---")
+                    summary_parts.append("\n".join(info_parts))
+            elif summary_mode == VsmetaSummary.NUMBER_TITLE:
+                if data.number:
+                    summary_parts.append(f"番号: {data.number}")
+                if data.title:
+                    summary_parts.append(data.title)
+            summary = "\n\n".join(summary_parts) if summary_parts else None
         if summary:
             encoder.write_string_field(VSMetaEncoder.TAG_CHAPTER_SUMMARY, summary, label="summary")
 

@@ -64,6 +64,7 @@ class VsmetaShowTitle(Enum):
     NUMBER_ORIGINALTITLE = "number_originaltitle"
     TITLE_ORIGINALTITLE = "title_originaltitle"
     ORIGINALTITLE_TITLE = "originaltitle_title"
+    CUSTOM = "custom"
 
     @classmethod
     def names(cls):
@@ -74,6 +75,7 @@ class VsmetaShowTitle(Enum):
             "番号 + 日文原始标题",
             "中文标题 + 日文标题",
             "日文标题 + 中文标题",
+            "自定义模板",
         ]
 
 
@@ -85,6 +87,7 @@ class VsmetaShowTitle2(Enum):
     SERIES = "series"
     ACTOR = "actor"
     NONE = "none"
+    CUSTOM = "custom"
 
     @classmethod
     def names(cls):
@@ -96,6 +99,7 @@ class VsmetaShowTitle2(Enum):
             "系列名称",
             "主要演员",
             "不写入",
+            "自定义模板",
         ]
 
 
@@ -109,6 +113,7 @@ class VsmetaSummary(Enum):
     OUTLINE_PUBLISHER = "outline_publisher"
     NUMBER_TITLE = "number_title"
     NONE = "none"
+    CUSTOM = "custom"
 
     @classmethod
     def names(cls):
@@ -122,6 +127,7 @@ class VsmetaSummary(Enum):
             "中文简介 + 制作信息",
             "番号 + 标题",
             "不写入",
+            "自定义模板",
         ]
 
 

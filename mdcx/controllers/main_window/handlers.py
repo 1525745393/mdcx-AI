@@ -6,6 +6,34 @@ from mdcx.config.manager import manager
 from mdcx.signals import signal_qt
 
 
+def render_preview_template(template: str, sample_data: dict) -> str:
+    """渲染预览模板"""
+    if not template:
+        return ""
+    
+    # 准备数据
+    context = {
+        "number": sample_data.get("number", ""),
+        "title": sample_data.get("title", ""),
+        "originaltitle": sample_data.get("originaltitle", ""),
+        "publisher": sample_data.get("publisher", ""),
+        "studio": sample_data.get("studio", ""),
+        "series": sample_data.get("series", ""),
+        "actors": ", ".join(sample_data.get("actors", [])[:3]),
+        "outline": sample_data.get("outline", ""),
+        "originalplot": sample_data.get("originalplot", ""),
+        "year": sample_data.get("year", ""),
+        "release": sample_data.get("release", ""),
+    }
+    
+    # 简单的模板渲染
+    result = template
+    for key, value in context.items():
+        result = result.replace(f"{{{key}}}", str(value))
+    
+    return result
+
+
 def show_netstatus() -> None:
     signal_qt.show_net_info(time.strftime("%Y-%m-%d %H:%M:%S").center(80, "="))
 
@@ -127,12 +155,16 @@ def update_vsmeta_preview(self):
             "series": "Premium EX",
             "actors": ["演员A", "演员B", "演员C"],
             "outline": "这是一部精彩的影片，讲述了精彩的故事内容，非常值得观看。",
-            "originalplot": "これは素敵な映画で、素敵なストーリーを描いています。是非ご覧ください。"
+            "originalplot": "これは素敵な映画で、素敵なストーリーを描いています。是非ご覧ください。",
+            "year": "2024",
+            "release": "2024-01-01",
         }
         
         # 生成标题预览
         title_mode = VsmetaShowTitle(list(VsmetaShowTitle)[self.Ui.comboBox_vsmeta_show_title.currentIndex()])
-        if title_mode == VsmetaShowTitle.TITLE:
+        if title_mode == VsmetaShowTitle.CUSTOM:
+            preview_title = render_preview_template(manager.config.vsmeta_custom_title, sample_data)
+        elif title_mode == VsmetaShowTitle.TITLE:
             preview_title = sample_data["title"]
         elif title_mode == VsmetaShowTitle.NUMBER_TITLE and sample_data["title"] and sample_data["number"]:
             preview_title = f"[{sample_data['number']}] {sample_data['title']}"
@@ -149,7 +181,9 @@ def update_vsmeta_preview(self):
         
         # 生成副标题预览
         title2_mode = VsmetaShowTitle2(list(VsmetaShowTitle2)[self.Ui.comboBox_vsmeta_show_title2.currentIndex()])
-        if title2_mode == VsmetaShowTitle2.ORIGINALTITLE:
+        if title2_mode == VsmetaShowTitle2.CUSTOM:
+            preview_title2 = render_preview_template(manager.config.vsmeta_custom_title2, sample_data)
+        elif title2_mode == VsmetaShowTitle2.ORIGINALTITLE:
             preview_title2 = sample_data["originaltitle"]
         elif title2_mode == VsmetaShowTitle2.PUBLISHER:
             preview_title2 = sample_data["publisher"]
@@ -172,50 +206,53 @@ def update_vsmeta_preview(self):
         # 生成简介预览
         summary_mode = VsmetaSummary(list(VsmetaSummary)[self.Ui.comboBox_vsmeta_summary.currentIndex()])
         summary_parts = []
-        if summary_mode == VsmetaSummary.JP_ZH_JP:
-            if sample_data["originaltitle"]:
-                summary_parts.append(sample_data["originaltitle"])
-            if sample_data["outline"]:
-                summary_parts.append(sample_data["outline"])
-            if sample_data["originalplot"] and sample_data["originalplot"] != sample_data["outline"]:
-                summary_parts.append(sample_data["originalplot"])
-        elif summary_mode == VsmetaSummary.OUTLINE:
-            if sample_data["outline"]:
-                summary_parts.append(sample_data["outline"])
-        elif summary_mode == VsmetaSummary.ORIGINALPLOT:
-            if sample_data["originalplot"]:
-                summary_parts.append(sample_data["originalplot"])
-        elif summary_mode == VsmetaSummary.ZH_JP:
-            if sample_data["outline"]:
-                summary_parts.append(sample_data["outline"])
-            if sample_data["originalplot"] and sample_data["originalplot"] != sample_data["outline"]:
-                summary_parts.append(sample_data["originalplot"])
-        elif summary_mode == VsmetaSummary.JP_ZH:
-            if sample_data["originaltitle"]:
-                summary_parts.append(sample_data["originaltitle"])
-            if sample_data["outline"]:
-                summary_parts.append(sample_data["outline"])
-        elif summary_mode == VsmetaSummary.TITLE_ONLY:
-            if sample_data["originaltitle"]:
-                summary_parts.append(sample_data["originaltitle"])
-        elif summary_mode == VsmetaSummary.OUTLINE_PUBLISHER:
-            if sample_data["outline"]:
-                summary_parts.append(sample_data["outline"])
-            info_parts = []
-            if sample_data["publisher"]:
-                info_parts.append(f"制作商: {sample_data['publisher']}")
-            if sample_data["studio"] and sample_data["studio"] != sample_data["publisher"]:
-                info_parts.append(f"工作室: {sample_data['studio']}")
-            if info_parts:
-                summary_parts.append("---")
-                summary_parts.append("\n".join(info_parts))
-        elif summary_mode == VsmetaSummary.NUMBER_TITLE:
-            if sample_data["number"]:
-                summary_parts.append(f"番号: {sample_data['number']}")
-            if sample_data["title"]:
-                summary_parts.append(sample_data["title"])
-        
-        preview_summary = "\n\n".join(summary_parts) if summary_parts else ""
+        if summary_mode == VsmetaSummary.CUSTOM:
+            preview_summary = render_preview_template(manager.config.vsmeta_custom_summary, sample_data)
+        else:
+            if summary_mode == VsmetaSummary.JP_ZH_JP:
+                if sample_data["originaltitle"]:
+                    summary_parts.append(sample_data["originaltitle"])
+                if sample_data["outline"]:
+                    summary_parts.append(sample_data["outline"])
+                if sample_data["originalplot"] and sample_data["originalplot"] != sample_data["outline"]:
+                    summary_parts.append(sample_data["originalplot"])
+            elif summary_mode == VsmetaSummary.OUTLINE:
+                if sample_data["outline"]:
+                    summary_parts.append(sample_data["outline"])
+            elif summary_mode == VsmetaSummary.ORIGINALPLOT:
+                if sample_data["originalplot"]:
+                    summary_parts.append(sample_data["originalplot"])
+            elif summary_mode == VsmetaSummary.ZH_JP:
+                if sample_data["outline"]:
+                    summary_parts.append(sample_data["outline"])
+                if sample_data["originalplot"] and sample_data["originalplot"] != sample_data["outline"]:
+                    summary_parts.append(sample_data["originalplot"])
+            elif summary_mode == VsmetaSummary.JP_ZH:
+                if sample_data["originaltitle"]:
+                    summary_parts.append(sample_data["originaltitle"])
+                if sample_data["outline"]:
+                    summary_parts.append(sample_data["outline"])
+            elif summary_mode == VsmetaSummary.TITLE_ONLY:
+                if sample_data["originaltitle"]:
+                    summary_parts.append(sample_data["originaltitle"])
+            elif summary_mode == VsmetaSummary.OUTLINE_PUBLISHER:
+                if sample_data["outline"]:
+                    summary_parts.append(sample_data["outline"])
+                info_parts = []
+                if sample_data["publisher"]:
+                    info_parts.append(f"制作商: {sample_data['publisher']}")
+                if sample_data["studio"] and sample_data["studio"] != sample_data["publisher"]:
+                    info_parts.append(f"工作室: {sample_data['studio']}")
+                if info_parts:
+                    summary_parts.append("---")
+                    summary_parts.append("\n".join(info_parts))
+            elif summary_mode == VsmetaSummary.NUMBER_TITLE:
+                if sample_data["number"]:
+                    summary_parts.append(f"番号: {sample_data['number']}")
+                if sample_data["title"]:
+                    summary_parts.append(sample_data["title"])
+            
+            preview_summary = "\n\n".join(summary_parts) if summary_parts else ""
         
         # 更新 UI
         self.Ui.label_preview_title.setText(preview_title or "（标题为空）")
