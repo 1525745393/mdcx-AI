@@ -1102,6 +1102,9 @@ def load_config(self: "MyMAinWindow"):
         # endregion
 
         self.Ui.checkBox_create_link.setChecked(manager.config.auto_link)
+        
+        # 更新 VSMETA 预览
+        self.update_vsmeta_preview()
 
         # ======================================================================================END
         # 根据是否同意改变清理按钮状态

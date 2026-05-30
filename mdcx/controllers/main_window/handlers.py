@@ -48,6 +48,8 @@ def apply_vsmeta_preset_recommended(self):
     self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.ORIGINALTITLE))
     self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP))
     signal_qt.show_log_text("✅ 已应用 VSMETA 推荐配置")
+    # 更新预览
+    self.update_vsmeta_preview()
 
 
 def apply_vsmeta_preset_high_quality(self):
@@ -64,6 +66,8 @@ def apply_vsmeta_preset_high_quality(self):
     self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.ORIGINALTITLE))
     self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP))
     signal_qt.show_log_text("✅ 已应用 VSMETA 高画质配置")
+    # 更新预览
+    self.update_vsmeta_preview()
 
 
 def apply_vsmeta_preset_small_file(self):
@@ -80,6 +84,8 @@ def apply_vsmeta_preset_small_file(self):
     self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.NONE))
     self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.OUTLINE))
     signal_qt.show_log_text("✅ 已应用 VSMETA 最小文件配置")
+    # 更新预览
+    self.update_vsmeta_preview()
 
 
 def reset_vsmeta_to_default(self):
@@ -97,6 +103,8 @@ def reset_vsmeta_to_default(self):
     self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.ORIGINALTITLE))
     self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP))
     signal_qt.show_log_text("✅ 已重置 VSMETA 配置为默认值")
+    # 更新预览
+    self.update_vsmeta_preview()
 
 
 def show_vsmeta_help(self):
