@@ -493,7 +493,7 @@ def save_config(self: "MyMAinWindow"):
     manager.config.vsmeta_include_backdrop = self.Ui.checkBox_vsmeta_include_backdrop.isChecked()
     manager.config.vsmeta_locked = self.Ui.checkBox_vsmeta_locked.isChecked()
     manager.config.vsmeta_image_max_dimension = self.Ui.spinBox_vsmeta_image_dimension.value()
-    manager.config.vsmeta_jpeg_quality = self.Ui.spinBox_vsmeta_jpeg_quality.value()
+    manager.config.vsmeta_jpeg_quality = self.Ui.slider_vsmeta_jpeg_quality.value()
     manager.config.vsmeta_actor_limit = self.Ui.spinBox_vsmeta_actor_limit.value()
     manager.config.vsmeta_tag_limit = self.Ui.spinBox_vsmeta_tag_limit.value()
     manager.config.vsmeta_show_title = list(VsmetaShowTitle)[self.Ui.comboBox_vsmeta_show_title.currentIndex()]

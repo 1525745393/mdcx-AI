@@ -262,6 +262,10 @@ def Init_Singal(self: "MyMAinWindow"):
     self.Ui.pushButton_vsmeta_preset_high_quality.clicked.connect(lambda: self.apply_vsmeta_preset_high_quality())
     self.Ui.pushButton_vsmeta_preset_small_file.clicked.connect(lambda: self.apply_vsmeta_preset_small_file())
     self.Ui.pushButton_vsmeta_reset.clicked.connect(lambda: self.reset_vsmeta_to_default())
+    # VSMETA JPEG 滑块事件
+    self.Ui.slider_vsmeta_jpeg_quality.valueChanged.connect(self.slider_vsmeta_jpeg_quality_valueChanged)
+    # VSMETA 帮助按钮
+    self.Ui.pushButton_vsmeta_help.clicked.connect(self.pushButton_vsmeta_help_clicked)
     # endregion
 
     # region 鼠标点击

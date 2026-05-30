@@ -704,7 +704,8 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.checkBox_vsmeta_include_backdrop.setChecked(manager.config.vsmeta_include_backdrop)
         self.Ui.checkBox_vsmeta_locked.setChecked(manager.config.vsmeta_locked)
         self.Ui.spinBox_vsmeta_image_dimension.setValue(manager.config.vsmeta_image_max_dimension)
-        self.Ui.spinBox_vsmeta_jpeg_quality.setValue(manager.config.vsmeta_jpeg_quality)
+        self.Ui.slider_vsmeta_jpeg_quality.setValue(manager.config.vsmeta_jpeg_quality)
+        self.Ui.label_vsmeta_jpeg_value.setText(str(manager.config.vsmeta_jpeg_quality))
         self.Ui.spinBox_vsmeta_actor_limit.setValue(manager.config.vsmeta_actor_limit)
         self.Ui.spinBox_vsmeta_tag_limit.setValue(manager.config.vsmeta_tag_limit)
         self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(
