@@ -499,6 +499,13 @@ from .perf import (
     reset_performance_monitor,
 )
 
+# 爬虫健康监控模块导出
+from .crawler_health import (
+    CrawlerHealthStats,
+    CrawlerHealthMonitor,
+    health_monitor,
+)
+
 __all__ = [
     "AsyncBackgroundExecutor",
     "executor",
@@ -521,4 +528,7 @@ __all__ = [
     "perf_monitor",
     "get_performance_report",
     "reset_performance_monitor",
+    "CrawlerHealthStats",
+    "CrawlerHealthMonitor",
+    "health_monitor",
 ]

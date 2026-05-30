@@ -7,6 +7,8 @@ from parsel import Selector
 
 from mdcx.config.models import Website
 from mdcx.models.types import CrawlerInput, CrawlerResponse, CrawlerResult
+from mdcx.utils import perf_monitor
+from mdcx.utils.crawler_health import health_monitor
 
 from .types import Context, CralwerException, CrawlerData
 
@@ -83,13 +85,24 @@ class GenericBaseCrawler[T: Context = Context](ABC):
         start_time = time.time()
         ctx = self.new_context(input)
         ctx.debug(f"{input=}")
+        
+        site = self.site()
 
         try:
-            data = await self._run(ctx)
+            with perf_monitor.timeit(f"crawler_{site.value}", category="crawler"):
+                data = await self._run(ctx)
+            
+            execution_time = time.time() - start_time
+            health_monitor.record_success(site, execution_time)
+            
             return CrawlerResponse(data=data, debug_info=ctx.debug_info)
         except Exception as e:
             ctx.debug(traceback.format_exc())
             ctx.debug_info.error = e
+            
+            execution_time = time.time() - start_time
+            health_monitor.record_failure(site, str(e))
+            
             return CrawlerResponse(debug_info=ctx.debug_info)
         finally:
             ctx.debug_info.execution_time = time.time() - start_time
