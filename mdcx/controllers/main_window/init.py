@@ -257,6 +257,11 @@ def Init_Singal(self: "MyMAinWindow"):
     self.Ui.pushButton_nfo_close.clicked.connect(self.Ui.widget_nfo.hide)
     self.Ui.pushButton_nfo_save.clicked.connect(self.save_nfo_info)
     self.Ui.pushButton_performance_monitor.clicked.connect(self.pushButton_performance_monitor_clicked)
+    # VSMETA 预设按钮
+    self.Ui.pushButton_vsmeta_preset_recommended.clicked.connect(lambda: self.apply_vsmeta_preset_recommended())
+    self.Ui.pushButton_vsmeta_preset_high_quality.clicked.connect(lambda: self.apply_vsmeta_preset_high_quality())
+    self.Ui.pushButton_vsmeta_preset_small_file.clicked.connect(lambda: self.apply_vsmeta_preset_small_file())
+    self.Ui.pushButton_vsmeta_reset.clicked.connect(lambda: self.reset_vsmeta_to_default())
     # endregion
 
     # region 鼠标点击

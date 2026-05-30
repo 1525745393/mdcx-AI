@@ -84,7 +84,13 @@ from mdcx.utils.file import (
 from mdcx.views.MDCx import Ui_MDCx
 
 from ..cut_window import CutWindow
-from .handlers import show_netstatus
+from .handlers import (
+    apply_vsmeta_preset_high_quality,
+    apply_vsmeta_preset_recommended,
+    apply_vsmeta_preset_small_file,
+    reset_vsmeta_to_default,
+    show_netstatus,
+)
 from .init import Init_QSystemTrayIcon, Init_Singal, Init_Ui, init_QTreeWidget
 from .load_config import load_config
 from .performance_dialog import open_performance_dialog
@@ -930,6 +936,34 @@ class MyMAinWindow(QMainWindow):
     def pushButton_performance_monitor_clicked(self):
         try:
             open_performance_dialog(self)
+        except Exception:
+            signal_qt.show_traceback_log(traceback.format_exc())
+
+    # VSMETA 预设：推荐配置
+    def apply_vsmeta_preset_recommended(self):
+        try:
+            apply_vsmeta_preset_recommended(self)
+        except Exception:
+            signal_qt.show_traceback_log(traceback.format_exc())
+
+    # VSMETA 预设：高画质
+    def apply_vsmeta_preset_high_quality(self):
+        try:
+            apply_vsmeta_preset_high_quality(self)
+        except Exception:
+            signal_qt.show_traceback_log(traceback.format_exc())
+
+    # VSMETA 预设：最小文件
+    def apply_vsmeta_preset_small_file(self):
+        try:
+            apply_vsmeta_preset_small_file(self)
+        except Exception:
+            signal_qt.show_traceback_log(traceback.format_exc())
+
+    # VSMETA 重置：默认值
+    def reset_vsmeta_to_default(self):
+        try:
+            reset_vsmeta_to_default(self)
         except Exception:
             signal_qt.show_traceback_log(traceback.format_exc())
 

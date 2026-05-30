@@ -1,5 +1,6 @@
 import time
 
+from mdcx.config.enums import VsmetaShowTitle, VsmetaShowTitle2, VsmetaSummary
 from mdcx.config.manager import manager
 from mdcx.signals import signal_qt
 
@@ -30,3 +31,64 @@ def show_netstatus() -> None:
             f"   CF Bypass：{bypass_status}    Bypass代理：{bypass_proxy_status}    超时：{str(timeout)}    重试：{str(retry_count)}"
         )
     signal_qt.show_net_info("=" * 80)
+
+
+def apply_vsmeta_preset_recommended(self) -> None:
+    """推荐配置：平衡图片质量和文件大小"""
+    self.Ui.checkBox_vsmeta_include_poster.setChecked(True)
+    self.Ui.checkBox_vsmeta_include_backdrop.setChecked(True)
+    self.Ui.checkBox_vsmeta_locked.setChecked(True)
+    self.Ui.spinBox_vsmeta_image_dimension.setValue(1920)
+    self.Ui.spinBox_vsmeta_jpeg_quality.setValue(90)
+    self.Ui.spinBox_vsmeta_actor_limit.setValue(20)
+    self.Ui.spinBox_vsmeta_tag_limit.setValue(10)
+    self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(list(VsmetaShowTitle).index(VsmetaShowTitle.TITLE))
+    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.ORIGINALTITLE))
+    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP))
+    signal_qt.show_log_text("✅ 已应用 VSMETA 推荐配置")
+
+
+def apply_vsmeta_preset_high_quality(self) -> None:
+    """高画质配置：高质量图片设置"""
+    self.Ui.checkBox_vsmeta_include_poster.setChecked(True)
+    self.Ui.checkBox_vsmeta_include_backdrop.setChecked(True)
+    self.Ui.checkBox_vsmeta_locked.setChecked(True)
+    self.Ui.spinBox_vsmeta_image_dimension.setValue(2160)
+    self.Ui.spinBox_vsmeta_jpeg_quality.setValue(100)
+    self.Ui.spinBox_vsmeta_actor_limit.setValue(50)
+    self.Ui.spinBox_vsmeta_tag_limit.setValue(30)
+    self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(list(VsmetaShowTitle).index(VsmetaShowTitle.NUMBER_TITLE))
+    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.ORIGINALTITLE))
+    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP))
+    signal_qt.show_log_text("✅ 已应用 VSMETA 高画质配置")
+
+
+def apply_vsmeta_preset_small_file(self) -> None:
+    """最小文件配置：节省空间的配置"""
+    self.Ui.checkBox_vsmeta_include_poster.setChecked(False)
+    self.Ui.checkBox_vsmeta_include_backdrop.setChecked(False)
+    self.Ui.checkBox_vsmeta_locked.setChecked(True)
+    self.Ui.spinBox_vsmeta_image_dimension.setValue(1080)
+    self.Ui.spinBox_vsmeta_jpeg_quality.setValue(70)
+    self.Ui.spinBox_vsmeta_actor_limit.setValue(5)
+    self.Ui.spinBox_vsmeta_tag_limit.setValue(5)
+    self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(list(VsmetaShowTitle).index(VsmetaShowTitle.TITLE))
+    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.DISABLED))
+    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.ZH_ONLY))
+    signal_qt.show_log_text("✅ 已应用 VSMETA 最小文件配置")
+
+
+def reset_vsmeta_to_default(self) -> None:
+    """重置为默认值"""
+    # 使用配置模型中的默认值
+    self.Ui.checkBox_vsmeta_include_poster.setChecked(True)
+    self.Ui.checkBox_vsmeta_include_backdrop.setChecked(True)
+    self.Ui.checkBox_vsmeta_locked.setChecked(True)
+    self.Ui.spinBox_vsmeta_image_dimension.setValue(1920)
+    self.Ui.spinBox_vsmeta_jpeg_quality.setValue(90)
+    self.Ui.spinBox_vsmeta_actor_limit.setValue(20)
+    self.Ui.spinBox_vsmeta_tag_limit.setValue(10)
+    self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(list(VsmetaShowTitle).index(VsmetaShowTitle.TITLE))
+    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.ORIGINALTITLE))
+    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP))
+    signal_qt.show_log_text("✅ 已重置 VSMETA 配置为默认值")
