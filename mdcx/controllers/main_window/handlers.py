@@ -77,8 +77,8 @@ def apply_vsmeta_preset_small_file(self):
     self.Ui.spinBox_vsmeta_actor_limit.setValue(5)
     self.Ui.spinBox_vsmeta_tag_limit.setValue(5)
     self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(list(VsmetaShowTitle).index(VsmetaShowTitle.TITLE))
-    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.DISABLED))
-    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.ZH_ONLY))
+    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.NONE))
+    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.OUTLINE))
     signal_qt.show_log_text("✅ 已应用 VSMETA 最小文件配置")
 
 

@@ -60,21 +60,43 @@ class OutlineShow(Enum):
 class VsmetaShowTitle(Enum):
     TITLE = "title"
     NUMBER_TITLE = "number_title"
+    NUMBER_ONLY = "number_only"
+    NUMBER_ORIGINALTITLE = "number_originaltitle"
+    TITLE_ORIGINALTITLE = "title_originaltitle"
+    ORIGINALTITLE_TITLE = "originaltitle_title"
 
     @classmethod
     def names(cls):
-        return ["中文翻译标题", "番号 + 中文翻译标题"]
+        return [
+            "中文翻译标题",
+            "番号 + 中文翻译标题",
+            "仅番号",
+            "番号 + 日文原始标题",
+            "中文标题 + 日文标题",
+            "日文标题 + 中文标题",
+        ]
 
 
 class VsmetaShowTitle2(Enum):
     ORIGINALTITLE = "originaltitle"
     PUBLISHER = "publisher"
     STUDIO = "studio"
+    PUBLISHER_STUDIO = "publisher_studio"
+    SERIES = "series"
+    ACTOR = "actor"
     NONE = "none"
 
     @classmethod
     def names(cls):
-        return ["日文原始标题", "制作商", "工作室", "不写入"]
+        return [
+            "日文原始标题",
+            "制作商",
+            "工作室",
+            "制作商 + 工作室",
+            "系列名称",
+            "主要演员",
+            "不写入",
+        ]
 
 
 class VsmetaSummary(Enum):
@@ -84,6 +106,8 @@ class VsmetaSummary(Enum):
     ZH_JP = "zh_jp"
     JP_ZH = "jp_zh"
     TITLE_ONLY = "title_only"
+    OUTLINE_PUBLISHER = "outline_publisher"
+    NUMBER_TITLE = "number_title"
     NONE = "none"
 
     @classmethod
@@ -95,6 +119,8 @@ class VsmetaSummary(Enum):
             "中文简介 + 日文简介",
             "日文标题 + 中文简介",
             "仅日文标题",
+            "中文简介 + 制作信息",
+            "番号 + 标题",
             "不写入",
         ]
 
