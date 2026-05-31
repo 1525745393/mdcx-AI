@@ -119,6 +119,8 @@ def apply_vsmeta_preset_small_file(self):
 def reset_vsmeta_to_default(self):
     """重置为默认值"""
     # 使用配置模型中的默认值
+    from mdcx.config.models import Config
+    default_config = Config()
     self.Ui.checkBox_vsmeta_include_poster.setChecked(True)
     self.Ui.checkBox_vsmeta_include_backdrop.setChecked(True)
     self.Ui.checkBox_vsmeta_locked.setChecked(True)
@@ -130,6 +132,9 @@ def reset_vsmeta_to_default(self):
     self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(list(VsmetaShowTitle).index(VsmetaShowTitle.TITLE))
     self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(list(VsmetaShowTitle2).index(VsmetaShowTitle2.ORIGINALTITLE))
     self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP))
+    self.Ui.lineEdit_vsmeta_custom_title.setText(default_config.vsmeta_custom_title)
+    self.Ui.lineEdit_vsmeta_custom_title2.setText(default_config.vsmeta_custom_title2)
+    self.Ui.textEdit_vsmeta_custom_summary.setPlainText(default_config.vsmeta_custom_summary)
     signal_qt.show_log_text("✅ 已重置 VSMETA 配置为默认值")
     # 更新预览
     self.update_vsmeta_preview()
@@ -163,7 +168,7 @@ def update_vsmeta_preview(self):
         # 生成标题预览
         title_mode = VsmetaShowTitle(list(VsmetaShowTitle)[self.Ui.comboBox_vsmeta_show_title.currentIndex()])
         if title_mode == VsmetaShowTitle.CUSTOM:
-            preview_title = render_preview_template(manager.config.vsmeta_custom_title, sample_data)
+            preview_title = render_preview_template(self.Ui.lineEdit_vsmeta_custom_title.text(), sample_data)
         elif title_mode == VsmetaShowTitle.TITLE:
             preview_title = sample_data["title"]
         elif title_mode == VsmetaShowTitle.NUMBER_TITLE and sample_data["title"] and sample_data["number"]:
@@ -182,7 +187,7 @@ def update_vsmeta_preview(self):
         # 生成副标题预览
         title2_mode = VsmetaShowTitle2(list(VsmetaShowTitle2)[self.Ui.comboBox_vsmeta_show_title2.currentIndex()])
         if title2_mode == VsmetaShowTitle2.CUSTOM:
-            preview_title2 = render_preview_template(manager.config.vsmeta_custom_title2, sample_data)
+            preview_title2 = render_preview_template(self.Ui.lineEdit_vsmeta_custom_title2.text(), sample_data)
         elif title2_mode == VsmetaShowTitle2.ORIGINALTITLE:
             preview_title2 = sample_data["originaltitle"]
         elif title2_mode == VsmetaShowTitle2.PUBLISHER:
@@ -207,7 +212,7 @@ def update_vsmeta_preview(self):
         summary_mode = VsmetaSummary(list(VsmetaSummary)[self.Ui.comboBox_vsmeta_summary.currentIndex()])
         summary_parts = []
         if summary_mode == VsmetaSummary.CUSTOM:
-            preview_summary = render_preview_template(manager.config.vsmeta_custom_summary, sample_data)
+            preview_summary = render_preview_template(self.Ui.textEdit_vsmeta_custom_summary.toPlainText(), sample_data)
         else:
             if summary_mode == VsmetaSummary.JP_ZH_JP:
                 if sample_data["originaltitle"]:

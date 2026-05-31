@@ -270,6 +270,10 @@ def Init_Singal(self: "MyMAinWindow"):
     self.Ui.comboBox_vsmeta_show_title.currentIndexChanged.connect(self.update_vsmeta_preview)
     self.Ui.comboBox_vsmeta_show_title2.currentIndexChanged.connect(self.update_vsmeta_preview)
     self.Ui.comboBox_vsmeta_summary.currentIndexChanged.connect(self.update_vsmeta_preview)
+    # VSMETA 自定义模板信号连接
+    self.Ui.lineEdit_vsmeta_custom_title.textChanged.connect(self.update_vsmeta_preview)
+    self.Ui.lineEdit_vsmeta_custom_title2.textChanged.connect(self.update_vsmeta_preview)
+    self.Ui.textEdit_vsmeta_custom_summary.textChanged.connect(self.update_vsmeta_preview)
     # endregion
 
     # region 鼠标点击
