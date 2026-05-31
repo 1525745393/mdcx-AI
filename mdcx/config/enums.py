@@ -60,10 +60,23 @@ class OutlineShow(Enum):
 class VsmetaShowTitle(Enum):
     TITLE = "title"
     NUMBER_TITLE = "number_title"
+    NUMBER_ONLY = "number_only"
+    NUMBER_ORIGINALTITLE = "number_originaltitle"
+    TITLE_ORIGINALTITLE = "title_originaltitle"
+    ORIGINALTITLE_TITLE = "originaltitle_title"
+    CUSTOM = "custom"
 
     @classmethod
     def names(cls):
-        return ["中文翻译标题", "番号 + 中文翻译标题"]
+        return [
+            "中文翻译标题",
+            "番号 + 中文翻译标题",
+            "仅番号",
+            "番号 + 日文原始标题",
+            "中文标题 + 日文标题",
+            "日文标题 + 中文标题",
+            "自定义模板",
+        ]
 
 
 class VsmetaShowTitle2(Enum):
@@ -71,10 +84,11 @@ class VsmetaShowTitle2(Enum):
     PUBLISHER = "publisher"
     STUDIO = "studio"
     NONE = "none"
+    CUSTOM = "custom"
 
     @classmethod
     def names(cls):
-        return ["日文原始标题", "制作商", "工作室", "不写入"]
+        return ["日文原始标题", "制作商", "工作室", "不写入", "自定义模板"]
 
 
 class VsmetaSummary(Enum):
@@ -85,6 +99,7 @@ class VsmetaSummary(Enum):
     JP_ZH = "jp_zh"
     TITLE_ONLY = "title_only"
     NONE = "none"
+    CUSTOM = "custom"
 
     @classmethod
     def names(cls):
@@ -96,6 +111,7 @@ class VsmetaSummary(Enum):
             "日文标题 + 中文简介",
             "仅日文标题",
             "不写入",
+            "自定义模板",
         ]
 
 

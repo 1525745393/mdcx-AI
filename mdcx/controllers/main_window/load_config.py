@@ -714,6 +714,9 @@ def load_config(self: "MyMAinWindow"):
             list(VsmetaShowTitle2).index(manager.config.vsmeta_show_title2)
         )
         self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(manager.config.vsmeta_summary))
+        self.Ui.lineEdit_vsmeta_custom_title.setText(manager.config.vsmeta_custom_title)
+        self.Ui.lineEdit_vsmeta_custom_title2.setText(manager.config.vsmeta_custom_title2)
+        self.Ui.plainTextEdit_vsmeta_custom_summary.setPlainText(manager.config.vsmeta_custom_summary)
         # 画质命名规则
         set_radio_buttons(
             manager.config.hd_name,

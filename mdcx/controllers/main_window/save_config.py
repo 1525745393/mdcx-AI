@@ -499,6 +499,9 @@ def save_config(self: "MyMAinWindow"):
     manager.config.vsmeta_show_title = list(VsmetaShowTitle)[self.Ui.comboBox_vsmeta_show_title.currentIndex()]
     manager.config.vsmeta_show_title2 = list(VsmetaShowTitle2)[self.Ui.comboBox_vsmeta_show_title2.currentIndex()]
     manager.config.vsmeta_summary = list(VsmetaSummary)[self.Ui.comboBox_vsmeta_summary.currentIndex()]
+    manager.config.vsmeta_custom_title = self.Ui.lineEdit_vsmeta_custom_title.text()
+    manager.config.vsmeta_custom_title2 = self.Ui.lineEdit_vsmeta_custom_title2.text()
+    manager.config.vsmeta_custom_summary = self.Ui.plainTextEdit_vsmeta_custom_summary.toPlainText()
     manager.config.hd_name = "height" if self.Ui.radioButton_definition_height.isChecked() else "hd"
 
     # 分辨率获取方式

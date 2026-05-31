@@ -533,7 +533,7 @@ class Ui_MDCx(object):
         self.scrollArea_10.setWidgetResizable(False)
         self.scrollArea_10.setObjectName("scrollArea_10")
         self.scrollAreaWidgetContents_gongju = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_gongju.setGeometry(QtCore.QRect(0, 0, 760, 1400))
+        self.scrollAreaWidgetContents_gongju.setGeometry(QtCore.QRect(0, 0, 760, 1260))
         self.scrollAreaWidgetContents_gongju.setAutoFillBackground(True)
         self.scrollAreaWidgetContents_gongju.setObjectName("scrollAreaWidgetContents_gongju")
         self.groupBox_7 = QtWidgets.QGroupBox(parent=self.scrollAreaWidgetContents_gongju)
@@ -800,13 +800,6 @@ class Ui_MDCx(object):
         self.checkBox_create_link.setMinimumSize(QtCore.QSize(0, 30))
         self.checkBox_create_link.setObjectName("checkBox_create_link")
         self.scrollArea_10.setWidget(self.scrollAreaWidgetContents_gongju)
-        self.groupBox_22 = QtWidgets.QGroupBox()
-        self.groupBox_22.setGeometry(QtCore.QRect(30, 1250, 701, 100))
-        self.groupBox_22.setObjectName("groupBox_22")
-        self.pushButton_performance_monitor = QtWidgets.QPushButton(parent=self.groupBox_22)
-        self.pushButton_performance_monitor.setGeometry(QtCore.QRect(140, 40, 351, 40))
-        self.pushButton_performance_monitor.setObjectName("pushButton_performance_monitor")
-        self.scrollArea_10.setWidget(self.groupBox_22)
         self.stackedWidget.addWidget(self.page_tool)
         self.page_setting = QtWidgets.QWidget()
         self.page_setting.setObjectName("page_setting")
@@ -8003,15 +7996,15 @@ class Ui_MDCx(object):
         self.scrollArea_vsmeta.setWidgetResizable(False)
         self.scrollArea_vsmeta.setObjectName("scrollArea_vsmeta")
         self.scrollAreaWidgetContents_vsmeta = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_vsmeta.setGeometry(QtCore.QRect(0, 0, 796, 450))
+        self.scrollAreaWidgetContents_vsmeta.setGeometry(QtCore.QRect(0, 0, 796, 950))
         self.scrollAreaWidgetContents_vsmeta.setObjectName("scrollAreaWidgetContents_vsmeta")
         self.groupBox_vsmeta_config = QtWidgets.QGroupBox(parent=self.scrollAreaWidgetContents_vsmeta)
-        self.groupBox_vsmeta_config.setGeometry(QtCore.QRect(30, 20, 701, 391))
+        self.groupBox_vsmeta_config.setGeometry(QtCore.QRect(30, 20, 701, 880))
         self.groupBox_vsmeta_config.setMinimumSize(QtCore.QSize(200, 0))
         self.groupBox_vsmeta_config.setMaximumSize(QtCore.QSize(739, 16777215))
         self.groupBox_vsmeta_config.setObjectName("groupBox_vsmeta_config")
         self.gridLayoutWidget_vsmeta_config = QtWidgets.QWidget(parent=self.groupBox_vsmeta_config)
-        self.gridLayoutWidget_vsmeta_config.setGeometry(QtCore.QRect(30, 30, 641, 341))
+        self.gridLayoutWidget_vsmeta_config.setGeometry(QtCore.QRect(30, 30, 641, 820))
         self.gridLayoutWidget_vsmeta_config.setObjectName("gridLayoutWidget_vsmeta_config")
         self.gridLayout_vsmeta_config = QtWidgets.QGridLayout(self.gridLayoutWidget_vsmeta_config)
         self.gridLayout_vsmeta_config.setContentsMargins(0, 0, 0, 0)
@@ -8066,8 +8059,86 @@ class Ui_MDCx(object):
         self.spinBox_vsmeta_tag_limit.setProperty("value", 10)
         self.spinBox_vsmeta_tag_limit.setObjectName("spinBox_vsmeta_tag_limit")
         self.gridLayout_vsmeta_config.addWidget(self.spinBox_vsmeta_tag_limit, 6, 1, 1, 1)
+        self.label_vsmeta_show_title = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_show_title.setObjectName("label_vsmeta_show_title")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_show_title, 7, 0, 1, 1)
+        self.comboBox_vsmeta_show_title = QtWidgets.QComboBox(parent=self.gridLayoutWidget_vsmeta_config)
+        self.comboBox_vsmeta_show_title.setMinimumSize(QtCore.QSize(200, 0))
+        self.comboBox_vsmeta_show_title.setObjectName("comboBox_vsmeta_show_title")
+        self.comboBox_vsmeta_show_title.addItems([
+            "中文翻译标题",
+            "番号 + 中文翻译标题",
+            "仅番号",
+            "番号 + 日文原始标题",
+            "中文标题 + 日文标题",
+            "日文标题 + 中文标题",
+            "自定义模板"
+        ])
+        self.gridLayout_vsmeta_config.addWidget(self.comboBox_vsmeta_show_title, 7, 1, 1, 1)
+        
+        # 自定义标题模板输入
+        self.label_vsmeta_custom_title = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_custom_title.setObjectName("label_vsmeta_custom_title")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_custom_title, 8, 0, 1, 1)
+        self.lineEdit_vsmeta_custom_title = QtWidgets.QLineEdit(parent=self.gridLayoutWidget_vsmeta_config)
+        self.lineEdit_vsmeta_custom_title.setMinimumSize(QtCore.QSize(300, 0))
+        self.lineEdit_vsmeta_custom_title.setObjectName("lineEdit_vsmeta_custom_title")
+        self.gridLayout_vsmeta_config.addWidget(self.lineEdit_vsmeta_custom_title, 8, 1, 1, 1)
+        
+        self.label_vsmeta_show_title2 = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_show_title2.setObjectName("label_vsmeta_show_title2")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_show_title2, 9, 0, 1, 1)
+        self.comboBox_vsmeta_show_title2 = QtWidgets.QComboBox(parent=self.gridLayoutWidget_vsmeta_config)
+        self.comboBox_vsmeta_show_title2.setMinimumSize(QtCore.QSize(200, 0))
+        self.comboBox_vsmeta_show_title2.setObjectName("comboBox_vsmeta_show_title2")
+        self.comboBox_vsmeta_show_title2.addItems(["日文原始标题", "制作商", "工作室", "不写入", "自定义模板"])
+        self.gridLayout_vsmeta_config.addWidget(self.comboBox_vsmeta_show_title2, 9, 1, 1, 1)
+        
+        # 自定义副标题模板输入
+        self.label_vsmeta_custom_title2 = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_custom_title2.setObjectName("label_vsmeta_custom_title2")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_custom_title2, 10, 0, 1, 1)
+        self.lineEdit_vsmeta_custom_title2 = QtWidgets.QLineEdit(parent=self.gridLayoutWidget_vsmeta_config)
+        self.lineEdit_vsmeta_custom_title2.setMinimumSize(QtCore.QSize(300, 0))
+        self.lineEdit_vsmeta_custom_title2.setObjectName("lineEdit_vsmeta_custom_title2")
+        self.gridLayout_vsmeta_config.addWidget(self.lineEdit_vsmeta_custom_title2, 10, 1, 1, 1)
+        
+        self.label_vsmeta_summary = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_summary.setObjectName("label_vsmeta_summary")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_summary, 11, 0, 1, 1)
+        self.comboBox_vsmeta_summary = QtWidgets.QComboBox(parent=self.gridLayoutWidget_vsmeta_config)
+        self.comboBox_vsmeta_summary.setMinimumSize(QtCore.QSize(200, 0))
+        self.comboBox_vsmeta_summary.setObjectName("comboBox_vsmeta_summary")
+        self.comboBox_vsmeta_summary.addItems([
+            "日文标题 + 中文简介 + 日文简介",
+            "中文简介",
+            "日文简介",
+            "中文简介 + 日文简介",
+            "日文标题 + 中文简介",
+            "仅日文标题",
+            "不写入",
+            "自定义模板"
+        ])
+        self.gridLayout_vsmeta_config.addWidget(self.comboBox_vsmeta_summary, 11, 1, 1, 1)
+        
+        # 自定义简介模板输入
+        self.label_vsmeta_custom_summary = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_custom_summary.setObjectName("label_vsmeta_custom_summary")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_custom_summary, 12, 0, 1, 1)
+        self.plainTextEdit_vsmeta_custom_summary = QtWidgets.QPlainTextEdit(parent=self.gridLayoutWidget_vsmeta_config)
+        self.plainTextEdit_vsmeta_custom_summary.setMinimumSize(QtCore.QSize(300, 100))
+        self.plainTextEdit_vsmeta_custom_summary.setObjectName("plainTextEdit_vsmeta_custom_summary")
+        self.gridLayout_vsmeta_config.addWidget(self.plainTextEdit_vsmeta_custom_summary, 12, 1, 1, 1)
+        
+        # 模板提示
+        self.label_vsmeta_template_help = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_template_help.setStyleSheet("color: rgb(8, 128, 128);")
+        self.label_vsmeta_template_help.setWordWrap(True)
+        self.label_vsmeta_template_help.setObjectName("label_vsmeta_template_help")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_template_help, 13, 0, 1, 2)
+        
         self.label_vsmeta_tips = QtWidgets.QLabel(parent=self.scrollAreaWidgetContents_vsmeta)
-        self.label_vsmeta_tips.setGeometry(QtCore.QRect(30, 420, 701, 21))
+        self.label_vsmeta_tips.setGeometry(QtCore.QRect(30, 910, 701, 21))
         self.label_vsmeta_tips.setStyleSheet("color: rgb(8, 128, 128);")
         self.label_vsmeta_tips.setObjectName("label_vsmeta_tips")
         self.scrollArea_vsmeta.setWidget(self.scrollAreaWidgetContents_vsmeta)
@@ -10507,8 +10578,6 @@ class Ui_MDCx(object):
         self.checkBox_copy_netdisk_nfo.setText(_translate("MDCx", "同时复制网盘目录的nfo、图片、字幕文件到软链接目录"))
         self.label_341.setText(_translate("MDCx", "勾选后将同时复制网盘中刮削好的nfo等文件到本地，或者你也可以重新刮削这些软链接"))
         self.checkBox_create_link.setText(_translate("MDCx", "刮削过程中自动创建软链接"))
-        self.groupBox_22.setTitle(_translate("MDCx", "性能监控（监控刮削性能和爬虫健康状态）"))
-        self.pushButton_performance_monitor.setText(_translate("MDCx", "打开性能监控"))
         self.groupBox_16.setTitle(_translate("MDCx", "刮削目录"))
         self.pushButton_select_softlink_folder.setText(_translate("MDCx", "选择目录"))
         self.label_58.setText(_translate("MDCx", "指不想要刮削的目录，可以填写多个目录，以逗号分开（中英文逗号都可以）"))
@@ -11244,6 +11313,16 @@ class Ui_MDCx(object):
         self.label_vsmeta_jpeg_quality.setText(_translate("MDCx", "JPEG 质量 (1-100):"))
         self.label_vsmeta_actor_limit.setText(_translate("MDCx", "演员数量上限:"))
         self.label_vsmeta_tag_limit.setText(_translate("MDCx", "标签数量上限:"))
+        self.label_vsmeta_show_title.setText(_translate("MDCx", "标题 (TAG_SHOW_TITLE):"))
+        self.label_vsmeta_custom_title.setText(_translate("MDCx", "标题模板:"))
+        self.label_vsmeta_show_title2.setText(_translate("MDCx", "副标题 (TAG_SHOW_TITLE2):"))
+        self.label_vsmeta_custom_title2.setText(_translate("MDCx", "副标题模板:"))
+        self.label_vsmeta_summary.setText(_translate("MDCx", "简介 (TAG_CHAPTER_SUMMARY):"))
+        self.label_vsmeta_custom_summary.setText(_translate("MDCx", "简介模板:"))
+        self.label_vsmeta_template_help.setText(_translate(
+            "MDCx",
+            "可用占位符: {number}, {title}, {originaltitle}, {publisher}, {studio}, {series}, {actors}, {outline}, {originalplot}, {year}, {release}"
+        ))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))
         self.groupBox_43.setTitle(_translate("MDCx", "Emby/Jellyfin 设置"))
