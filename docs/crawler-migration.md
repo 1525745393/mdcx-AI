@@ -1,5 +1,7 @@
 # 刮削器新版框架迁移指南
 
+> 📖 **更多文档**: [文档中心](README.md) | [主 README](../README.md) | [开发指南](../DEVELOPMENT.md) | [架构设计](architecture.md)
+
 本文档用于指导将旧版函数式刮削器迁移到 `mdcx.crawlers.base` 新版框架。目标是在不破坏原有行为的前提下，逐步移除旧版 `main()` 入口和 `LegacyCrawler` 注册。
 
 ## 目标

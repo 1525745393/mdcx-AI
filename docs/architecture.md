@@ -1,5 +1,7 @@
 # MDCx 架构设计文档
 
+> 📖 **更多文档**: [文档中心](README.md) | [主 README](../README.md) | [开发指南](../DEVELOPMENT.md) | [API 文档](api-documentation.md)
+
 ## 📋 文档信息
 
 - **项目名称**: MDCx

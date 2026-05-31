@@ -1,5 +1,7 @@
 # CI 测试说明
 
+> 📖 **更多文档**: [文档中心](README.md) | [主 README](../README.md) | [开发指南](../DEVELOPMENT.md)
+
 本项目使用 GitHub Actions 进行自动化测试和构建。
 
 ## CI 工作流程

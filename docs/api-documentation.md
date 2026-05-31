@@ -1,5 +1,7 @@
 # MDCx 核心模块 API 文档
 
+> 📖 **更多文档**: [文档中心](README.md) | [主 README](../README.md) | [开发指南](../DEVELOPMENT.md) | [架构设计](architecture.md)
+
 ## 📋 概述
 
 本文档详细描述 MDCx 项目的核心模块功能、API 接口和使用方法。
