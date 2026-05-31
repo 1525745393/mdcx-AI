@@ -4,10 +4,9 @@ import json
 import re
 import time
 import traceback
-from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import aiofiles
 from PIL import Image
@@ -449,36 +448,6 @@ def get_template_context(data: CrawlersResult) -> dict:
         "website": data.website or "",
     }
 
-def validate_template(template: str) -> tuple[bool, str]:
-    """Validate a template string
-    
-    Returns (is_valid, error_message) tuple.
-    """
-    stack = []
-    i = 0
-    n = len(template)
-    
-    while i < n:
-        if template.startswith("{if:", i):
-            stack.append("if")
-            i += 4
-        elif template.startswith("{/if}", i):
-            if not stack or stack[-1] != "if":
-                return False, f"未闭合的标签: {{/if}} 在位置 {i}"
-            stack.pop()
-            i += 5
-        elif template[i] == "{":
-            end = template.find("}", i)
-            if end == -1:
-                return False, f"未闭合的占位符: {{ 在位置 {i}"
-            i = end + 1
-        else:
-            i += 1
-    
-    if stack:
-        return False, f"缺少闭合标签: {{/if}}"
-    
-    return True, ""
 
 def render_template(template: str, data: CrawlersResult) -> str:
     """Render a template string using data from CrawlersResult
@@ -554,6 +523,7 @@ def render_template(template: str, data: CrawlersResult) -> str:
     for key, value in context.items():
         result = result.replace(f"{{{key}}}", str(value))
     
+
     return result
 
 
@@ -664,6 +634,18 @@ async def write_vsmeta(
             title2_value = data.publisher
         elif title2_mode == VsmetaShowTitle2.STUDIO:
             title2_value = data.studio
+        elif title2_mode == VsmetaShowTitle2.PUBLISHER_STUDIO:
+            parts = []
+            if data.publisher:
+                parts.append(data.publisher)
+            if data.studio and data.studio != data.publisher:
+                parts.append(data.studio)
+            title2_value = " | ".join(parts) if parts else None
+        elif title2_mode == VsmetaShowTitle2.SERIES:
+            title2_value = data.series
+        elif title2_mode == VsmetaShowTitle2.ACTOR:
+            actor_list = data.all_actors if len(data.all_actors) > len(data.actors) else data.actors
+            title2_value = ", ".join(actor_list[:3]) if actor_list else None
         else:
             title2_value = None
         if title2_value:
@@ -724,6 +706,22 @@ async def write_vsmeta(
             elif summary_mode == VsmetaSummary.TITLE_ONLY:
                 if data.originaltitle:
                     summary_parts.append(data.originaltitle)
+            elif summary_mode == VsmetaSummary.OUTLINE_PUBLISHER:
+                if data.outline:
+                    summary_parts.append(data.outline)
+                info_parts = []
+                if data.publisher:
+                    info_parts.append(f"制作商: {data.publisher}")
+                if data.studio and data.studio != data.publisher:
+                    info_parts.append(f"工作室: {data.studio}")
+                if info_parts:
+                    summary_parts.append("---")
+                    summary_parts.append("\n".join(info_parts))
+            elif summary_mode == VsmetaSummary.NUMBER_TITLE:
+                if data.number:
+                    summary_parts.append(f"番号: {data.number}")
+                if data.title:
+                    summary_parts.append(data.title)
             summary = "\n\n".join(summary_parts) if summary_parts else None
         if summary:
             encoder.write_string_field(VSMetaEncoder.TAG_CHAPTER_SUMMARY, summary, label="summary")
