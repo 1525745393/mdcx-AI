@@ -12266,6 +12266,9 @@
                                 <height>0</height>
                               </size>
                             </property>
+                            <property name="toolTip">
+                              <string>勾选后生成：视频文件名.vsmeta；不勾选生成：视频名.vsmeta（例如：abc-123.vsmeta）</string>
+                            </property>
                             <property name="text">
                               <string>保留视频扩展名</string>
                             </property>
@@ -18866,6 +18869,9 @@
                       <layout class="QGridLayout" name="gridLayout_vsmeta_config">
                         <item row="0" column="0" colspan="2">
                           <widget class="QCheckBox" name="checkBox_vsmeta_include_poster">
+                            <property name="toolTip">
+                              <string>将封面图片嵌入到 VSMETA 文件中，无需额外的图片文件，Video Station 可以直接读取</string>
+                            </property>
                             <property name="text">
                               <string>嵌入封面图 (poster)</string>
                             </property>
@@ -18873,6 +18879,9 @@
                         </item>
                         <item row="1" column="0" colspan="2">
                           <widget class="QCheckBox" name="checkBox_vsmeta_include_backdrop">
+                            <property name="toolTip">
+                              <string>将背景图（fanart）嵌入到 VSMETA 文件中，提供更好的视觉效果</string>
+                            </property>
                             <property name="text">
                               <string>嵌入背景图 (backdrop/fanart)</string>
                             </property>
@@ -18880,6 +18889,9 @@
                         </item>
                         <item row="2" column="0" colspan="2">
                           <widget class="QCheckBox" name="checkBox_vsmeta_locked">
+                            <property name="toolTip">
+                              <string>锁定后，Synology Video Station 将不会自动更新此文件的元数据，保持手动配置的内容</string>
+                            </property>
                             <property name="text">
                               <string>锁定元数据 (禁止 Video Station 自动更新)</string>
                             </property>
@@ -18899,6 +18911,9 @@
                                 <width>100</width>
                                 <height>0</height>
                               </size>
+                            </property>
+                            <property name="toolTip">
+                              <string>设置嵌入图片的最大边长（像素），较大尺寸提供更高清晰度但文件体积更大，建议值：1080-1920</string>
                             </property>
                             <property name="minimum">
                               <number>320</number>
@@ -18929,6 +18944,9 @@
                                 <height>0</height>
                               </size>
                             </property>
+                            <property name="toolTip">
+                              <string>JPEG 图片压缩质量，100 为最高质量，较低数值可减小文件体积，建议值：85-95</string>
+                            </property>
                             <property name="minimum">
                               <number>10</number>
                             </property>
@@ -18955,6 +18973,9 @@
                                 <height>0</height>
                               </size>
                             </property>
+                            <property name="toolTip">
+                              <string>限制 VSMETA 文件中保存的演员数量，过多可能影响显示效果，建议值：10-20</string>
+                            </property>
                             <property name="minimum">
                               <number>0</number>
                             </property>
@@ -18980,6 +19001,9 @@
                                 <width>100</width>
                                 <height>0</height>
                               </size>
+                            </property>
+                            <property name="toolTip">
+                              <string>限制 VSMETA 文件中保存的标签（关键词）数量，建议值：5-15</string>
                             </property>
                             <property name="minimum">
                               <number>0</number>
