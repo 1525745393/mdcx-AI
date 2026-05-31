@@ -11327,9 +11327,61 @@ class Ui_MDCx(object):
         self.label_vsmeta_custom_title2.setText(_translate("MDCx", "副标题模板:"))
         self.label_vsmeta_summary.setText(_translate("MDCx", "简介 (TAG_CHAPTER_SUMMARY):"))
         self.label_vsmeta_custom_summary.setText(_translate("MDCx", "简介模板:"))
+        self.comboBox_vsmeta_show_title.setToolTip(_translate(
+            "MDCx",
+            "选择标题显示模式：\n• 中文翻译标题：仅显示中文标题\n• 番号 + 中文翻译标题：显示番号和中文标题组合\n• 仅番号：只显示作品番号\n• 番号 + 日文原始标题：显示番号和日文标题\n• 中文标题 + 日文标题：双语标题显示\n• 日文标题 + 中文标题：日文优先的双语标题\n• 自定义模板：使用下方自定义模板"
+        ))
+        self.lineEdit_vsmeta_custom_title.setToolTip(_translate(
+            "MDCx",
+            "自定义标题模板，使用占位符如 {number}, {title}, {originaltitle}, {publisher}, {studio}, {series}, {actors} 等\n• {number}：番号\n• {title}：中文翻译标题\n• {originaltitle}：日文原始标题\n• {publisher}：发行商\n• {studio}：制作公司\n• {series}：系列名称\n• {actors}：演员列表\n• {year}：年份\n• {release}：发布日期\n• {score}：评分\n• {if:field}内容{/if}：条件显示内容\n• {field|默认值}：字段为空时使用默认值"
+        ))
+        self.comboBox_vsmeta_show_title2.setToolTip(_translate(
+            "MDCx",
+            "选择副标题显示模式：\n• 日文原始标题：显示日文原标题\n• 制作商：显示发行商信息\n• 工作室：显示制作工作室\n• 不写入：不设置副标题\n• 自定义模板：使用下方自定义模板"
+        ))
+        self.lineEdit_vsmeta_custom_title2.setToolTip(_translate(
+            "MDCx",
+            "自定义副标题模板，使用占位符如 {publisher}, {studio}, {series}, {director}, {year}, {release} 等\n• {publisher}：发行商\n• {studio}：制作公司\n• {series}：系列名称\n• {director}：导演\n• {year}：年份\n• {release}：发布日期"
+        ))
+        self.comboBox_vsmeta_summary.setToolTip(_translate(
+            "MDCx",
+            "选择简介显示模式：\n• 日文标题 + 中文简介 + 日文简介：完整三语版本\n• 中文简介：仅显示中文简介\n• 日文简介：仅显示日文简介\n• 中文简介 + 日文简介：双语简介\n• 日文标题 + 中文简介：日文标题加中文简介\n• 仅日文标题：只显示日文标题\n• 不写入：不设置简介\n• 自定义模板：使用下方自定义模板"
+        ))
+        self.plainTextEdit_vsmeta_custom_summary.setToolTip(_translate(
+            "MDCx",
+            "自定义简介模板，使用占位符如 {outline}, {originalplot}, {originaltitle}, {title}, {publisher}, {studio}, {genre}, {mosaic}, {website} 等\n• {outline}：中文简介\n• {originalplot}：日文简介\n• {originaltitle}：日文原始标题\n• {title}：中文标题\n• {publisher}：发行商\n• {studio}：制作公司\n• {genre}：类型/标签\n• {mosaic}：马赛克类型\n• {website}：官方网站"
+        ))
+        self.checkBox_vsmeta_include_poster.setToolTip(_translate(
+            "MDCx",
+            "勾选此项后，会将封面图片嵌入到 VSMETA 文件中，确保 Video Station 能够显示作品封面"
+        ))
+        self.checkBox_vsmeta_include_backdrop.setToolTip(_translate(
+            "MDCx",
+            "勾选此项后，会将背景图片（fanart）嵌入到 VSMETA 文件中，增强 Video Station 的视觉效果"
+        ))
+        self.checkBox_vsmeta_locked.setToolTip(_translate(
+            "MDCx",
+            "勾选此项后，会锁定 VSMETA 元数据，防止 Video Station 自动更新或修改已设置的元数据信息"
+        ))
+        self.spinBox_vsmeta_image_dimension.setToolTip(_translate(
+            "MDCx",
+            "设置嵌入图片的最大尺寸（像素），较大尺寸可提供更好的显示效果但会增加文件大小\n推荐值：1920 - 3840 像素"
+        ))
+        self.spinBox_vsmeta_jpeg_quality.setToolTip(_translate(
+            "MDCx",
+            "设置 JPEG 图片的压缩质量（1-100），数值越高画质越好但文件越大\n推荐值：85 - 95，兼顾画质与文件大小"
+        ))
+        self.spinBox_vsmeta_actor_limit.setToolTip(_translate(
+            "MDCx",
+            "设置 VSMETA 中显示的演员数量上限，限制演员数量可避免元数据过大影响性能\n推荐值：10 - 30 个演员"
+        ))
+        self.spinBox_vsmeta_tag_limit.setToolTip(_translate(
+            "MDCx",
+            "设置 VSMETA 中显示的标签数量上限，限制标签数量可优化显示效果\n推荐值：5 - 20 个标签"
+        ))
         self.label_vsmeta_template_help.setText(_translate(
             "MDCx",
-            "可用占位符: {number}, {title}, {originaltitle}, {publisher}, {studio}, {series}, {actors}, {outline}, {originalplot}, {year}, {release}, {score}, {country}, {director}, {genre}, {mosaic}, {runtime}, {label}, {website}\n增强语法: {field|默认值} (字段为空时使用默认值), {if:field}内容{/if} (条件显示)"
+            "【模板语法完整指南】\n\n【基础占位符】\n• 番号相关：{number}\n• 标题相关：{title}（中文）、{originaltitle}（日文）\n• 制作信息：{publisher}（发行商）、{studio}（工作室）、{series}（系列）\n• 演职人员：{actors}（演员列表）、{director}（导演）\n• 剧情描述：{outline}（中文简介）、{originalplot}（日文简介）\n• 时间信息：{year}（年份）、{release}（发布日期）、{runtime}（时长）\n• 其他信息：{score}（评分）、{country}（国家）、{genre}（类型）、{mosaic}（马赛克类型）、{label}（标签）、{website}（官网）\n\n【增强语法】\n• 条件显示：{if:field}内容{/if} - 字段存在时显示内容\n• 默认值：{field|默认值} - 字段为空时使用默认值\n\n【示例模板】\n• 标题：[{number}] {title}\n• 副标题：{publisher} / {studio}\n• 简介：{originaltitle}\\n\\n{outline}\\n\\n发行: {publisher}\\n片商: {studio}"
         ))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))
