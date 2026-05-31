@@ -400,131 +400,26 @@ def parse_runtime(runtime: str) -> int | None:
         return None
 
 
-@dataclass
-class TemplatePreset:
-    name: str
-    template: str
-    description: str
-
-
-# 标题预设模板
-TITLE_PRESETS: List[TemplatePreset] = [
-    TemplatePreset(
-        name="番号-标题(原名)",
-        template="{number} - {title} ({originaltitle})",
-        description="显示番号、中文标题和日文原名"
-    ),
-    TemplatePreset(
-        name="番号-标题",
-        template="{number} - {title}",
-        description="只显示番号和中文标题"
-    ),
-    TemplatePreset(
-        name="番号 (原名)",
-        template="{number} ({originaltitle})",
-        description="显示番号和日文原名"
-    ),
-    TemplatePreset(
-        name="仅标题",
-        template="{title}",
-        description="只显示中文标题"
-    ),
-    TemplatePreset(
-        name="仅原名",
-        template="{originaltitle}",
-        description="只显示日文原名"
-    ),
-    TemplatePreset(
-        name="完整信息",
-        template="{if:series}[{series}] {/if}{number} - {title} {if:actors}[{actors}]{/if}",
-        description="包含系列、番号、标题和演员"
-    ),
-    TemplatePreset(
-        name="评分-标题",
-        template="{if:score}[{score}] {/if}{number} - {title}",
-        description="显示评分、番号和标题"
-    ),
-]
-
-# 副标题预设模板
-TITLE2_PRESETS: List[TemplatePreset] = [
-    TemplatePreset(
-        name="发行商/片商",
-        template="{publisher} / {studio}",
-        description="显示发行商和片商"
-    ),
-    TemplatePreset(
-        name="片商/系列",
-        template="{studio} / {series}",
-        description="显示片商和系列"
-    ),
-    TemplatePreset(
-        name="演员",
-        template="{actors}",
-        description="显示演员列表"
-    ),
-    TemplatePreset(
-        name="发行日期",
-        template="{release}",
-        description="显示发行日期"
-    ),
-    TemplatePreset(
-        name="导演",
-        template="{if:director}导演: {director}{/if}",
-        description="显示导演信息"
-    ),
-    TemplatePreset(
-        name="评分/时长",
-        template="{if:score}评分: {score}{/if}{if:runtime} | 时长: {runtime}分钟{/if}",
-        description="显示评分和时长"
-    ),
-    TemplatePreset(
-        name="标签/类型",
-        template="{genre}",
-        description="显示类型标签"
-    ),
-]
-
-# 简介预设模板
-SUMMARY_PRESETS: List[TemplatePreset] = [
-    TemplatePreset(
-        name="原名+简介+剧情",
-        template="{originaltitle}\n\n{outline}\n\n{originalplot}",
-        description="完整的三部分简介"
-    ),
-    TemplatePreset(
-        name="原名+简介",
-        template="{originaltitle}\n\n{outline}",
-        description="日文原名和中文简介"
-    ),
-    TemplatePreset(
-        name="原名+剧情",
-        template="{originaltitle}\n\n{originalplot}",
-        description="日文原名和日文剧情"
-    ),
-    TemplatePreset(
-        name="仅简介",
-        template="{outline}",
-        description="只显示中文简介"
-    ),
-    TemplatePreset(
-        name="完整信息",
-        template="{if:title}{title}\n\n{/if}"
-                 "{if:originaltitle}{originaltitle}\n\n{/if}"
-                 "{if:actors}演员: {actors}\n\n{/if}"
-                 "{if:release}发行: {release}\n\n{/if}"
-                 "{outline}\n\n{originalplot}",
-        description="包含所有可用信息的完整简介"
-    ),
-]
+# 导入辅助模块的预设和验证功能
+from ..utils.vsmeta_template_helper import (
+    TITLE_PRESETS,
+    TITLE2_PRESETS,
+    SUMMARY_PRESETS,
+    PLACEHOLDERS_WITH_DESC,
+    validate_template as helper_validate_template,
+)
 
 # 所有可用的占位符列表
-AVAILABLE_PLACEHOLDERS: List[str] = [
-    "number", "title", "originaltitle", "publisher", "studio",
-    "series", "actors", "outline", "originalplot", "year",
-    "release", "score", "country", "director", "genre",
-    "mosaic", "runtime", "label", "website"
-]
+AVAILABLE_PLACEHOLDERS: List[str] = [ph[0] for ph in PLACEHOLDERS_WITH_DESC]
+
+
+def validate_template(template: str) -> Tuple[bool, str]:
+    """
+    验证模板字符串
+    
+    Returns (is_valid, error_message)
+    """
+    return helper_validate_template(template)
 
 
 def get_template_context(data: CrawlersResult) -> dict:
