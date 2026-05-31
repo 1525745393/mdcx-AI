@@ -18827,7 +18827,7 @@
                       <x>0</x>
                       <y>0</y>
                       <width>796</width>
-                      <height>600</height>
+                      <height>450</height>
                     </rect>
                   </property>
                   <widget class="QGroupBox" name="groupBox_vsmeta_config">
@@ -18836,7 +18836,7 @@
                         <x>30</x>
                         <y>20</y>
                         <width>701</width>
-                        <height>550</height>
+                        <height>391</height>
                       </rect>
                     </property>
                     <property name="minimumSize">
@@ -18860,7 +18860,7 @@
                           <x>30</x>
                           <y>30</y>
                           <width>641</width>
-                          <height>500</height>
+                          <height>341</height>
                         </rect>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_vsmeta_config">
@@ -18990,122 +18990,6 @@
                             <property name="value">
                               <number>10</number>
                             </property>
-                          </widget>
-                        </item>
-                        <item row="7" column="0">
-                          <widget class="QLabel" name="label_vsmeta_show_title">
-                            <property name="text">
-                              <string>标题内容 (TAG_SHOW_TITLE):</string>
-                            </property>
-                          </widget>
-                        </item>
-                        <item row="7" column="1">
-                          <widget class="QComboBox" name="comboBox_vsmeta_show_title">
-                            <property name="minimumSize">
-                              <size>
-                                <width>100</width>
-                                <height>0</height>
-                              </size>
-                            </property>
-                            <item>
-                              <property name="text">
-                                <string>中文翻译标题</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>番号 + 中文翻译标题</string>
-                              </property>
-                            </item>
-                          </widget>
-                        </item>
-                        <item row="8" column="0">
-                          <widget class="QLabel" name="label_vsmeta_show_title2">
-                            <property name="text">
-                              <string>副标题内容 (TAG_SHOW_TITLE2):</string>
-                            </property>
-                          </widget>
-                        </item>
-                        <item row="8" column="1">
-                          <widget class="QComboBox" name="comboBox_vsmeta_show_title2">
-                            <property name="minimumSize">
-                              <size>
-                                <width>100</width>
-                                <height>0</height>
-                              </size>
-                            </property>
-                            <item>
-                              <property name="text">
-                                <string>日文原始标题</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>制作商</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>工作室</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>不写入</string>
-                              </property>
-                            </item>
-                          </widget>
-                        </item>
-                        <item row="9" column="0">
-                          <widget class="QLabel" name="label_vsmeta_summary">
-                            <property name="text">
-                              <string>简介内容 (TAG_CHAPTER_SUMMARY):</string>
-                            </property>
-                          </widget>
-                        </item>
-                        <item row="9" column="1">
-                          <widget class="QComboBox" name="comboBox_vsmeta_summary">
-                            <property name="minimumSize">
-                              <size>
-                                <width>100</width>
-                                <height>0</height>
-                              </size>
-                            </property>
-                            <item>
-                              <property name="text">
-                                <string>日文标题 + 中文简介 + 日文简介</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>中文简介</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>日文简介</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>中文简介 + 日文简介</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>日文标题 + 中文简介</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>仅日文标题</string>
-                              </property>
-                            </item>
-                            <item>
-                              <property name="text">
-                                <string>不写入</string>
-                              </property>
-                            </item>
                           </widget>
                         </item>
                       </layout>

@@ -257,23 +257,6 @@ def Init_Singal(self: "MyMAinWindow"):
     self.Ui.pushButton_nfo_close.clicked.connect(self.Ui.widget_nfo.hide)
     self.Ui.pushButton_nfo_save.clicked.connect(self.save_nfo_info)
     self.Ui.pushButton_performance_monitor.clicked.connect(self.pushButton_performance_monitor_clicked)
-    # VSMETA 预设按钮
-    self.Ui.pushButton_vsmeta_preset_recommended.clicked.connect(lambda: self.apply_vsmeta_preset_recommended())
-    self.Ui.pushButton_vsmeta_preset_high_quality.clicked.connect(lambda: self.apply_vsmeta_preset_high_quality())
-    self.Ui.pushButton_vsmeta_preset_small_file.clicked.connect(lambda: self.apply_vsmeta_preset_small_file())
-    self.Ui.pushButton_vsmeta_reset.clicked.connect(lambda: self.reset_vsmeta_to_default())
-    # VSMETA JPEG 滑块事件
-    self.Ui.slider_vsmeta_jpeg_quality.valueChanged.connect(self.slider_vsmeta_jpeg_quality_valueChanged)
-    # VSMETA 帮助按钮
-    self.Ui.pushButton_vsmeta_help.clicked.connect(self.pushButton_vsmeta_help_clicked)
-    # VSMETA 预览更新事件
-    self.Ui.comboBox_vsmeta_show_title.currentIndexChanged.connect(self.update_vsmeta_preview)
-    self.Ui.comboBox_vsmeta_show_title2.currentIndexChanged.connect(self.update_vsmeta_preview)
-    self.Ui.comboBox_vsmeta_summary.currentIndexChanged.connect(self.update_vsmeta_preview)
-    # VSMETA 自定义模板信号连接
-    self.Ui.lineEdit_vsmeta_custom_title.textChanged.connect(self.update_vsmeta_preview)
-    self.Ui.lineEdit_vsmeta_custom_title2.textChanged.connect(self.update_vsmeta_preview)
-    self.Ui.textEdit_vsmeta_custom_summary.textChanged.connect(self.update_vsmeta_preview)
     # endregion
 
     # region 鼠标点击

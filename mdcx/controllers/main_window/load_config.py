@@ -704,8 +704,7 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.checkBox_vsmeta_include_backdrop.setChecked(manager.config.vsmeta_include_backdrop)
         self.Ui.checkBox_vsmeta_locked.setChecked(manager.config.vsmeta_locked)
         self.Ui.spinBox_vsmeta_image_dimension.setValue(manager.config.vsmeta_image_max_dimension)
-        self.Ui.slider_vsmeta_jpeg_quality.setValue(manager.config.vsmeta_jpeg_quality)
-        self.Ui.label_vsmeta_jpeg_value.setText(str(manager.config.vsmeta_jpeg_quality))
+        self.Ui.spinBox_vsmeta_jpeg_quality.setValue(manager.config.vsmeta_jpeg_quality)
         self.Ui.spinBox_vsmeta_actor_limit.setValue(manager.config.vsmeta_actor_limit)
         self.Ui.spinBox_vsmeta_tag_limit.setValue(manager.config.vsmeta_tag_limit)
         self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(
@@ -717,7 +716,7 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.comboBox_vsmeta_summary.setCurrentIndex(list(VsmetaSummary).index(manager.config.vsmeta_summary))
         self.Ui.lineEdit_vsmeta_custom_title.setText(manager.config.vsmeta_custom_title)
         self.Ui.lineEdit_vsmeta_custom_title2.setText(manager.config.vsmeta_custom_title2)
-        self.Ui.textEdit_vsmeta_custom_summary.setPlainText(manager.config.vsmeta_custom_summary)
+        self.Ui.plainTextEdit_vsmeta_custom_summary.setPlainText(manager.config.vsmeta_custom_summary)
         # 画质命名规则
         set_radio_buttons(
             manager.config.hd_name,
@@ -1105,9 +1104,6 @@ def load_config(self: "MyMAinWindow"):
         # endregion
 
         self.Ui.checkBox_create_link.setChecked(manager.config.auto_link)
-        
-        # 更新 VSMETA 预览
-        self.update_vsmeta_preview()
 
         # ======================================================================================END
         # 根据是否同意改变清理按钮状态

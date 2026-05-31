@@ -753,7 +753,7 @@
   "vsmeta_summary": "jp_zh_jp",
   "vsmeta_custom_title": "{number} - {title} ({originaltitle})",
   "vsmeta_custom_title2": "{publisher} / {studio}",
-  "vsmeta_custom_summary": "{originaltitle}\n\n{outline}\n\n{originalplot}",
+  "vsmeta_custom_summary": "{originaltitle}\\n\\n{outline}\\n\\n{originalplot}",
   "hd_name": "height",
   "hd_get": "path",
   "folder_moword": true,

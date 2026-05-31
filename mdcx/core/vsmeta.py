@@ -6,6 +6,7 @@ import time
 import traceback
 from io import BytesIO
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 import aiofiles
 from PIL import Image
@@ -398,29 +399,34 @@ def parse_runtime(runtime: str) -> int | None:
         return None
 
 
-def render_template(template: str, data: CrawlersResult) -> str:
-    """Render a template string using data from CrawlersResult
-    
-    Supported placeholders:
-    - {number}: 番号
-    - {title}: 中文标题
-    - {originaltitle}: 日文原始标题
-    - {publisher}: 制作商
-    - {studio}: 工作室
-    - {series}: 系列名称
-    - {actors}: 演员列表（逗号分隔，最多显示3个）
-    - {outline}: 中文简介
-    - {originalplot}: 日文简介
-    - {year}: 年份
-    - {release}: 发布日期
+# 导入辅助模块的预设和验证功能
+from ..utils.vsmeta_template_helper import (
+    TITLE_PRESETS,
+    TITLE2_PRESETS,
+    SUMMARY_PRESETS,
+    PLACEHOLDERS_WITH_DESC,
+    validate_template as helper_validate_template,
+)
+
+# 所有可用的占位符列表
+AVAILABLE_PLACEHOLDERS: List[str] = [ph[0] for ph in PLACEHOLDERS_WITH_DESC]
+
+
+def validate_template(template: str) -> tuple[bool, str]:
     """
-    import re
+    验证模板字符串
+    
+    Returns (is_valid, error_message)
+    """
+    return helper_validate_template(template)
 
-    if not template:
-        return ""
 
-    # 准备数据
-    context = {
+def get_template_context(data: CrawlersResult) -> dict:
+    """Get the template context from CrawlersResult data
+    
+    Returns a dictionary of all available placeholders and their values.
+    """
+    return {
         "number": data.number or "",
         "title": data.title or "",
         "originaltitle": data.originaltitle or "",
@@ -432,12 +438,91 @@ def render_template(template: str, data: CrawlersResult) -> str:
         "originalplot": data.originalplot or "",
         "year": data.year or "",
         "release": data.release or "",
+        "score": data.score or "",
+        "country": data.country or "",
+        "director": data.director or "",
+        "genre": ", ".join(data.genres[:5]) if data.genres else "",
+        "mosaic": data.mosaic or "",
+        "runtime": str(data.runtime) if data.runtime else "",
+        "label": data.label or "",
+        "website": data.website or "",
     }
 
-    # 简单的模板渲染
+
+def render_template(template: str, data: CrawlersResult) -> str:
+    """Render a template string using data from CrawlersResult
+    
+    Supports the following placeholders and syntax:
+    
+    **Basic Placeholders:**
+    - {number} - Video number
+    - {title} - Chinese title
+    - {originaltitle} - Japanese original title
+    - {publisher} - Publisher
+    - {studio} - Studio
+    - {series} - Series name
+    - {actors} - Actors (comma-separated, max 3)
+    - {outline} - Chinese summary
+    - {originalplot} - Japanese summary
+    - {year} - Year
+    - {release} - Release date
+    - {score} - Rating score
+    - {country} - Country
+    - {director} - Director
+    - {genre} - Genres (comma-separated, max 5)
+    - {mosaic} - Mosaic type
+    - {runtime} - Runtime in minutes
+    - {label} - Label
+    - {website} - Official website
+    
+    **Enhanced Syntax:**
+    - {field|default} - Use default value if field is empty
+    - {if:field}...{/if} - Conditionally render content if field has value
+    """
+    context = get_template_context(data)
     result = template
+    
+    # Process conditional blocks: {if:field}content{/if}
+    def process_conditionals(s):
+        pattern = r'\{if:([^}]+)\}(.*?)\{/if\}'
+        while True:
+            match = re.search(pattern, s, re.DOTALL)
+            if not match:
+                break
+            field = match.group(1)
+            content = match.group(2)
+            value = context.get(field, "")
+            if value and str(value).strip():
+                s = s[:match.start()] + content + s[match.end():]
+            else:
+                s = s[:match.start()] + s[match.end():]
+        return s
+    
+    result = process_conditionals(result)
+    
+    # Process placeholders with defaults: {field|default}
+    def process_defaults(s):
+        pattern = r'\{([^}|]+)\|([^}]+)\}'
+        while True:
+            match = re.search(pattern, s)
+            if not match:
+                break
+            field = match.group(1)
+            default = match.group(2)
+            value = context.get(field, "")
+            if value and str(value).strip():
+                replacement = str(value)
+            else:
+                replacement = default
+            s = s[:match.start()] + replacement + s[match.end():]
+        return s
+    
+    result = process_defaults(result)
+    
+    # Process basic placeholders: {field}
     for key, value in context.items():
         result = result.replace(f"{{{key}}}", str(value))
+    
 
     return result
 
@@ -527,14 +612,14 @@ async def write_vsmeta(
             display_title = render_template(manager.config.vsmeta_custom_title, data)
         elif show_title_mode == VsmetaShowTitle.NUMBER_TITLE and data.title and data.number:
             display_title = f"[{data.number}] {data.title}"
-        elif show_title_mode == VsmetaShowTitle.NUMBER_ONLY and data.number:
-            display_title = data.number
+        elif show_title_mode == VsmetaShowTitle.NUMBER_ONLY:
+            display_title = data.number or file_info.file_name
         elif show_title_mode == VsmetaShowTitle.NUMBER_ORIGINALTITLE and data.number and data.originaltitle:
             display_title = f"[{data.number}] {data.originaltitle}"
         elif show_title_mode == VsmetaShowTitle.TITLE_ORIGINALTITLE and data.title and data.originaltitle:
-            display_title = f"{data.title} | {data.originaltitle}"
+            display_title = f"{data.title} ({data.originaltitle})"
         elif show_title_mode == VsmetaShowTitle.ORIGINALTITLE_TITLE and data.originaltitle and data.title:
-            display_title = f"{data.originaltitle} | {data.title}"
+            display_title = f"{data.originaltitle} ({data.title})"
         else:
             display_title = data.title or data.number or file_info.file_name
         encoder.write_string_field(VSMetaEncoder.TAG_SHOW_TITLE, display_title, label="showTitle")

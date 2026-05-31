@@ -493,7 +493,7 @@ def save_config(self: "MyMAinWindow"):
     manager.config.vsmeta_include_backdrop = self.Ui.checkBox_vsmeta_include_backdrop.isChecked()
     manager.config.vsmeta_locked = self.Ui.checkBox_vsmeta_locked.isChecked()
     manager.config.vsmeta_image_max_dimension = self.Ui.spinBox_vsmeta_image_dimension.value()
-    manager.config.vsmeta_jpeg_quality = self.Ui.slider_vsmeta_jpeg_quality.value()
+    manager.config.vsmeta_jpeg_quality = self.Ui.spinBox_vsmeta_jpeg_quality.value()
     manager.config.vsmeta_actor_limit = self.Ui.spinBox_vsmeta_actor_limit.value()
     manager.config.vsmeta_tag_limit = self.Ui.spinBox_vsmeta_tag_limit.value()
     manager.config.vsmeta_show_title = list(VsmetaShowTitle)[self.Ui.comboBox_vsmeta_show_title.currentIndex()]
@@ -501,7 +501,7 @@ def save_config(self: "MyMAinWindow"):
     manager.config.vsmeta_summary = list(VsmetaSummary)[self.Ui.comboBox_vsmeta_summary.currentIndex()]
     manager.config.vsmeta_custom_title = self.Ui.lineEdit_vsmeta_custom_title.text()
     manager.config.vsmeta_custom_title2 = self.Ui.lineEdit_vsmeta_custom_title2.text()
-    manager.config.vsmeta_custom_summary = self.Ui.textEdit_vsmeta_custom_summary.toPlainText()
+    manager.config.vsmeta_custom_summary = self.Ui.plainTextEdit_vsmeta_custom_summary.toPlainText()
     manager.config.hd_name = "height" if self.Ui.radioButton_definition_height.isChecked() else "hd"
 
     # 分辨率获取方式
