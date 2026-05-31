@@ -20,6 +20,7 @@
 12. [杂项设置](#杂项设置)
 13. [配置示例](#配置示例)
 14. [最佳配置建议](#最佳配置建议)
+15. [VSMETA 配置详解](#vsmeta-配置详解)
 
 ---
 
@@ -1051,6 +1052,1318 @@
 - **代理配置**：中国大陆用户建议配置代理以访问国外网站
 - **Cloudflare**：遇到 Cloudflare 保护时配置 `cf_bypass_url`
 - **API Token**：获取 Theporndb API Token 以提高欧美片刮削成功率
+
+---
+
+## VSMETA 配置详解
+
+VSMETA 是 Emby/Jellyfin 用于识别和管理元数据的文件格式。本章节详细介绍 VSMETA 相关的配置选项，帮助用户自定义 VSMETA 文件中标题、副标题和简介内容的显示方式。
+
+### VSMETA 配置概述
+
+VSMETA 文件包含以下主要配置维度：
+
+- **标题内容配置**（`vsmeta_show_title`）：定义 VSMETA 中的主标题显示内容
+- **副标题内容配置**（`vsmeta_show_title2`）：定义 VSMETA 中的副标题显示内容
+- **简介内容配置**（`vsmeta_summary`）：定义 VSMETA 中的简介显示内容
+- **嵌入选项配置**：控制是否在 VSMETA 中嵌入封面图、背景图等媒体资源
+- **质量参数配置**：控制图片尺寸、JPEG 质量等质量参数
+- **数量限制配置**：控制演员、标签等元素的数量上限
+
+### 配置项总览表
+
+#### 标题内容配置
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `vsmeta_show_title` | string | `"title"` | VSMETA 标题内容显示模式 |
+| `vsmeta_custom_title` | string | 见下文 | 自定义标题模板（当模式为 `custom` 时使用） |
+
+#### 副标题内容配置
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `vsmeta_show_title2` | string | `"originaltitle"` | VSMETA 副标题内容显示模式 |
+| `vsmeta_custom_title2` | string | 见下文 | 自定义副标题模板（当模式为 `custom` 时使用） |
+
+#### 简介内容配置
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `vsmeta_summary` | string | `"jp_zh_jp"` | VSMETA 简介内容显示模式 |
+| `vsmeta_custom_summary` | string | 见下文 | 自定义简介模板（当模式为 `custom` 时使用） |
+
+#### 其他 VSMETA 配置
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `vsmeta_keep_ext` | bool | `false` | VSMETA 是否保留视频文件扩展名 |
+| `vsmeta_include_poster` | bool | `true` | 是否在 VSMETA 中嵌入封面图 |
+| `vsmeta_include_backdrop` | bool | `true` | 是否在 VSMETA 中嵌入背景图 |
+| `vsmeta_locked` | bool | `true` | VSMETA 元数据是否锁定 |
+| `vsmeta_image_max_dimension` | int | `1920` | VSMETA 图片最大尺寸（像素） |
+| `vsmeta_jpeg_quality` | int | `90` | VSMETA 图片 JPEG 质量（1-100） |
+| `vsmeta_actor_limit` | int | `20` | VSMETA 演员数量上限 |
+| `vsmeta_tag_limit` | int | `10` | VSMETA 标签数量上限 |
+
+### VsmetaShowTitle 配置项详解
+
+#### 功能说明
+
+`vsmeta_show_title` 配置项用于定义 VSMETA 文件中主标题（Show Title）的显示内容。这个配置项决定了在 Emby/Jellyfin 等媒体服务器中显示的视频标题格式。
+
+#### 可选值说明
+
+| 可选值 | 功能描述 | 使用场景 |
+|--------|----------|----------|
+| `TITLE` | 中文翻译标题 | 默认选项，简洁明了，适合大多数用户 |
+| `NUMBER_TITLE` | 番号 + 中文翻译标题 | 需要同时显示番号和标题，便于识别 |
+| `NUMBER_ONLY` | 仅显示番号 | 番好型用户，只关注番号 |
+| `NUMBER_ORIGINALTITLE` | 番号 + 日文原始标题 | 日文用户，需要原始标题信息 |
+| `TITLE_ORIGINALTITLE` | 中文标题 + 日文标题 | 双语环境，显示两种语言 |
+| `ORIGINALTITLE_TITLE` | 日文标题 + 中文标题 | 日文优先，中文作为参考 |
+| `CUSTOM` | 自定义模板 | 需要完全自定义标题格式 |
+
+#### 配置效果示例
+
+假设有一部影片信息如下：
+
+- 番号：`ABC-123`
+- 中文标题：`经典剧情`
+- 日文原始标题：`クラシックドラマ`
+
+**示例 1：使用 `TITLE` 模式**
+
+```json
+{
+  "vsmeta_show_title": "title"
+}
+```
+
+显示效果：`经典剧情`
+
+**示例 2：使用 `NUMBER_TITLE` 模式**
+
+```json
+{
+  "vsmeta_show_title": "number_title"
+}
+```
+
+显示效果：`ABC-123 经典剧情`
+
+**示例 3：使用 `NUMBER_ONLY` 模式**
+
+```json
+{
+  "vsmeta_show_title": "number_only"
+}
+```
+
+显示效果：`ABC-123`
+
+**示例 4：使用 `NUMBER_ORIGINALTITLE` 模式**
+
+```json
+{
+  "vsmeta_show_title": "number_originaltitle"
+}
+```
+
+显示效果：`ABC-123 クラシックドラマ`
+
+**示例 5：使用 `TITLE_ORIGINALTITLE` 模式**
+
+```json
+{
+  "vsmeta_show_title": "title_originaltitle"
+}
+```
+
+显示效果：`经典剧情 クラシックドラマ`
+
+**示例 6：使用 `ORIGINALTITLE_TITLE` 模式**
+
+```json
+{
+  "vsmeta_show_title": "originaltitle_title"
+}
+```
+
+显示效果：`クラシックドラマ 经典剧情`
+
+**示例 7：使用 `CUSTOM` 自定义模式**
+
+```json
+{
+  "vsmeta_show_title": "custom",
+  "vsmeta_custom_title": "{number} - {title}"
+}
+```
+
+显示效果：`ABC-123 - 经典剧情`
+
+### VsmetaShowTitle2 配置项详解
+
+#### 功能说明
+
+`vsmeta_show_title2` 配置项用于定义 VSMETA 文件中副标题（Second Title/Subtitle）的显示内容。这个配置项在 Emby/Jellyfin 中通常显示在主标题下方，提供额外的影片信息。
+
+#### 可选值说明
+
+| 可选值 | 功能描述 | 使用场景 |
+|--------|----------|----------|
+| `ORIGINALTITLE` | 日文原始标题 | 显示原始日文标题 |
+| `PUBLISHER` | 制作商/发行商 | 显示发行公司信息 |
+| `STUDIO` | 工作室/制作公司 | 显示制作工作室信息 |
+| `PUBLISHER_STUDIO` | 制作商 + 工作室 | 同时显示发行和制作信息 |
+| `SERIES` | 系列名称 | 显示所属系列 |
+| `ACTOR` | 主要演员 | 显示影片主要演员 |
+| `NONE` | 不写入 | 不显示副标题 |
+| `CUSTOM` | 自定义模板 | 完全自定义副标题格式 |
+
+#### 配置效果示例
+
+假设有一部影片信息如下：
+
+- 日文原始标题：`クラシックドラマ`
+- 制作商：`ABC 出版社`
+- 工作室：`XYZ 工作室`
+- 系列：`经典系列`
+- 演员：`演员A`、`演员B`
+
+**示例 1：使用 `ORIGINALTITLE` 模式**
+
+```json
+{
+  "vsmeta_show_title2": "originaltitle"
+}
+```
+
+显示效果：`クラシックドラマ`
+
+**示例 2：使用 `PUBLISHER` 模式**
+
+```json
+{
+  "vsmeta_show_title2": "publisher"
+}
+```
+
+显示效果：`ABC 出版社`
+
+**示例 3：使用 `STUDIO` 模式**
+
+```json
+{
+  "vsmeta_show_title2": "studio"
+}
+```
+
+显示效果：`XYZ 工作室`
+
+**示例 4：使用 `PUBLISHER_STUDIO` 模式**
+
+```json
+{
+  "vsmeta_show_title2": "publisher_studio"
+}
+```
+
+显示效果：`ABC 出版社 / XYZ 工作室`
+
+**示例 5：使用 `SERIES` 模式**
+
+```json
+{
+  "vsmeta_show_title2": "series"
+}
+```
+
+显示效果：`经典系列`
+
+**示例 6：使用 `ACTOR` 模式**
+
+```json
+{
+  "vsmeta_show_title2": "actor"
+}
+```
+
+显示效果：`演员A、演员B`
+
+**示例 7：使用 `NONE` 模式**
+
+```json
+{
+  "vsmeta_show_title2": "none"
+}
+```
+
+不显示副标题内容
+
+**示例 8：使用 `CUSTOM` 自定义模式**
+
+```json
+{
+  "vsmeta_show_title2": "custom",
+  "vsmeta_custom_title2": "{publisher} / {studio}"
+}
+```
+
+显示效果：`ABC 出版社 / XYZ 工作室`
+
+### VsmetaSummary 配置项详解
+
+#### 功能说明
+
+`vsmeta_summary` 配置项用于定义 VSMETA 文件中简介（Summary/Plot）的显示内容。这个配置项决定了在 Emby/Jellyfin 中显示的影片剧情介绍格式。
+
+#### 可选值说明
+
+| 可选值 | 功能描述 | 使用场景 |
+|--------|----------|----------|
+| `JP_ZH_JP` | 日文标题 + 中文简介 + 日文简介 | 完整的三语言版本（默认） |
+| `OUTLINE` | 中文简介 | 仅显示中文剧情介绍 |
+| `ORIGINALPLOT` | 日文简介 | 仅显示日文剧情介绍 |
+| `ZH_JP` | 中文简介 + 日文简介 | 双语剧情介绍 |
+| `JP_ZH` | 日文标题 + 中文简介 | 日文标题 + 中文剧情 |
+| `TITLE_ONLY` | 仅日文标题 | 仅显示日文标题 |
+| `OUTLINE_PUBLISHER` | 中文简介 + 制作信息 | 剧情介绍 + 发行信息 |
+| `NUMBER_TITLE` | 番号 + 标题 | 显示番号和标题 |
+| `NONE` | 不写入 | 不显示简介内容 |
+| `CUSTOM` | 自定义模板 | 完全自定义简介格式 |
+
+#### 配置效果示例
+
+假设有一部影片信息如下：
+
+- 番号：`ABC-123`
+- 日文原始标题：`クラシックドラマ`
+- 中文标题：`经典剧情`
+- 中文简介：`这是一部精彩的剧情片，讲述了感人至深的故事。`
+- 日文简介：`心を打つ感動的な物語を語った素晴らしいドラマです。`
+- 制作商：`ABC 出版社`
+
+**示例 1：使用 `JP_ZH_JP` 模式（默认）**
+
+```json
+{
+  "vsmeta_summary": "jp_zh_jp"
+}
+```
+
+显示效果：
+```
+クラシックドラマ
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+心を打つ感動的な物語を語った素晴らしいドラマです。
+```
+
+**示例 2：使用 `OUTLINE` 模式**
+
+```json
+{
+  "vsmeta_summary": "outline"
+}
+```
+
+显示效果：
+```
+这是一部精彩的剧情片，讲述了感人至深的故事。
+```
+
+**示例 3：使用 `ORIGINALPLOT` 模式**
+
+```json
+{
+  "vsmeta_summary": "originalplot"
+}
+```
+
+显示效果：
+```
+心を打つ感動的な物語を語った素晴らしいドラマです。
+```
+
+**示例 4：使用 `ZH_JP` 模式**
+
+```json
+{
+  "vsmeta_summary": "zh_jp"
+}
+```
+
+显示效果：
+```
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+心を打つ感動的な物語を語った素晴らしいドラマです。
+```
+
+**示例 5：使用 `JP_ZH` 模式**
+
+```json
+{
+  "vsmeta_summary": "jp_zh"
+}
+```
+
+显示效果：
+```
+クラシックドラマ
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+```
+
+**示例 6：使用 `TITLE_ONLY` 模式**
+
+```json
+{
+  "vsmeta_summary": "title_only"
+}
+```
+
+显示效果：
+```
+クラシックドラマ
+```
+
+**示例 7：使用 `OUTLINE_PUBLISHER` 模式**
+
+```json
+{
+  "vsmeta_summary": "outline_publisher"
+}
+```
+
+显示效果：
+```
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+发行: ABC 出版社
+```
+
+**示例 8：使用 `NUMBER_TITLE` 模式**
+
+```json
+{
+  "vsmeta_summary": "number_title"
+}
+```
+
+显示效果：
+```
+ABC-123 经典剧情
+```
+
+**示例 9：使用 `NONE` 模式**
+
+```json
+{
+  "vsmeta_summary": "none"
+}
+```
+
+不显示简介内容
+
+**示例 10：使用 `CUSTOM` 自定义模式**
+
+```json
+{
+  "vsmeta_summary": "custom",
+  "vsmeta_custom_summary": "{originaltitle}\n\n{outline}\n\n{originalplot}"
+}
+```
+
+显示效果：
+```
+クラシックドラマ
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+心を打つ感動的な物語を語った素晴らしいドラマです。
+```
+
+### 其他 VSMETA 配置详解
+
+#### vsmeta_keep_ext
+
+**功能说明**：控制 VSMETA 文件名是否保留视频文件扩展名。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_keep_ext": true
+}
+```
+
+- `true`：VSMETA 文件保留扩展名，如 `ABC-123.mp4.vsmeta`
+- `false`：VSMETA 文件不保留扩展名，如 `ABC-123.vsmeta`（默认）
+
+#### vsmeta_include_poster
+
+**功能说明**：控制是否在 VSMETA 文件中嵌入封面图（Poster）。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_include_poster": true
+}
+```
+
+- `true`：嵌入封面图到 VSMETA 文件中（默认）
+- `false`：不嵌入封面图
+
+#### vsmeta_include_backdrop
+
+**功能说明**：控制是否在 VSMETA 文件中嵌入背景图（Backdrop/Fanart）。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_include_backdrop": true
+}
+```
+
+- `true`：嵌入背景图到 VSMETA 文件中（默认）
+- `false`：不嵌入背景图
+
+#### vsmeta_locked
+
+**功能说明**：控制 VSMETA 元数据是否锁定，防止在媒体服务器中被意外修改。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_locked": true
+}
+```
+
+- `true`：锁定元数据（默认）
+- `false`：不锁定元数据
+
+#### vsmeta_image_max_dimension
+
+**功能说明**：控制 VSMETA 中嵌入图片的最大尺寸（宽度或高度）。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_image_max_dimension": 1920
+}
+```
+
+- 默认值：`1920`（像素）
+- 推荐值：1920-4096，根据实际需求调整
+
+#### vsmeta_jpeg_quality
+
+**功能说明**：控制 VSMETA 中嵌入图片的 JPEG 压缩质量。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_jpeg_quality": 90
+}
+```
+
+- 默认值：`90`（1-100）
+- 推荐值：80-95，质量与文件大小的平衡
+
+#### vsmeta_actor_limit
+
+**功能说明**：限制 VSMETA 中显示的演员数量。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_actor_limit": 20
+}
+```
+
+- 默认值：`20`
+- 推荐值：10-30，根据实际演员数量调整
+
+#### vsmeta_tag_limit
+
+**功能说明**：限制 VSMETA 中显示的标签数量。
+
+**配置示例**：
+
+```json
+{
+  "vsmeta_tag_limit": 10
+}
+```
+
+- 默认值：`10`
+- 推荐值：5-20，根据实际标签数量调整
+
+### 自定义模板语法
+
+当选择 `CUSTOM` 模式时，可以使用以下变量构建自定义模板：
+
+#### 标题模板变量
+
+| 变量 | 说明 | 示例值 |
+|------|------|--------|
+| `{number}` | 影片番号 | `ABC-123` |
+| `{title}` | 中文翻译标题 | `经典剧情` |
+| `{originaltitle}` | 日文原始标题 | `クラシックドラマ` |
+| `{publisher}` | 制作商 | `ABC 出版社` |
+| `{studio}` | 工作室 | `XYZ 工作室` |
+| `{series}` | 系列名称 | `经典系列` |
+| `{actor}` | 主要演员 | `演员A、演员B` |
+| `{release}` | 发布日期 | `2024-01-15` |
+| `{year}` | 发布年份 | `2024` |
+| `{runtime}` | 时长（分钟） | `120` |
+
+#### 模板语法示例
+
+**示例 1：简单标题格式**
+
+```json
+{
+  "vsmeta_custom_title": "{number} - {title}"
+}
+```
+
+效果：`ABC-123 - 经典剧情`
+
+**示例 2：带括号的番号**
+
+```json
+{
+  "vsmeta_custom_title": "[{number}] {title}"
+}
+```
+
+效果：`[ABC-123] 经典剧情`
+
+**示例 3：完整标题格式**
+
+```json
+{
+  "vsmeta_custom_title": "{number} - {title} ({originaltitle})"
+}
+```
+
+效果：`ABC-123 - 经典剧情 (クラシックドラマ)`
+
+**示例 4：副标题自定义**
+
+```json
+{
+  "vsmeta_custom_title2": "{publisher} / {studio}"
+}
+```
+
+效果：`ABC 出版社 / XYZ 工作室`
+
+**示例 5：简介自定义**
+
+```json
+{
+  "vsmeta_custom_summary": "{originaltitle}\n\n{outline}\n\n发行: {publisher}\n片商: {studio}"
+}
+```
+
+效果：
+```
+クラシックドラマ
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+發行: ABC 出版社
+片商: XYZ 工作室
+```
+
+### 自定义模板完整指南
+
+当你选择 `CUSTOM` 模式时，可以使用功能强大的自定义模板来精确控制 VSMETA 文件中标题、副标题和简介的显示内容。本指南将详细介绍模板语法的各个方面。
+
+#### 模板语法基础
+
+自定义模板采用简单的文本替换机制。你可以在模板中使用**占位符**，系统会自动将其替换为对应的影片信息。
+
+**基本语法格式**：
+
+```
+{占位符名称}
+```
+
+**示例**：
+
+```
+{title}                    → 经典剧情
+{number}                   → ABC-123
+{publisher} / {studio}     → ABC 出版社 / XYZ 工作室
+```
+
+#### 所有可用占位符
+
+以下是 VSMETA 自定义模板中所有可用的占位符及其说明：
+
+##### 基础信息类
+
+| 占位符 | 说明 | 示例值 |
+|--------|------|--------|
+| `{number}` | 影片番号 | `ABC-123` |
+| `{title}` | 中文翻译标题 | `经典剧情` |
+| `{originaltitle}` | 日文原始标题 | `クラシックドラマ` |
+| `{publisher}` | 发行商/制作商 | `ABC 出版社` |
+| `{studio}` | 工作室/制作公司 | `XYZ 工作室` |
+| `{series}` | 系列名称 | `经典系列` |
+
+##### 演职人员类
+
+| 占位符 | 说明 | 示例值 |
+|--------|------|--------|
+| `{actors}` | 演员列表（逗号分隔，最多显示3个） | `演员A、演员B、演员C` |
+| `{director}` | 导演 | `张三` |
+
+##### 内容描述类
+
+| 占位符 | 说明 | 示例值 |
+|--------|------|--------|
+| `{outline}` | 中文简介/剧情介绍 | `这是一部精彩的剧情片...` |
+| `{originalplot}` | 日文剧情简介 | `心を打つ感動的な...` |
+| `{genre}` | 类型/Genre 标签 | `剧情、爱情` |
+| `{label}` | 标签/Label 信息 | `高清`、`独家` |
+
+##### 时间数值类
+
+| 占位符 | 说明 | 示例值 |
+|--------|------|--------|
+| `{year}` | 发布年份 | `2024` |
+| `{release}` | 发布日期（完整） | `2024-01-15` |
+| `{runtime}` | 时长（分钟） | `120` |
+| `{score}` | 评分 | `8.5` |
+
+##### 其他信息类
+
+| 占位符 | 说明 | 示例值 |
+|--------|------|--------|
+| `{country}` | 国家/地区 | `日本` |
+| `{mosaic}` | 马赛克类型 | `有码`、`无码` |
+| `{website}` | 官方网站 | `https://example.com` |
+
+#### 增强语法：条件渲染
+
+条件渲染允许你根据字段是否存在来动态决定是否显示某些内容。这对于处理可选字段非常有用。
+
+**语法格式**：
+
+```
+{if:字段名}内容{/if}
+```
+
+**工作原理**：
+
+- 当指定字段存在且不为空时，`{if:字段名}` 和 `{/if}` 标签之间的内容会被显示
+- 当字段不存在或为空时，这部分内容会被完全省略
+
+**嵌套条件**：
+
+条件标签可以嵌套使用，以实现更复杂的逻辑：
+
+```
+{if:field1}内容1{if:field2}内容2{/if}内容3{/if}
+```
+
+**示例 1：显示系列信息（如果存在）**
+
+```
+模板：{if:series}[{series}] {/if}{number} - {title}
+```
+
+- 当有系列时：`[经典系列] ABC-123 - 经典剧情`
+- 当无系列时：`ABC-123 - 经典剧情`
+
+**示例 2：演员信息条件显示**
+
+```
+模板：{if:actors}演员: {actors}{/if}
+```
+
+- 当有演员时：`演员: 演员A、演员B、演员C`
+- 当无演员时：（完全省略，不显示任何内容）
+
+**示例 3：多字段条件组合**
+
+```
+模板：{if:score}评分: {score} | {/if}{if:runtime}时长: {runtime}分钟{/if}
+```
+
+- 当有评分和时长时：`评分: 8.5 | 时长: 120分钟`
+- 当只有评分时：`评分: 8.5`
+- 当只有时长时：`时长: 120分钟`
+
+**示例 4：带前缀的条件显示**
+
+```
+模板：{if:director}导演: {director}\n\n{/if}{outline}
+```
+
+- 当有导演时：
+  ```
+  导演: 张三
+  
+  这是一部精彩的剧情片...
+  ```
+- 当无导演时：
+  ```
+  这是一部精彩的剧情片...
+  ```
+
+**示例 5：复杂嵌套条件**
+
+```
+模板：{if:series}[{series}] {/if}{number} {if:actors}- [{actors}]{/if}
+```
+
+- 当有系列和演员时：`[经典系列] ABC-123 - [演员A、演员B]`
+- 当只有演员时：`ABC-123 - [演员A、演员B]`
+- 当只有系列时：`[经典系列] ABC-123`
+
+#### 增强语法：默认值
+
+默认值语法允许你为可能为空的字段提供备选显示内容。
+
+**语法格式**：
+
+```
+{字段名|默认值}
+```
+
+**工作原理**：
+
+- 当字段存在且不为空时，显示字段的实际值
+- 当字段不存在或为空时，显示 `|` 后面的默认值
+
+**示例 1：标题默认值**
+
+```
+模板：{title|无标题}
+```
+
+- 当有标题时：`经典剧情`
+- 当无标题时：`无标题`
+
+**示例 2：发行商默认值**
+
+```
+模板：发行: {publisher|未知发行商}
+```
+
+- 当有发行商时：`发行: ABC 出版社`
+- 当无发行商时：`发行: 未知发行商`
+
+**示例 3：评分默认值**
+
+```
+模板：{score|暂无评分}
+```
+
+- 当有评分时：`8.5`
+- 当无评分时：`暂无评分`
+
+**示例 4：系列默认值**
+
+```
+模板：{series|单集作品}
+```
+
+- 当有系列时：`经典系列`
+- 当无系列时：`单集作品`
+
+#### 高级用法：组合使用
+
+##### 条件渲染 + 默认值组合
+
+可以将条件渲染与默认值结合使用：
+
+```
+{if:publisher|未知发行商}发行: {publisher}\n{/if}
+```
+
+解析逻辑：
+1. 首先检查 `publisher` 字段是否存在
+2. 如果存在，显示 `发行: {publisher}`
+3. 如果不存在，显示 `发行: 未知发行商`
+
+##### 多条件组合模板
+
+以下是一个完整信息的简介模板示例：
+
+```
+{if:title}{title}\n\n{/if}\
+{if:originaltitle}{originaltitle}\n\n{/if}\
+{if:actors}演员: {actors}\n\n{/if}\
+{if:release}发行日期: {release}\n\n{/if}\
+{if:publisher}发行: {publisher}\n{/if}\
+{if:studio}片商: {studio}{/if}\
+\n\n\
+{if:outline}【中文简介】\n{outline}\n\n{/if}\
+{if:originalplot}【日文剧情】\n{originalplot}{/if}
+```
+
+这个模板会生成一个包含所有可用信息的完整简介：
+
+```
+经典剧情
+
+クラシックドラマ
+
+演员: 演员A、演员B、演员C
+
+发行日期: 2024-01-15
+
+发行: ABC 出版社
+片商: XYZ 工作室
+
+【中文简介】
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+【日文剧情】
+心を打つ感動的な物語を語った素晴らしいドラマです。
+```
+
+#### 丰富的模板示例
+
+##### 简单标题模板
+
+**示例 1：仅番号**
+
+```json
+{
+  "vsmeta_custom_title": "{number}"
+}
+```
+
+效果：`ABC-123`
+
+**示例 2：番号 + 中文标题**
+
+```json
+{
+  "vsmeta_custom_title": "{number} - {title}"
+}
+```
+
+效果：`ABC-123 - 经典剧情`
+
+**示例 3：番号 + 中文标题 + 日文原名**
+
+```json
+{
+  "vsmeta_custom_title": "{number} - {title} ({originaltitle})"
+}
+```
+
+效果：`ABC-123 - 经典剧情 (クラシックドラマ)`
+
+**示例 4：带括号格式**
+
+```json
+{
+  "vsmeta_custom_title": "[{number}] {title}"
+}
+```
+
+效果：`[ABC-123] 经典剧情`
+
+##### 复杂标题模板
+
+**示例 5：包含系列信息**
+
+```json
+{
+  "vsmeta_custom_title": "{if:series}[{series}] {/if}{number} - {title}"
+}
+```
+
+- 有系列时：`[经典系列] ABC-123 - 经典剧情`
+- 无系列时：`ABC-123 - 经典剧情`
+
+**示例 6：包含评分**
+
+```json
+{
+  "vsmeta_custom_title": "{if:score}[{score}] {/if}{number} - {title}"
+}
+```
+
+- 有评分时：`[8.5] ABC-123 - 经典剧情`
+- 无评分时：`ABC-123 - 经典剧情`
+
+**示例 7：完整信息标题**
+
+```json
+{
+  "vsmeta_custom_title": "{if:series}[{series}] {/if}{number} - {title} {if:actors}[{actors}]{/if}"
+}
+```
+
+效果示例：`[经典系列] ABC-123 - 经典剧情 [演员A、演员B、演员C]`
+
+##### 副标题模板示例
+
+**示例 8：发行商/片商**
+
+```json
+{
+  "vsmeta_custom_title2": "{publisher} / {studio}"
+}
+```
+
+效果：`ABC 出版社 / XYZ 工作室`
+
+**示例 9：仅演员列表**
+
+```json
+{
+  "vsmeta_custom_title2": "{actors}"
+}
+```
+
+效果：`演员A、演员B、演员C`
+
+**示例 10：发行日期**
+
+```json
+{
+  "vsmeta_custom_title2": "{release}"
+}
+```
+
+效果：`2024-01-15`
+
+**示例 11：带条件的评分和时长**
+
+```json
+{
+  "vsmeta_custom_title2": "{if:score}评分: {score}{/if}{if:runtime} | 时长: {runtime}分钟{/if}"
+}
+```
+
+- 有评分和时长时：`评分: 8.5 | 时长: 120分钟`
+- 只有评分时：`评分: 8.5`
+
+**示例 12：导演信息**
+
+```json
+{
+  "vsmeta_custom_title2": "{if:director}导演: {director}{/if}"
+}
+```
+
+- 有导演时：`导演: 张三`
+- 无导演时：（不显示）
+
+##### 简介模板示例
+
+**示例 13：原名 + 中文简介**
+
+```json
+{
+  "vsmeta_custom_summary": "{originaltitle}\n\n{outline}"
+}
+```
+
+效果：
+```
+クラシックドラマ
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+```
+
+**示例 14：三段式完整简介**
+
+```json
+{
+  "vsmeta_custom_summary": "{originaltitle}\n\n{outline}\n\n{originalplot}"
+}
+```
+
+效果：
+```
+クラシックドラマ
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+心を打つ感動的な物語を語った素晴らしいドラマです。
+```
+
+**示例 15：带元数据的简介**
+
+```json
+{
+  "vsmeta_custom_summary": "{if:title}{title}\n\n{/if}{outline}\n\n发行: {publisher|未知发行商}\n片商: {studio|未知片商}"
+}
+```
+
+效果示例：
+```
+经典剧情
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+
+发行: ABC 出版社
+片商: XYZ 工作室
+```
+
+**示例 16：演员信息简介**
+
+```json
+{
+  "vsmeta_custom_summary": "演员: {actors}\n\n{outline}"
+}
+```
+
+效果：
+```
+演员: 演员A、演员B、演员C
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+```
+
+**示例 17：详细元数据简介**
+
+```json
+{
+  "vsmeta_custom_summary": "发行日期: {release}\n类型: {genre}\n评分: {score|暂无}\n\n{outline}"
+}
+```
+
+效果：
+```
+发行日期: 2024-01-15
+类型: 剧情、爱情
+评分: 8.5
+
+这是一部精彩的剧情片，讲述了感人至深的故事。
+```
+
+##### 预设模板快速参考
+
+系统内置了多个预设模板，可以直接使用：
+
+**标题预设**：
+
+| 预设名称 | 模板内容 |
+|----------|----------|
+| 番号-标题(原名) | `{number} - {title} ({originaltitle})` |
+| 番号-标题 | `{number} - {title}` |
+| 番号 (原名) | `{number} ({originaltitle})` |
+| 仅标题 | `{title}` |
+| 仅原名 | `{originaltitle}` |
+| 完整信息 | `{if:series}[{series}] {/if}{number} - {title} {if:actors}[{actors}]{/if}` |
+| 评分-标题 | `{if:score}[{score}] {/if}{number} - {title}` |
+
+**副标题预设**：
+
+| 预设名称 | 模板内容 |
+|----------|----------|
+| 发行商/片商 | `{publisher} / {studio}` |
+| 片商/系列 | `{studio} / {series}` |
+| 演员 | `{actors}` |
+| 发行日期 | `{release}` |
+| 导演 | `{if:director}导演: {director}{/if}` |
+| 评分/时长 | `{if:score}评分: {score}{/if}{if:runtime} \| 时长: {runtime}分钟{/if}` |
+| 标签/类型 | `{genre}` |
+
+**简介预设**：
+
+| 预设名称 | 模板内容 |
+|----------|----------|
+| 原名+简介+剧情 | `{originaltitle}\n\n{outline}\n\n{originalplot}` |
+| 原名+简介 | `{originaltitle}\n\n{outline}` |
+| 原名+剧情 | `{originaltitle}\n\n{originalplot}` |
+| 仅简介 | `{outline}` |
+| 完整信息 | 包含所有可用信息的完整简介 |
+
+#### 常见问题解答
+
+**Q1：为什么我的条件渲染不生效？**
+
+请确保 `{if:}` 和 `{/if}` 标签正确配对使用。每个 `{if:字段}` 必须有对应的 `{/if}`。检查方法：
+- 打开模板，确认每个 `{if:` 都有对应的 `{/if}`
+- 条件标签不能嵌套错误，例如：`{if:a}{if:b}...{/if}...{/if}` 是正确的，但 `{if:a}{if:b}...{/if}` 缺少一个 `{/if}`
+
+**Q2：字段为空时会显示什么？**
+
+- 如果没有使用默认值语法，空字段会显示为空字符串（即什么都不显示）
+- 如果使用了默认值语法，例如 `{title|无标题}`，空字段会显示默认值 "无标题"
+
+**Q3：可以使用多个条件标签吗？**
+
+是的，可以在一个模板中使用多个条件标签。例如：
+```
+{if:series}[{series}] {/if}{number} {if:actors}[{actors}]{/if} {if:score}[{score}]{/if}
+```
+
+**Q4：条件标签可以嵌套吗？**
+
+可以，但建议保持嵌套结构清晰。例如：
+```
+{if:series}[{series}] {if:score}({score}){/if}{/if}{number}
+```
+
+**Q5：如何处理换行？**
+
+在 JSON 字符串中，换行使用 `\n` 表示。例如：
+```
+{originaltitle}\n\n{outline}
+```
+两个 `\n` 会产生一个空行。
+
+**Q6：占位符名称大小写敏感吗？**
+
+是的，占位符名称必须完全匹配，例如使用 `{title}` 而不是 `{Title}` 或 `{TITLE}`。
+
+**Q7：如何避免字段为空时出现多余的分隔符？**
+
+使用条件渲染来处理分隔符。例如：
+```
+错误写法：{title} | {publisher} | {studio}
+正确写法：{title}{if:publisher} | {publisher}{/if}{if:studio} | {studio}{/if}
+```
+
+**Q8：演员列表最多显示几个？**
+
+演员列表默认最多显示3个演员（可通过 `actor_name_max` 配置），多个演员之间用顿号（`、`）分隔。
+
+#### 最佳实践建议
+
+##### 1. 标题模板建议
+
+- **简洁优先**：对于大多数用户，`{number} - {title}` 格式足够清晰
+- **信息丰富**：需要更多信息时，使用 `{if:series}[{series}] {/if}{number} - {title}`
+- **避免过长**：标题过长可能影响显示效果，建议控制在合理长度内
+
+##### 2. 副标题模板建议
+
+- **相关性强**：副标题应与主标题内容相关，如 `{publisher} / {studio}`
+- **条件使用**：对于可选字段（如导演），使用条件渲染避免空白
+- **信息分层**：副标题用于补充主标题未包含的重要信息
+
+##### 3. 简介模板建议
+
+- **结构清晰**：使用空行分隔不同部分，如 `{originaltitle}\n\n{outline}\n\n{originalplot}`
+- **包含元数据**：在简介开头包含关键元数据（演员、发行日期等）
+- **使用默认值**：对可选字段使用默认值，避免完全空白
+
+##### 4. 性能考虑
+
+- **避免过度嵌套**：过多嵌套的条件标签可能影响解析性能
+- **简洁模板**：模板越简洁，解析速度越快
+- **合理使用默认值**：默认值会增加模板复杂度，按需使用
+
+##### 5. 兼容性考虑
+
+- **测试不同场景**：确保模板在各种数据完整度下都能正确显示
+- **处理空字段**：测试字段为空时的显示效果
+- **跨服务器测试**：如果使用多个媒体服务器，建议在各服务器上测试显示效果
+
+##### 6. 维护建议
+
+- **注释模板**：复杂的自定义模板建议添加注释说明用途
+- **版本记录**：记录不同配置版本，方便回溯
+- **预设模板**：可以从预设模板开始，逐步修改以适应需求
+
+### 完整配置示例
+
+以下是 VSMETA 配置的完整示例，展示了各种配置的组合使用：
+
+```json
+{
+  "vsmeta_show_title": "NUMBER_TITLE",
+  "vsmeta_show_title2": "PUBLISHER_STUDIO",
+  "vsmeta_summary": "JP_ZH_JP",
+  "vsmeta_keep_ext": false,
+  "vsmeta_include_poster": true,
+  "vsmeta_include_backdrop": true,
+  "vsmeta_locked": true,
+  "vsmeta_image_max_dimension": 1920,
+  "vsmeta_jpeg_quality": 90,
+  "vsmeta_actor_limit": 20,
+  "vsmeta_tag_limit": 10,
+  "vsmeta_custom_title": "{number} - {title}",
+  "vsmeta_custom_title2": "{publisher} / {studio}",
+  "vsmeta_custom_summary": "{originaltitle}\n\n{outline}\n\n{originalplot}"
+}
+```
+
+#### 简化配置示例
+
+如果只需要基本配置，可以使用以下简化版本：
+
+```json
+{
+  "vsmeta_show_title": "title",
+  "vsmeta_show_title2": "originaltitle",
+  "vsmeta_summary": "jp_zh_jp"
+}
+```
+
+#### 隐私保护配置示例
+
+如果需要减少 VSMETA 中嵌入的信息量：
+
+```json
+{
+  "vsmeta_show_title": "NUMBER_ONLY",
+  "vsmeta_show_title2": "NONE",
+  "vsmeta_summary": "NONE",
+  "vsmeta_include_poster": true,
+  "vsmeta_include_backdrop": false,
+  "vsmeta_actor_limit": 5,
+  "vsmeta_tag_limit": 5
+}
+```
+
+### 最佳配置建议
+
+#### 1. 标题配置建议
+
+- **日常使用**：推荐使用 `NUMBER_TITLE` 或 `TITLE` 模式，兼顾识别度和美观度
+- **番好型用户**：推荐使用 `NUMBER_ONLY` 模式，简洁明了
+- **日语学习者**：推荐使用 `NUMBER_ORIGINALTITLE` 或 `TITLE_ORIGINALTITLE` 模式
+
+#### 2. 副标题配置建议
+
+- **一般用户**：推荐使用 `ORIGINALTITLE` 或 `PUBLISHER` 模式
+- **系列收藏者**：推荐使用 `SERIES` 模式
+- **演员粉丝**：推荐使用 `ACTOR` 模式
+
+#### 3. 简介配置建议
+
+- **完整信息**：推荐使用 `JP_ZH_JP` 或 `ZH_JP` 模式
+- **简洁信息**：推荐使用 `OUTLINE` 或 `ORIGINALPLOT` 模式
+- **隐私保护**：推荐使用 `NONE` 模式
+
+#### 4. 性能与质量建议
+
+- **图片质量**：建议 `vsmeta_jpeg_quality` 设置在 85-95 之间
+- **图片尺寸**：建议 `vsmeta_image_max_dimension` 设置在 1920-2048 之间
+- **信息限制**：建议 `vsmeta_actor_limit` 和 `vsmeta_tag_limit` 根据实际需要设置
+
+#### 5. 媒体服务器兼容性
+
+- **Emby**：推荐使用默认配置，所有功能完全支持
+- **Jellyfin**：推荐使用默认配置，大多数功能支持
+- **其他服务器**：建议测试后再决定具体配置
 
 ---
 
