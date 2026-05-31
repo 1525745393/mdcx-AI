@@ -1,6 +1,6 @@
 # v220260565 版本发布 - The Implementation Plan (Decomposed and Prioritized Task List)
 
-## [/] Task 1: 更新版本号
+## [x] Task 1: 更新版本号
 - **Priority**: P0
 - **Depends On**: None
 - **Description**: 
@@ -12,7 +12,7 @@
   - `programmatic` TR-1.2: 运行 `grep LOCAL_VERSION mdcx/consts.py` 验证
 - **Notes**: 使用 bump 脚本更安全，避免手动编辑出错
 
-## [ ] Task 2: 更新 Changelog 文档
+## [x] Task 2: 更新 Changelog 文档
 - **Priority**: P0
 - **Depends On**: None
 - **Description**: 
@@ -26,7 +26,7 @@
   - `programmatic` TR-2.1: 检查 changelog.md 文件首行为 "## 220260565"
   - `human-judgment` TR-2.2: 确认变更内容描述准确完整
 
-## [ ] Task 3: 创建 Release Commit
+## [x] Task 3: 创建 Release Commit
 - **Priority**: P0
 - **Depends On**: [Task 1, Task 2]
 - **Description**: 
@@ -37,7 +37,7 @@
   - `programmatic` TR-3.1: 检查 git log 最新提交信息
   - `programmatic` TR-3.2: 确认工作树干净无未提交修改
 
-## [ ] Task 4: 创建 Git 标签
+## [x] Task 4: 创建 Git 标签
 - **Priority**: P0
 - **Depends On**: [Task 3]
 - **Description**: 
@@ -48,7 +48,7 @@
   - `programmatic` TR-4.1: 运行 `git tag` 确认标签存在
   - `programmatic` TR-4.2: 运行 `git rev-parse v220260565` 验证标签指向正确的提交
 
-## [ ] Task 5: 推送到远程仓库
+## [x] Task 5: 推送到远程仓库
 - **Priority**: P0
 - **Depends On**: [Task 4]
 - **Description**: 
@@ -59,7 +59,7 @@
   - `programmatic` TR-5.1: 运行 `git ls-remote --tags origin` 确认远程标签存在
   - `human-judgment` TR-5.2: 确认 GitHub 仓库中可以看到新标签
 
-## [ ] Task 6: 监控 GitHub Actions 构建
+## [x] Task 6: 监控 GitHub Actions 构建
 - **Priority**: P0
 - **Depends On**: [Task 5]
 - **Description**: 
