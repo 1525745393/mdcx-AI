@@ -149,7 +149,7 @@ PLACEHOLDERS_WITH_DESC = [
 ]
 
 
-def validate_template(template: str) -> Tuple[bool, str]:
+def validate_template(template: str) -> tuple[bool, str]:
     """
     验证模板字符串
     

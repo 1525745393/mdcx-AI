@@ -412,7 +412,7 @@ from ..utils.vsmeta_template_helper import (
 AVAILABLE_PLACEHOLDERS: List[str] = [ph[0] for ph in PLACEHOLDERS_WITH_DESC]
 
 
-def validate_template(template: str) -> Tuple[bool, str]:
+def validate_template(template: str) -> tuple[bool, str]:
     """
     验证模板字符串
     
