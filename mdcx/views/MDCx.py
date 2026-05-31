@@ -11329,7 +11329,7 @@ class Ui_MDCx(object):
         self.label_vsmeta_custom_summary.setText(_translate("MDCx", "简介模板:"))
         self.label_vsmeta_template_help.setText(_translate(
             "MDCx",
-            "可用占位符: {number}, {title}, {originaltitle}, {publisher}, {studio}, {series}, {actors}, {outline}, {originalplot}, {year}, {release}"
+            "可用占位符: {number}, {title}, {originaltitle}, {publisher}, {studio}, {series}, {actors}, {outline}, {originalplot}, {year}, {release}, {score}, {country}, {director}, {genre}, {mosaic}, {runtime}, {label}, {website}\n增强语法: {field|默认值} (字段为空时使用默认值), {if:field}内容{/if} (条件显示)"
         ))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))

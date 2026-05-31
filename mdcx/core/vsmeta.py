@@ -4,8 +4,10 @@ import json
 import re
 import time
 import traceback
+from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
+from typing import Dict, List, Optional
 
 import aiofiles
 from PIL import Image
@@ -398,23 +400,139 @@ def parse_runtime(runtime: str) -> int | None:
         return None
 
 
-def render_template(template: str, data: CrawlersResult) -> str:
-    """Render a template string using data from CrawlersResult
+@dataclass
+class TemplatePreset:
+    name: str
+    template: str
+    description: str
+
+
+# 标题预设模板
+TITLE_PRESETS: List[TemplatePreset] = [
+    TemplatePreset(
+        name="番号-标题(原名)",
+        template="{number} - {title} ({originaltitle})",
+        description="显示番号、中文标题和日文原名"
+    ),
+    TemplatePreset(
+        name="番号-标题",
+        template="{number} - {title}",
+        description="只显示番号和中文标题"
+    ),
+    TemplatePreset(
+        name="番号 (原名)",
+        template="{number} ({originaltitle})",
+        description="显示番号和日文原名"
+    ),
+    TemplatePreset(
+        name="仅标题",
+        template="{title}",
+        description="只显示中文标题"
+    ),
+    TemplatePreset(
+        name="仅原名",
+        template="{originaltitle}",
+        description="只显示日文原名"
+    ),
+    TemplatePreset(
+        name="完整信息",
+        template="{if:series}[{series}] {/if}{number} - {title} {if:actors}[{actors}]{/if}",
+        description="包含系列、番号、标题和演员"
+    ),
+    TemplatePreset(
+        name="评分-标题",
+        template="{if:score}[{score}] {/if}{number} - {title}",
+        description="显示评分、番号和标题"
+    ),
+]
+
+# 副标题预设模板
+TITLE2_PRESETS: List[TemplatePreset] = [
+    TemplatePreset(
+        name="发行商/片商",
+        template="{publisher} / {studio}",
+        description="显示发行商和片商"
+    ),
+    TemplatePreset(
+        name="片商/系列",
+        template="{studio} / {series}",
+        description="显示片商和系列"
+    ),
+    TemplatePreset(
+        name="演员",
+        template="{actors}",
+        description="显示演员列表"
+    ),
+    TemplatePreset(
+        name="发行日期",
+        template="{release}",
+        description="显示发行日期"
+    ),
+    TemplatePreset(
+        name="导演",
+        template="{if:director}导演: {director}{/if}",
+        description="显示导演信息"
+    ),
+    TemplatePreset(
+        name="评分/时长",
+        template="{if:score}评分: {score}{/if}{if:runtime} | 时长: {runtime}分钟{/if}",
+        description="显示评分和时长"
+    ),
+    TemplatePreset(
+        name="标签/类型",
+        template="{genre}",
+        description="显示类型标签"
+    ),
+]
+
+# 简介预设模板
+SUMMARY_PRESETS: List[TemplatePreset] = [
+    TemplatePreset(
+        name="原名+简介+剧情",
+        template="{originaltitle}\n\n{outline}\n\n{originalplot}",
+        description="完整的三部分简介"
+    ),
+    TemplatePreset(
+        name="原名+简介",
+        template="{originaltitle}\n\n{outline}",
+        description="日文原名和中文简介"
+    ),
+    TemplatePreset(
+        name="原名+剧情",
+        template="{originaltitle}\n\n{originalplot}",
+        description="日文原名和日文剧情"
+    ),
+    TemplatePreset(
+        name="仅简介",
+        template="{outline}",
+        description="只显示中文简介"
+    ),
+    TemplatePreset(
+        name="完整信息",
+        template="{if:title}{title}\n\n{/if}"
+                 "{if:originaltitle}{originaltitle}\n\n{/if}"
+                 "{if:actors}演员: {actors}\n\n{/if}"
+                 "{if:release}发行: {release}\n\n{/if}"
+                 "{outline}\n\n{originalplot}",
+        description="包含所有可用信息的完整简介"
+    ),
+]
+
+# 所有可用的占位符列表
+AVAILABLE_PLACEHOLDERS: List[str] = [
+    "number", "title", "originaltitle", "publisher", "studio",
+    "series", "actors", "outline", "originalplot", "year",
+    "release", "score", "country", "director", "genre",
+    "mosaic", "runtime", "label", "website"
+]
+
+
+def get_template_context(data: CrawlersResult) -> dict:
+    """Get the template context from CrawlersResult data
     
-    Supports the following placeholders:
-    - {number} - Video number
-    - {title} - Chinese title
-    - {originaltitle} - Japanese original title
-    - {publisher} - Publisher
-    - {studio} - Studio
-    - {series} - Series name
-    - {actors} - Actors (comma-separated, max 3)
-    - {outline} - Chinese summary
-    - {originalplot} - Japanese summary
-    - {year} - Year
-    - {release} - Release date
+    Returns a dictionary of all available placeholders and their values.
     """
-    context = {
+    return {
         "number": data.number or "",
         "title": data.title or "",
         "originaltitle": data.originaltitle or "",
@@ -426,10 +544,121 @@ def render_template(template: str, data: CrawlersResult) -> str:
         "originalplot": data.originalplot or "",
         "year": data.year or "",
         "release": data.release or "",
+        "score": data.score or "",
+        "country": data.country or "",
+        "director": data.director or "",
+        "genre": ", ".join(data.genres[:5]) if data.genres else "",
+        "mosaic": data.mosaic or "",
+        "runtime": str(data.runtime) if data.runtime else "",
+        "label": data.label or "",
+        "website": data.website or "",
     }
+
+def validate_template(template: str) -> tuple[bool, str]:
+    """Validate a template string
+    
+    Returns (is_valid, error_message) tuple.
+    """
+    stack = []
+    i = 0
+    n = len(template)
+    
+    while i < n:
+        if template.startswith("{if:", i):
+            stack.append("if")
+            i += 4
+        elif template.startswith("{/if}", i):
+            if not stack or stack[-1] != "if":
+                return False, f"未闭合的标签: {{/if}} 在位置 {i}"
+            stack.pop()
+            i += 5
+        elif template[i] == "{":
+            end = template.find("}", i)
+            if end == -1:
+                return False, f"未闭合的占位符: {{ 在位置 {i}"
+            i = end + 1
+        else:
+            i += 1
+    
+    if stack:
+        return False, f"缺少闭合标签: {{/if}}"
+    
+    return True, ""
+
+def render_template(template: str, data: CrawlersResult) -> str:
+    """Render a template string using data from CrawlersResult
+    
+    Supports the following placeholders and syntax:
+    
+    **Basic Placeholders:**
+    - {number} - Video number
+    - {title} - Chinese title
+    - {originaltitle} - Japanese original title
+    - {publisher} - Publisher
+    - {studio} - Studio
+    - {series} - Series name
+    - {actors} - Actors (comma-separated, max 3)
+    - {outline} - Chinese summary
+    - {originalplot} - Japanese summary
+    - {year} - Year
+    - {release} - Release date
+    - {score} - Rating score
+    - {country} - Country
+    - {director} - Director
+    - {genre} - Genres (comma-separated, max 5)
+    - {mosaic} - Mosaic type
+    - {runtime} - Runtime in minutes
+    - {label} - Label
+    - {website} - Official website
+    
+    **Enhanced Syntax:**
+    - {field|default} - Use default value if field is empty
+    - {if:field}...{/if} - Conditionally render content if field has value
+    """
+    context = get_template_context(data)
     result = template
+    
+    # Process conditional blocks: {if:field}content{/if}
+    def process_conditionals(s):
+        pattern = r'\{if:([^}]+)\}(.*?)\{/if\}'
+        while True:
+            match = re.search(pattern, s, re.DOTALL)
+            if not match:
+                break
+            field = match.group(1)
+            content = match.group(2)
+            value = context.get(field, "")
+            if value and str(value).strip():
+                s = s[:match.start()] + content + s[match.end():]
+            else:
+                s = s[:match.start()] + s[match.end():]
+        return s
+    
+    result = process_conditionals(result)
+    
+    # Process placeholders with defaults: {field|default}
+    def process_defaults(s):
+        pattern = r'\{([^}|]+)\|([^}]+)\}'
+        while True:
+            match = re.search(pattern, s)
+            if not match:
+                break
+            field = match.group(1)
+            default = match.group(2)
+            value = context.get(field, "")
+            if value and str(value).strip():
+                replacement = str(value)
+            else:
+                replacement = default
+            s = s[:match.start()] + replacement + s[match.end():]
+        return s
+    
+    result = process_defaults(result)
+    
+    # Process basic placeholders: {field}
     for key, value in context.items():
         result = result.replace(f"{{{key}}}", str(value))
+    
     return result
 
 
