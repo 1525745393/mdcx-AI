@@ -2,16 +2,31 @@
 测试文件工具函数
 """
 import os
+import atexit
 import tempfile
 from pathlib import Path
 
 import pytest
 from unittest.mock import MagicMock, patch
 
-# 在导入前模拟 signal 模块以避免 PyQt6 依赖
+
+# 在导入前立即 mock signal 模块
 signal_mock = MagicMock()
 signal_mock.add_log = MagicMock()
-patch.dict('sys.modules', {'mdcx.signals': MagicMock(signal=signal_mock)}).start()
+_patcher = patch.dict('sys.modules', {'mdcx.signals': MagicMock(signal=signal_mock)})
+_patcher.start()
+
+
+def _cleanup_patcher():
+    """清理 mock 补丁"""
+    try:
+        _patcher.stop()
+    except:
+        pass
+
+
+atexit.register(_cleanup_patcher)
+
 
 from mdcx.utils.file import (
     build_file_name_index,
