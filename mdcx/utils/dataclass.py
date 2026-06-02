@@ -44,14 +44,13 @@ def update_valid(d1: "T", d2: "DataclassInstance | dict", validator: Callable[..
 def update_existing(d1: dict, d2: dict) -> dict:
     """
     类似 dict.update, 但不会向 d1 添加新 key.
+    
+    返回一个新的字典, 不会修改原始字典.
     """
-    res = d1
-    other = d2
-    if len(d1) > len(d2):
-        d1, d2 = d2, d1  # 确保 d1 是较小的字典
-    for key in d1:
+    res: dict = d1.copy()  # 创建副本，不修改原始字典
+    for key in res:
         if key in d2:
-            res[key] = other[key]
+            res[key] = d2[key]
     return res
 
 
@@ -63,12 +62,11 @@ def update_existing_valid(d1: dict, d2: dict, validator: Callable[..., bool] = b
         d1: 要更新的字典
         d2: 包含新值的字典
         validator: 判断有效值的函数, 接受新值, 返回 bool 表示是否有效. 默认使用 bool 转换.
+    
+    返回一个新的字典, 不会修改原始字典.
     """
-    res = d1
-    other = d2
-    if len(d1) > len(d2):
-        d1, d2 = d2, d1
-    for key in d1:
-        if key in d2 and validator(r := other[key]):
+    res: dict = d1.copy()  # 创建副本，不修改原始字典
+    for key in res:
+        if key in d2 and validator(r := d2[key]):
             res[key] = r
     return res
