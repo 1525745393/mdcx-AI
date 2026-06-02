@@ -171,6 +171,11 @@ def validate_template(template: str) -> tuple[bool, str]:
             end = template.find("}", i)
             if end == -1:
                 return False, f"未闭合的占位符: {{ 在位置 {i}"
+            
+            inner_content = template[i+1:end]
+            if "{" in inner_content:
+                return False, f"占位符内不允许嵌套 {{ 在位置 {i}"
+            
             i = end + 1
         else:
             i += 1
@@ -195,3 +200,155 @@ def get_presets_for_type(template_type: str) -> list[TemplatePreset]:
     elif template_type == "summary":
         return SUMMARY_PRESETS
     return []
+
+
+def get_all_presets() -> dict[str, list[TemplatePreset]]:
+    """
+    获取所有预设模板
+    
+    Returns:
+        包含 title, title2, summary 预设的字典
+    """
+    return {
+        "title": TITLE_PRESETS,
+        "title2": TITLE2_PRESETS,
+        "summary": SUMMARY_PRESETS
+    }
+
+
+def get_preset_by_name(template_type: str, name: str) -> TemplatePreset | None:
+    """
+    根据名称查找预设模板
+    
+    Args:
+        template_type: 预设类型
+        name: 预设名称
+    
+    Returns:
+        找到的预设，未找到返回 None
+    """
+    presets = get_presets_for_type(template_type)
+    for preset in presets:
+        if preset.name == name:
+            return preset
+    return None
+
+
+def extract_placeholders(template: str) -> set[str]:
+    """
+    从模板中提取所有占位符名称
+    
+    Args:
+        template: 模板字符串
+    
+    Returns:
+        占位符名称集合
+    """
+    placeholders = set()
+    i = 0
+    n = len(template)
+    
+    while i < n:
+        if template.startswith("{if:", i):
+            # 条件标签 {if:field}
+            end = template.find("}", i)
+            if end != -1:
+                field = template[i + 4:end]
+                placeholders.add(field.strip())
+            i = end + 1 if end != -1 else i + 1
+        elif template.startswith("{/if}", i):
+            i += 5
+        elif template[i] == "{":
+            end = template.find("}", i)
+            if end != -1:
+                content = template[i + 1:end]
+                # 处理默认值语法 {field|default}
+                if "|" in content:
+                    field = content.split("|")[0]
+                else:
+                    field = content
+                placeholders.add(field.strip())
+            i = end + 1 if end != -1 else i + 1
+        else:
+            i += 1
+    
+    return placeholders
+
+
+def render_template(template: str, data: dict) -> str:
+    """
+    使用数据渲染模板
+    
+    Args:
+        template: 模板字符串
+        data: 数据字典
+    
+    Returns:
+        渲染后的字符串
+    """
+    result = []
+    i = 0
+    n = len(template)
+    
+    while i < n:
+        if template.startswith("{if:", i):
+            # 条件渲染 {if:field}...{/if}
+            field_end = template.find("}", i)
+            if field_end == -1:
+                result.append(template[i])
+                i += 1
+                continue
+            
+            field = template[i + 4:field_end].strip()
+            content_start = field_end + 1
+            
+            # 查找对应的 {/if}
+            depth = 1
+            j = content_start
+            while j < n and depth > 0:
+                if template.startswith("{if:", j):
+                    depth += 1
+                    j += 4
+                elif template.startswith("{/if}", j):
+                    depth -= 1
+                    if depth == 0:
+                        break
+                    j += 5
+                else:
+                    j += 1
+            
+            if depth == 0:
+                # 找到了闭合标签
+                if field in data and data[field]:
+                    # 递归渲染条件内容
+                    inner_content = template[content_start:j]
+                    result.append(render_template(inner_content, data))
+                i = j + 5
+            else:
+                # 未找到闭合标签，原样输出
+                result.append(template[i])
+                i += 1
+        
+        elif template[i] == "{":
+            # 普通占位符 {field} 或 {field|default}
+            end = template.find("}", i)
+            if end == -1:
+                result.append(template[i])
+                i += 1
+                continue
+            
+            content = template[i + 1:end]
+            if "|" in content:
+                field, default = content.split("|", 1)
+                value = data.get(field.strip(), default)
+            else:
+                value = data.get(content, "")
+            
+            result.append(str(value) if value is not None else "")
+            i = end + 1
+        
+        else:
+            result.append(template[i])
+            i += 1
+    
+    return "".join(result)
