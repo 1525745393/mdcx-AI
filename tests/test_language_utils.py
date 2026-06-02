@@ -1,13 +1,8 @@
 """
 测试语言检测工具函数
 """
-import pytest
 
-from mdcx.utils.language import (
-    is_japanese,
-    is_english,
-    is_probably_english_for_translation
-)
+from mdcx.utils.language import is_english, is_japanese, is_probably_english_for_translation
 
 
 class TestLanguageDetection:

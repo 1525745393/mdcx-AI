@@ -1,14 +1,12 @@
 """
 测试文件工具函数
 """
-import os
 import atexit
 import tempfile
 from pathlib import Path
-
-import pytest
 from unittest.mock import MagicMock, patch
 
+import pytest
 
 # 在导入前立即 mock signal 模块
 signal_mock = MagicMock()
@@ -21,19 +19,19 @@ def _cleanup_patcher():
     """清理 mock 补丁"""
     try:
         _patcher.stop()
-    except:
+    except Exception:
         pass
 
 
 atexit.register(_cleanup_patcher)
 
 
-from mdcx.utils.file import (
+from mdcx.utils.file import (  # noqa: E402 - 必须在导入前先 mock 模块
     build_file_name_index,
+    delete_file_sync,
     find_file_from_index,
     find_file_in_folder,
-    delete_file_sync,
-    move_file_sync
+    move_file_sync,
 )
 
 

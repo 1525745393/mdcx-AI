@@ -1,18 +1,17 @@
 """
 测试 VSMETA 模板辅助模块
 """
-import pytest
 
 from mdcx.utils.vsmeta_template_helper import (
-    TemplatePreset,
-    TITLE_PRESETS,
-    TITLE2_PRESETS,
     SUMMARY_PRESETS,
+    TITLE2_PRESETS,
+    TITLE_PRESETS,
+    TemplatePreset,
+    extract_placeholders,
     get_all_presets,
     get_preset_by_name,
+    render_template,
     validate_template,
-    extract_placeholders,
-    render_template
 )
 
 

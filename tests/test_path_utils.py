@@ -1,17 +1,9 @@
 """
 测试路径工具函数
 """
-import os
-import tempfile
-from pathlib import Path
 
-import pytest
 
-from mdcx.utils.path import (
-    showFilePath,
-    is_descendant,
-    is_any_descendant
-)
+from mdcx.utils.path import is_any_descendant, is_descendant, showFilePath
 
 
 class TestShowFilePath:
