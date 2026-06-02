@@ -1,5 +1,3 @@
-from typing import List
-
 from ..config.manager import manager
 from ..number import remove_escape_string1
 
@@ -30,7 +28,7 @@ def deal_actor_more(actor: str) -> str:
     """
     actor_name_max: int = int(manager.config.actor_name_max)
     actor_name_more: str = manager.config.actor_name_more
-    actor_list: List[str] = actor.split(",")
+    actor_list: list[str] = actor.split(",")
     
     if len(actor_list) > actor_name_max:  # 演员多于设置值时
         result: str = ""

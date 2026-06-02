@@ -2,7 +2,6 @@
 VSMETA模板辅助模块
 提供预设模板和占位符选择工具
 """
-from typing import List, Optional, Tuple
 from dataclasses import dataclass
 
 
@@ -15,7 +14,7 @@ class TemplatePreset:
 
 
 # 标题预设模板
-TITLE_PRESETS: List[TemplatePreset] = [
+TITLE_PRESETS: list[TemplatePreset] = [
     TemplatePreset(
         name="番号-标题(原名)",
         template="{number} - {title} ({originaltitle})",
@@ -54,7 +53,7 @@ TITLE_PRESETS: List[TemplatePreset] = [
 ]
 
 # 副标题预设模板
-TITLE2_PRESETS: List[TemplatePreset] = [
+TITLE2_PRESETS: list[TemplatePreset] = [
     TemplatePreset(
         name="发行商/片商",
         template="{publisher} / {studio}",
@@ -93,7 +92,7 @@ TITLE2_PRESETS: List[TemplatePreset] = [
 ]
 
 # 简介预设模板
-SUMMARY_PRESETS: List[TemplatePreset] = [
+SUMMARY_PRESETS: list[TemplatePreset] = [
     TemplatePreset(
         name="原名+简介+剧情",
         template="{originaltitle}\n\n{outline}\n\n{originalplot}",
@@ -177,12 +176,12 @@ def validate_template(template: str) -> tuple[bool, str]:
             i += 1
     
     if stack:
-        return False, f"缺少闭合标签: {{/if}}"
+        return False, "缺少闭合标签: {/if}"
     
     return True, ""
 
 
-def get_presets_for_type(template_type: str) -> List[TemplatePreset]:
+def get_presets_for_type(template_type: str) -> list[TemplatePreset]:
     """
     根据类型获取预设模板列表
     

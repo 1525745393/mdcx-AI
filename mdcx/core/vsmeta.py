@@ -6,7 +6,6 @@ import time
 import traceback
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import aiofiles
 from PIL import Image
@@ -28,6 +27,12 @@ from ..signals import signal
 from ..utils import get_used_time
 from ..utils.file import delete_file_async, move_file_async
 from ..utils.leb128 import encode_varint
+from ..utils.vsmeta_template_helper import (
+    PLACEHOLDERS_WITH_DESC,
+)
+from ..utils.vsmeta_template_helper import (
+    validate_template as helper_validate_template,
+)
 
 
 class VSMetaEncoder:
@@ -399,23 +404,14 @@ def parse_runtime(runtime: str) -> int | None:
         return None
 
 
-# 导入辅助模块的预设和验证功能
-from ..utils.vsmeta_template_helper import (
-    TITLE_PRESETS,
-    TITLE2_PRESETS,
-    SUMMARY_PRESETS,
-    PLACEHOLDERS_WITH_DESC,
-    validate_template as helper_validate_template,
-)
-
 # 所有可用的占位符列表
-AVAILABLE_PLACEHOLDERS: List[str] = [ph[0] for ph in PLACEHOLDERS_WITH_DESC]
+AVAILABLE_PLACEHOLDERS: list[str] = [ph[0] for ph in PLACEHOLDERS_WITH_DESC]
 
 
 def validate_template(template: str) -> tuple[bool, str]:
     """
     验证模板字符串
-    
+
     Returns (is_valid, error_message)
     """
     return helper_validate_template(template)
@@ -423,7 +419,7 @@ def validate_template(template: str) -> tuple[bool, str]:
 
 def get_template_context(data: CrawlersResult) -> dict:
     """Get the template context from CrawlersResult data
-    
+
     Returns a dictionary of all available placeholders and their values.
     """
     return {
@@ -433,7 +429,9 @@ def get_template_context(data: CrawlersResult) -> dict:
         "publisher": data.publisher or "",
         "studio": data.studio or "",
         "series": data.series or "",
-        "actors": ", ".join((data.all_actors if len(data.all_actors) > len(data.actors) else data.actors)[:3]) if (data.actors or data.all_actors) else "",
+        "actors": ", ".join((data.all_actors if len(data.all_actors) > len(data.actors) else data.actors)[:3])
+        if (data.actors or data.all_actors)
+        else "",
         "outline": data.outline or "",
         "originalplot": data.originalplot or "",
         "year": data.year or "",
@@ -451,9 +449,9 @@ def get_template_context(data: CrawlersResult) -> dict:
 
 def render_template(template: str, data: CrawlersResult) -> str:
     """Render a template string using data from CrawlersResult
-    
+
     Supports the following placeholders and syntax:
-    
+
     **Basic Placeholders:**
     - {number} - Video number
     - {title} - Chinese title
@@ -474,17 +472,17 @@ def render_template(template: str, data: CrawlersResult) -> str:
     - {runtime} - Runtime in minutes
     - {label} - Label
     - {website} - Official website
-    
+
     **Enhanced Syntax:**
     - {field|default} - Use default value if field is empty
     - {if:field}...{/if} - Conditionally render content if field has value
     """
     context = get_template_context(data)
     result = template
-    
+
     # Process conditional blocks: {if:field}content{/if}
     def process_conditionals(s):
-        pattern = r'\{if:([^}]+)\}(.*?)\{/if\}'
+        pattern = r"\{if:([^}]+)\}(.*?)\{/if\}"
         while True:
             match = re.search(pattern, s, re.DOTALL)
             if not match:
@@ -493,16 +491,16 @@ def render_template(template: str, data: CrawlersResult) -> str:
             content = match.group(2)
             value = context.get(field, "")
             if value and str(value).strip():
-                s = s[:match.start()] + content + s[match.end():]
+                s = s[: match.start()] + content + s[match.end() :]
             else:
-                s = s[:match.start()] + s[match.end():]
+                s = s[: match.start()] + s[match.end() :]
         return s
-    
+
     result = process_conditionals(result)
-    
+
     # Process placeholders with defaults: {field|default}
     def process_defaults(s):
-        pattern = r'\{([^}|]+)\|([^}]+)\}'
+        pattern = r"\{([^}|]+)\|([^}]+)\}"
         while True:
             match = re.search(pattern, s)
             if not match:
@@ -514,15 +512,14 @@ def render_template(template: str, data: CrawlersResult) -> str:
                 replacement = str(value)
             else:
                 replacement = default
-            s = s[:match.start()] + replacement + s[match.end():]
+            s = s[: match.start()] + replacement + s[match.end() :]
         return s
-    
+
     result = process_defaults(result)
-    
+
     # Process basic placeholders: {field}
     for key, value in context.items():
         result = result.replace(f"{{{key}}}", str(value))
-    
 
     return result
 
