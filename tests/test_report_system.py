@@ -1,8 +1,5 @@
 import tempfile
 import time
-from pathlib import Path
-
-import pytest
 
 from mdcx.utils.report_system import (
     ReportGenerator,
@@ -249,7 +246,7 @@ class TestReportGenerator:
             assert output_path.exists()
             assert output_path.name.startswith("scrape_result_")
 
-            with open(output_path, "r", encoding="utf-8") as f:
+            with open(output_path, encoding="utf-8") as f:
                 content = f.read()
                 assert content == report
 

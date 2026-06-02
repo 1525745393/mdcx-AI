@@ -491,19 +491,18 @@ def convert_half(string: str) -> str:
 
 
 # 性能监控模块导出
+# 爬虫健康监控模块导出
+from .crawler_health import (
+    CrawlerHealthMonitor,
+    CrawlerHealthStats,
+    health_monitor,
+)
 from .perf import (
     PerformanceMonitor,
     PerfRecord,
     get_performance_report,
     perf_monitor,
     reset_performance_monitor,
-)
-
-# 爬虫健康监控模块导出
-from .crawler_health import (
-    CrawlerHealthStats,
-    CrawlerHealthMonitor,
-    health_monitor,
 )
 
 __all__ = [

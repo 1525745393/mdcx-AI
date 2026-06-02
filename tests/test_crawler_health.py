@@ -1,12 +1,11 @@
-import pytest
 import time
 
+from mdcx.config.models import Website
 from mdcx.utils.crawler_health import (
-    CrawlerHealthStats,
     CrawlerHealthMonitor,
+    CrawlerHealthStats,
     health_monitor,
 )
-from mdcx.config.models import Website
 
 
 class TestCrawlerHealthStats:

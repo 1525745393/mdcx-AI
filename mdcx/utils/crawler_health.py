@@ -1,10 +1,8 @@
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 
 from mdcx.config.models import Website
-from mdcx.utils import perf_monitor
 
 
 @dataclass
