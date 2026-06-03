@@ -8169,7 +8169,28 @@ class Ui_MDCx(object):
         self.label_vsmeta_template_help.setWordWrap(True)
         self.label_vsmeta_template_help.setObjectName("label_vsmeta_template_help")
         self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_template_help, 13, 0, 1, 2)
-        
+
+        # 标题预览
+        self.label_vsmeta_title_preview = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_title_preview.setStyleSheet("background-color: #f5f5f5; padding: 5px;")
+        self.label_vsmeta_title_preview.setWordWrap(True)
+        self.label_vsmeta_title_preview.setObjectName("label_vsmeta_title_preview")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_title_preview, 14, 0, 1, 2)
+
+        # 副标题预览
+        self.label_vsmeta_title2_preview = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_title2_preview.setStyleSheet("background-color: #f5f5f5; padding: 5px;")
+        self.label_vsmeta_title2_preview.setWordWrap(True)
+        self.label_vsmeta_title2_preview.setObjectName("label_vsmeta_title2_preview")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_title2_preview, 15, 0, 1, 2)
+
+        # 简介预览
+        self.label_vsmeta_summary_preview = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
+        self.label_vsmeta_summary_preview.setStyleSheet("background-color: #f5f5f5; padding: 5px;")
+        self.label_vsmeta_summary_preview.setWordWrap(True)
+        self.label_vsmeta_summary_preview.setObjectName("label_vsmeta_summary_preview")
+        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_summary_preview, 16, 0, 1, 2)
+
         # 重置和导出按钮
         self.pushButton_vsmeta_reset = QtWidgets.QPushButton(parent=self.scrollAreaWidgetContents_vsmeta)
         self.pushButton_vsmeta_reset.setGeometry(QtCore.QRect(30, 1150, 100, 30))
