@@ -8167,7 +8167,7 @@ class Ui_MDCx(object):
         self.textEdit_vsmeta_template_help = QtWidgets.QPlainTextEdit(parent=self.gridLayoutWidget_vsmeta_config)
         self.textEdit_vsmeta_template_help.setStyleSheet("color: rgb(8, 128, 128); background-color: transparent; border: none;")
         self.textEdit_vsmeta_template_help.setReadOnly(True)
-        self.textEdit_vsmeta_template_help.setMaximumHeight(180)
+        self.textEdit_vsmeta_template_help.setMaximumHeight(220)
         self.textEdit_vsmeta_template_help.setObjectName("textEdit_vsmeta_template_help")
         self.gridLayout_vsmeta_config.addWidget(self.textEdit_vsmeta_template_help, 13, 0, 1, 2)
 
