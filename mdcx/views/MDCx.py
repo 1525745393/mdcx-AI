@@ -8082,6 +8082,15 @@ class Ui_MDCx(object):
         ])
         self.gridLayout_vsmeta_config.addWidget(self.comboBox_vsmeta_show_title, 7, 1, 1, 1)
         
+        # 自定义预设管理（标题）
+        self.pushButton_vsmeta_save_preset = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_save_preset.setObjectName("pushButton_vsmeta_save_preset")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_save_preset, 7, 2, 1, 1)
+
+        self.pushButton_vsmeta_delete_preset = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_delete_preset.setObjectName("pushButton_vsmeta_delete_preset")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_delete_preset, 7, 3, 1, 1)
+        
         # 自定义标题模板输入
         self.label_vsmeta_custom_title = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
         self.label_vsmeta_custom_title.setObjectName("label_vsmeta_custom_title")
@@ -8099,6 +8108,15 @@ class Ui_MDCx(object):
         self.comboBox_vsmeta_show_title2.setObjectName("comboBox_vsmeta_show_title2")
         self.comboBox_vsmeta_show_title2.addItems(["日文原始标题", "制作商", "工作室", "不写入", "自定义模板"])
         self.gridLayout_vsmeta_config.addWidget(self.comboBox_vsmeta_show_title2, 9, 1, 1, 1)
+        
+        # 自定义预设管理（副标题）
+        self.pushButton_vsmeta_save_preset2 = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_save_preset2.setObjectName("pushButton_vsmeta_save_preset2")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_save_preset2, 9, 2, 1, 1)
+
+        self.pushButton_vsmeta_delete_preset2 = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_delete_preset2.setObjectName("pushButton_vsmeta_delete_preset2")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_delete_preset2, 9, 3, 1, 1)
         
         # 自定义副标题模板输入
         self.label_vsmeta_custom_title2 = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
@@ -8126,6 +8144,15 @@ class Ui_MDCx(object):
             "自定义模板"
         ])
         self.gridLayout_vsmeta_config.addWidget(self.comboBox_vsmeta_summary, 11, 1, 1, 1)
+        
+        # 自定义预设管理（简介）
+        self.pushButton_vsmeta_save_preset3 = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_save_preset3.setObjectName("pushButton_vsmeta_save_preset3")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_save_preset3, 11, 2, 1, 1)
+
+        self.pushButton_vsmeta_delete_preset3 = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_delete_preset3.setObjectName("pushButton_vsmeta_delete_preset3")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_delete_preset3, 11, 3, 1, 1)
         
         # 自定义简介模板输入
         self.label_vsmeta_custom_summary = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
@@ -11401,6 +11428,12 @@ class Ui_MDCx(object):
         self.label_vsmeta_title_preview.setText(_translate("MDCx", "标题预览："))
         self.label_vsmeta_title2_preview.setText(_translate("MDCx", "副标题预览："))
         self.label_vsmeta_summary_preview.setText(_translate("MDCx", "简介预览："))
+        self.pushButton_vsmeta_save_preset.setText(_translate("MDCx", "保存预设"))
+        self.pushButton_vsmeta_delete_preset.setText(_translate("MDCx", "删除预设"))
+        self.pushButton_vsmeta_save_preset2.setText(_translate("MDCx", "保存预设"))
+        self.pushButton_vsmeta_delete_preset2.setText(_translate("MDCx", "删除预设"))
+        self.pushButton_vsmeta_save_preset3.setText(_translate("MDCx", "保存预设"))
+        self.pushButton_vsmeta_delete_preset3.setText(_translate("MDCx", "删除预设"))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))
         self.groupBox_43.setTitle(_translate("MDCx", "Emby/Jellyfin 设置"))
