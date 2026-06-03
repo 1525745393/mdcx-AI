@@ -3423,4 +3423,13 @@ MyMAinWindow.Init_Singal = Init_Singal
 MyMAinWindow.init_QTreeWidget = init_QTreeWidget
 MyMAinWindow.set_style = set_style
 MyMAinWindow.set_dark_style = set_dark_style
+MyMAinWindow._load_vsmeta_custom_presets = _load_vsmeta_custom_presets
+MyMAinWindow._update_vsmeta_preview = _update_vsmeta_preview
+MyMAinWindow._save_vsmeta_preset = _save_vsmeta_preset
+MyMAinWindow._delete_vsmeta_preset = _delete_vsmeta_preset
+MyMAinWindow._on_vsmeta_title_preset_changed = _on_vsmeta_title_preset_changed
+MyMAinWindow._on_vsmeta_title2_preset_changed = _on_vsmeta_title2_preset_changed
+MyMAinWindow._on_vsmeta_summary_preset_changed = _on_vsmeta_summary_preset_changed
+MyMAinWindow._reset_vsmeta_config = _reset_vsmeta_config
+MyMAinWindow._export_vsmeta_config = _export_vsmeta_config
 # endregion
