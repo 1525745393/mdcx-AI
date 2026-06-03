@@ -1599,7 +1599,7 @@ def _setup_vsmeta_autocomplete(self: "MyMAinWindow"):
 def _setup_vsmeta_summary_autocomplete(self: "MyMAinWindow"):
     """为简介PlainTextEdit设置自动补全功能"""
     from PyQt6.QtWidgets import QCompleter
-    from PyQt6.QtCore import Qt, QEvent, QObject
+    from PyQt6.QtCore import Qt
     from mdcx.utils.vsmeta_template_helper import PLACEHOLDERS_WITH_DESC
     
     # 创建一个自定义completer用于PlainTextEdit
@@ -1612,45 +1612,14 @@ def _setup_vsmeta_summary_autocomplete(self: "MyMAinWindow"):
     completer_summary.activated.connect(lambda text: self._on_vsmeta_summary_completer_activated(text))
     self._vsmeta_summary_completer = completer_summary
     
-    # 为PlainTextEdit安装事件过滤器
-    class SummaryTextEditEventFilter(QObject):
-        def __init__(self, parent, main_window):
-            super().__init__(parent)
-            self.main_window = main_window
-        
-        def eventFilter(self, obj, event):
-            if event.type() == QEvent.Type.KeyPress:
-                key_event = event
-                key = key_event.key()
-                text_edit = obj
-                
-                # 如果completer是打开的，让它处理
-                completer = self.main_window._vsmeta_summary_completer
-                if completer and completer.popup().isVisible():
-                    if key in [Qt.Key.Key_Enter, Qt.Key.Key_Return, Qt.Key.Key_Escape, Qt.Key.Key_Tab, Qt.Key.Key_Backtab]:
-                        return False  # 让completer处理
-                # 检测输入{时显示补全
-                if key_event.text() == '{':
-                    # 允许正常处理后再显示补全
-                    QTimer.singleShot(10, lambda: self.main_window._show_summary_completer())
-            return False
-    
-    from PyQt6.QtCore import QTimer
-    self._vsmeta_summary_event_filter = SummaryTextEditEventFilter(
-        self.Ui.plainTextEdit_vsmeta_custom_summary,
-        self
-    )
-    self.Ui.plainTextEdit_vsmeta_custom_summary.installEventFilter(
-        self._vsmeta_summary_event_filter
-    )
     # 绑定textChanged
     self.Ui.plainTextEdit_vsmeta_custom_summary.textChanged.connect(
         self._on_vsmeta_summary_text_changed
     )
 
 
-def _show_summary_completer(self: "MyMAinWindow"):
-    """显示简介PlainTextEdit的补全"""
+def _on_vsmeta_summary_text_changed(self: "MyMAinWindow"):
+    """简介PlainTextEdit文本变化时"""
     text_edit = self.Ui.plainTextEdit_vsmeta_custom_summary
     completer = self._vsmeta_summary_completer
     cursor = text_edit.textCursor()
@@ -1665,22 +1634,6 @@ def _show_summary_completer(self: "MyMAinWindow"):
         rect.setWidth(completer.popup().sizeHintForColumn(0)
             + completer.popup().verticalScrollBar().sizeHint().width())
         completer.complete(rect)
-
-
-def _on_vsmeta_summary_text_changed(self: "MyMAinWindow"):
-    """简介PlainTextEdit文本变化时"""
-    text_edit = self.Ui.plainTextEdit_vsmeta_custom_summary
-    completer = self._vsmeta_summary_completer
-    cursor = text_edit.textCursor()
-    cursor_pos = cursor.position()
-    text = text_edit.toPlainText()
-    last_brace_pos = text.rfind('{', 0, cursor_pos)
-    if last_brace_pos != -1:
-        partial = text[last_brace_pos + 1:cursor_pos]
-        if len(partial) >= 1:  # 有输入才显示
-            completer.setCompletionPrefix(partial)
-            rect = text_edit.cursorRect()
-            completer.complete(rect)
 
 
 def _on_vsmeta_summary_completer_activated(self: "MyMAinWindow", text: str):
