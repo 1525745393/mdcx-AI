@@ -105,6 +105,10 @@ from .load_config import (
     _apply_vsmeta_preset,
     _on_vsmeta_preview_preset_clicked,
     _setup_vsmeta_autocomplete,
+    _setup_vsmeta_summary_autocomplete,
+    _show_summary_completer,
+    _on_vsmeta_summary_text_changed,
+    _on_vsmeta_summary_completer_activated,
     _on_vsmeta_completer_activated,
     _on_vsmeta_text_changed,
 )
@@ -3450,6 +3454,10 @@ MyMAinWindow._preview_vsmeta_preset = _preview_vsmeta_preset
 MyMAinWindow._apply_vsmeta_preset = _apply_vsmeta_preset
 MyMAinWindow._on_vsmeta_preview_preset_clicked = _on_vsmeta_preview_preset_clicked
 MyMAinWindow._setup_vsmeta_autocomplete = _setup_vsmeta_autocomplete
+MyMAinWindow._setup_vsmeta_summary_autocomplete = _setup_vsmeta_summary_autocomplete
+MyMAinWindow._show_summary_completer = _show_summary_completer
+MyMAinWindow._on_vsmeta_summary_text_changed = _on_vsmeta_summary_text_changed
+MyMAinWindow._on_vsmeta_summary_completer_activated = _on_vsmeta_summary_completer_activated
 MyMAinWindow._on_vsmeta_completer_activated = _on_vsmeta_completer_activated
 MyMAinWindow._on_vsmeta_text_changed = _on_vsmeta_text_changed
 # endregion

@@ -1561,11 +1561,11 @@ def _setup_vsmeta_autocomplete(self: "MyMAinWindow"):
     from PyQt6.QtCore import Qt
     from mdcx.utils.vsmeta_template_helper import PLACEHOLDERS_WITH_DESC
     
-    # 创建纯占位符列表
-    placeholder_list = [p for p, d in PLACEHOLDERS_WITH_DESC]
+    # 创建带描述的列表
+    placeholder_display_list = [f"{p} - {d}" for p, d in PLACEHOLDERS_WITH_DESC]
     
     # 为标题输入框设置自动补全
-    completer_title = QCompleter(placeholder_list, self)
+    completer_title = QCompleter(placeholder_display_list, self)
     completer_title.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
     completer_title.setFilterMode(Qt.MatchFlag.MatchContains)
     completer_title.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
@@ -1573,7 +1573,7 @@ def _setup_vsmeta_autocomplete(self: "MyMAinWindow"):
     self.Ui.lineEdit_vsmeta_custom_title.setCompleter(completer_title)
     
     # 为副标题输入框设置自动补全
-    completer_title2 = QCompleter(placeholder_list, self)
+    completer_title2 = QCompleter(placeholder_display_list, self)
     completer_title2.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
     completer_title2.setFilterMode(Qt.MatchFlag.MatchContains)
     completer_title2.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
@@ -1582,7 +1582,7 @@ def _setup_vsmeta_autocomplete(self: "MyMAinWindow"):
     
     # 存储占位符字典，方便后续处理
     self._vsmeta_placeholder_map = {p: d for p, d in PLACEHOLDERS_WITH_DESC}
-    self._vsmeta_placeholder_list = placeholder_list
+    self._vsmeta_placeholder_list = [p for p, d in PLACEHOLDERS_WITH_DESC]
     
     # 绑定textChanged信号来触发补全
     self.Ui.lineEdit_vsmeta_custom_title.textChanged.connect(
@@ -1591,6 +1591,117 @@ def _setup_vsmeta_autocomplete(self: "MyMAinWindow"):
     self.Ui.lineEdit_vsmeta_custom_title2.textChanged.connect(
         lambda: self._on_vsmeta_text_changed("title2")
     )
+    
+    # 为简介PlainTextEdit创建单独的补全功能
+    self._setup_vsmeta_summary_autocomplete()
+
+
+def _setup_vsmeta_summary_autocomplete(self: "MyMAinWindow"):
+    """为简介PlainTextEdit设置自动补全功能"""
+    from PyQt6.QtWidgets import QCompleter
+    from PyQt6.QtCore import Qt, QEvent, QObject
+    from mdcx.utils.vsmeta_template_helper import PLACEHOLDERS_WITH_DESC
+    
+    # 创建一个自定义completer用于PlainTextEdit
+    placeholder_display_list = [f"{p} - {d}" for p, d in PLACEHOLDERS_WITH_DESC]
+    completer_summary = QCompleter(placeholder_display_list, self)
+    completer_summary.setWidget(self.Ui.plainTextEdit_vsmeta_custom_summary)
+    completer_summary.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+    completer_summary.setFilterMode(Qt.MatchFlag.MatchContains)
+    completer_summary.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+    completer_summary.activated.connect(lambda text: self._on_vsmeta_summary_completer_activated(text))
+    self._vsmeta_summary_completer = completer_summary
+    
+    # 为PlainTextEdit安装事件过滤器
+    class SummaryTextEditEventFilter(QObject):
+        def __init__(self, parent, main_window):
+            super().__init__(parent)
+            self.main_window = main_window
+        
+        def eventFilter(self, obj, event):
+            if event.type() == QEvent.Type.KeyPress:
+                key_event = event
+                key = key_event.key()
+                text_edit = obj
+                
+                # 如果completer是打开的，让它处理
+                completer = self.main_window._vsmeta_summary_completer
+                if completer and completer.popup().isVisible():
+                    if key in [Qt.Key.Key_Enter, Qt.Key.Key_Return, Qt.Key.Key_Escape, Qt.Key.Key_Tab, Qt.Key.Key_Backtab]:
+                        return False  # 让completer处理
+                # 检测输入{时显示补全
+                if key_event.text() == '{':
+                    # 允许正常处理后再显示补全
+                    QTimer.singleShot(10, lambda: self.main_window._show_summary_completer())
+            return False
+    
+    from PyQt6.QtCore import QTimer
+    self._vsmeta_summary_event_filter = SummaryTextEditEventFilter(
+        self.Ui.plainTextEdit_vsmeta_custom_summary,
+        self
+    )
+    self.Ui.plainTextEdit_vsmeta_custom_summary.installEventFilter(
+        self._vsmeta_summary_event_filter
+    )
+    # 绑定textChanged
+    self.Ui.plainTextEdit_vsmeta_custom_summary.textChanged.connect(
+        self._on_vsmeta_summary_text_changed
+    )
+
+
+def _show_summary_completer(self: "MyMAinWindow"):
+    """显示简介PlainTextEdit的补全"""
+    text_edit = self.Ui.plainTextEdit_vsmeta_custom_summary
+    completer = self._vsmeta_summary_completer
+    cursor = text_edit.textCursor()
+    cursor_pos = cursor.position()
+    text = text_edit.toPlainText()
+    last_brace_pos = text.rfind('{', 0, cursor_pos)
+    if last_brace_pos != -1:
+        partial = text[last_brace_pos + 1:cursor_pos]
+        completer.setCompletionPrefix(partial)
+        # 显示补全列表
+        rect = text_edit.cursorRect()
+        rect.setWidth(completer.popup().sizeHintForColumn(0)
+            + completer.popup().verticalScrollBar().sizeHint().width())
+        completer.complete(rect)
+
+
+def _on_vsmeta_summary_text_changed(self: "MyMAinWindow"):
+    """简介PlainTextEdit文本变化时"""
+    text_edit = self.Ui.plainTextEdit_vsmeta_custom_summary
+    completer = self._vsmeta_summary_completer
+    cursor = text_edit.textCursor()
+    cursor_pos = cursor.position()
+    text = text_edit.toPlainText()
+    last_brace_pos = text.rfind('{', 0, cursor_pos)
+    if last_brace_pos != -1:
+        partial = text[last_brace_pos + 1:cursor_pos]
+        if len(partial) >= 1:  # 有输入才显示
+            completer.setCompletionPrefix(partial)
+            rect = text_edit.cursorRect()
+            completer.complete(rect)
+
+
+def _on_vsmeta_summary_completer_activated(self: "MyMAinWindow", text: str):
+    """简介completer选择时"""
+    from PyQt6.QtGui import QTextCursor
+    if " - " in text:
+        placeholder = text.split(" - ")[0]
+    else:
+        placeholder = text
+    text_edit = self.Ui.plainTextEdit_vsmeta_custom_summary
+    cursor = text_edit.textCursor()
+    cursor_pos = cursor.position()
+    full_text = text_edit.toPlainText()
+    last_brace_pos = full_text.rfind('{', 0, cursor_pos)
+    if last_brace_pos != -1:
+        # 替换从{到光标位置的内容
+        cursor.setPosition(last_brace_pos)
+        cursor.setPosition(cursor_pos, QTextCursor.MoveMode.KeepAnchor)
+        cursor.removeSelectedText()
+        cursor.insertText(f"{{{placeholder}}}")
+        text_edit.setTextCursor(cursor)
 
 
 def _on_vsmeta_text_changed(self: "MyMAinWindow", template_type: str):
@@ -1613,13 +1724,15 @@ def _on_vsmeta_text_changed(self: "MyMAinWindow", template_type: str):
         completer = line_edit.completer()
         if completer:
             completer.setCompletionPrefix(partial)
-            # 如果有输入内容或刚输入{，显示补全列表
             if len(partial) >= 0:
                 completer.complete()
 
 
 def _on_vsmeta_completer_activated(self: "MyMAinWindow", template_type: str, placeholder: str):
-    """当用户从自动补全列表中选择一个占位符时调用"""
+    """保持向后兼容"""
+    if " - " in placeholder:
+        placeholder = placeholder.split(" - ")[0]
+    
     if template_type == "title":
         line_edit = self.Ui.lineEdit_vsmeta_custom_title
     elif template_type == "title2":
@@ -1630,17 +1743,14 @@ def _on_vsmeta_completer_activated(self: "MyMAinWindow", template_type: str, pla
     cursor_pos = line_edit.cursorPosition()
     text = line_edit.text()
     
-    # 查找光标前最近的{
     last_brace_pos = text.rfind('{', 0, cursor_pos)
     if last_brace_pos != -1:
-        # 替换从{到光标位置的内容为完整的占位符
         before_brace = text[:last_brace_pos]
         after_cursor = text[cursor_pos:]
         
         insert_text = f"{{{placeholder}}}"
         new_text = before_brace + insert_text + after_cursor
         
-        # 暂时断开信号避免循环
         from PyQt6.QtCore import QSignalBlocker
         with QSignalBlocker(line_edit):
             line_edit.setText(new_text)
