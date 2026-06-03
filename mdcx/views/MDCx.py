@@ -8164,11 +8164,12 @@ class Ui_MDCx(object):
         self.gridLayout_vsmeta_config.addWidget(self.plainTextEdit_vsmeta_custom_summary, 12, 1, 1, 1)
         
         # 模板提示
-        self.label_vsmeta_template_help = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
-        self.label_vsmeta_template_help.setStyleSheet("color: rgb(8, 128, 128);")
-        self.label_vsmeta_template_help.setWordWrap(True)
-        self.label_vsmeta_template_help.setObjectName("label_vsmeta_template_help")
-        self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_template_help, 13, 0, 1, 2)
+        self.textEdit_vsmeta_template_help = QtWidgets.QPlainTextEdit(parent=self.gridLayoutWidget_vsmeta_config)
+        self.textEdit_vsmeta_template_help.setStyleSheet("color: rgb(8, 128, 128); background-color: transparent; border: none;")
+        self.textEdit_vsmeta_template_help.setReadOnly(True)
+        self.textEdit_vsmeta_template_help.setMaximumHeight(180)
+        self.textEdit_vsmeta_template_help.setObjectName("textEdit_vsmeta_template_help")
+        self.gridLayout_vsmeta_config.addWidget(self.textEdit_vsmeta_template_help, 13, 0, 1, 2)
 
         # 标题预览
         self.label_vsmeta_title_preview = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
@@ -11436,7 +11437,7 @@ class Ui_MDCx(object):
             "MDCx",
             "设置 VSMETA 中显示的标签数量上限，限制标签数量可优化显示效果\n推荐值：5 - 20 个标签"
         ))
-        self.label_vsmeta_template_help.setText(_translate(
+        self.textEdit_vsmeta_template_help.setPlainText(_translate(
             "MDCx",
             "【模板语法完整指南】\n\n"
             "【基础占位符】\n"
