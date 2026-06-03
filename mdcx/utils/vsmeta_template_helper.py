@@ -145,6 +145,15 @@ PLACEHOLDERS_WITH_DESC = [
     ("runtime", "时长(分钟)"),
     ("label", "标签"),
     ("website", "官网"),
+    ("letters", "番号字母部分"),
+    ("wanted", "想看人数"),
+    ("tag", "标签(逗号分隔)"),
+    ("thumb", "缩略图URL"),
+    ("poster", "海报URL"),
+    ("trailer", "预告片URL"),
+    ("actor", "单个演员"),
+    ("director_list", "导演列表"),
+    ("tags_list", "标签列表"),
 ]
 
 
@@ -397,4 +406,13 @@ PREVIEW_SAMPLE_DATA: dict = {
     "mosaic": "有码",
     "label": "测试标签",
     "website": "https://example.com",
+    "letters": "ABC",
+    "wanted": "1234",
+    "tag": "标签1,标签2,标签3",
+    "thumb": "https://example.com/thumb.jpg",
+    "poster": "https://example.com/poster.jpg",
+    "trailer": "https://example.com/trailer.mp4",
+    "actor": "演员A",
+    "director_list": "导演A,导演B",
+    "tags_list": "标签1,标签2,标签3",
 }

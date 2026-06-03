@@ -11441,13 +11441,16 @@ class Ui_MDCx(object):
             "MDCx",
             "【模板语法完整指南】\n\n"
             "【基础占位符】\n"
-            "• 番号相关：{number}\n"
+            "• 番号相关：{number}（完整番号）、{letters}（番号字母部分）\n"
             "• 标题相关：{title}（中文）、{originaltitle}（日文）\n"
             "• 制作信息：{publisher}（发行商）、{studio}（工作室）、{series}（系列）\n"
-            "• 演职人员：{actors}（演员列表）、{director}（导演）\n"
+            "• 演职人员：{actors}（演员列表，最多3个）、{actor}（第一个演员）、{director}（导演）、{director_list}（导演列表）\n"
             "• 剧情描述：{outline}（中文简介）、{originalplot}（日文简介）\n"
             "• 时间信息：{year}（年份）、{release}（发布日期）、{runtime}（时长）\n"
-            "• 其他信息：{score}（评分）、{country}（国家）、{genre}（类型）、{mosaic}（马赛克类型）、{label}（标签）、{website}（官网）\n\n"
+            "• 评分信息：{score}（评分）、{wanted}（想看人数）\n"
+            "• 标签类型：{genre}（类型/标签，最多5个）、{tag}（全部标签）、{tags_list}（全部标签，同tag）、{mosaic}（马赛克类型）、{label}（标签，同publisher）\n"
+            "• 其他信息：{country}（国家）、{website}（官网）\n"
+            "• 图片资源：{thumb}（缩略图URL）、{poster}（海报URL）、{trailer}（预告片URL）\n\n"
             "【增强语法】\n"
             "• 条件显示：{if:field}内容{/if} - 字段存在时显示内容\n"
             "• 默认值：{field|默认值} - 字段为空时使用默认值\n\n"
@@ -11455,6 +11458,7 @@ class Ui_MDCx(object):
             "• {title|无标题} - 标题为空时显示\"无标题\"\n"
             "• {actors|未知演员} - 演员为空时显示\"未知演员\"\n"
             "• {score|暂无评分} - 评分为空时显示\"暂无评分\"\n"
+            "• {if:series}[{series}] {/if}{number} - {title} - 有系列名时显示系列名\n"
         ))
         self.label_vsmeta_title_preview.setText(_translate("MDCx", "标题预览："))
         self.label_vsmeta_title2_preview.setText(_translate("MDCx", "副标题预览："))

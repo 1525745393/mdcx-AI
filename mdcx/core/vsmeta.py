@@ -422,6 +422,7 @@ def get_template_context(data: CrawlersResult) -> dict:
 
     Returns a dictionary of all available placeholders and their values.
     """
+    actor_list = data.all_actors if len(data.all_actors) > len(data.actors) else data.actors
     return {
         "number": data.number or "",
         "title": data.title or "",
@@ -429,9 +430,8 @@ def get_template_context(data: CrawlersResult) -> dict:
         "publisher": data.publisher or "",
         "studio": data.studio or "",
         "series": data.series or "",
-        "actors": ", ".join((data.all_actors if len(data.all_actors) > len(data.actors) else data.actors)[:3])
-        if (data.actors or data.all_actors)
-        else "",
+        "actors": ", ".join(actor_list[:3]) if actor_list else "",
+        "actor": actor_list[0] if actor_list else "",
         "outline": data.outline or "",
         "originalplot": data.originalplot or "",
         "year": data.year or "",
@@ -439,11 +439,19 @@ def get_template_context(data: CrawlersResult) -> dict:
         "score": data.score or "",
         "country": data.country or "",
         "director": data.director or "",
-        "genre": ", ".join(data.genres[:5]) if data.genres else "",
+        "director_list": ", ".join(data.directors) if data.directors else "",
+        "genre": ", ".join(data.tags[:5]) if data.tags else "",
         "mosaic": data.mosaic or "",
         "runtime": str(data.runtime) if data.runtime else "",
-        "label": data.label or "",
-        "website": data.website or "",
+        "label": data.publisher or "",
+        "website": "",
+        "letters": data.letters or "",
+        "wanted": data.wanted or "",
+        "tag": ", ".join(data.tags) if data.tags else "",
+        "tags_list": ", ".join(data.tags) if data.tags else "",
+        "thumb": data.thumb or "",
+        "poster": data.poster or "",
+        "trailer": data.trailer or "",
     }
 
 
@@ -460,6 +468,7 @@ def render_template(template: str, data: CrawlersResult) -> str:
     - {studio} - Studio
     - {series} - Series name
     - {actors} - Actors (comma-separated, max 3)
+    - {actor} - First actor
     - {outline} - Chinese summary
     - {originalplot} - Japanese summary
     - {year} - Year
@@ -467,11 +476,19 @@ def render_template(template: str, data: CrawlersResult) -> str:
     - {score} - Rating score
     - {country} - Country
     - {director} - Director
+    - {director_list} - Directors (comma-separated)
     - {genre} - Genres (comma-separated, max 5)
     - {mosaic} - Mosaic type
     - {runtime} - Runtime in minutes
     - {label} - Label
     - {website} - Official website
+    - {letters} - Number letters prefix
+    - {wanted} - Wanted count
+    - {tag} - Tags (comma-separated)
+    - {tags_list} - Tags (comma-separated, alias for {tag})
+    - {thumb} - Thumbnail URL
+    - {poster} - Poster URL
+    - {trailer} - Trailer URL
 
     **Enhanced Syntax:**
     - {field|default} - Use default value if field is empty
