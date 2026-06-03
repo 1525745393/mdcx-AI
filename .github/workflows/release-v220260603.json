@@ -1,0 +1,8 @@
+{
+  "tag_name": "v220260603",
+  "name": "V220260603 - 修复VSMeta方法绑定问题",
+  "body": "## 修复\n\n- 修复运行时 AttributeError：`MyMAinWindow` 对象缺少 `_load_vsmeta_custom_presets` 等VSMeta相关方法\n- 补全了9个VSMeta方法的外部绑定：\n  - `_load_vsmeta_custom_presets`\n  - `_update_vsmeta_preview`\n  - `_save_vsmeta_preset`\n  - `_delete_vsmeta_preset`\n  - `_on_vsmeta_title_preset_changed`\n  - `_on_vsmeta_title2_preset_changed`\n  - `_on_vsmeta_summary_preset_changed`\n  - `_reset_vsmeta_config`\n  - `_export_vsmeta_config`",
+  "target_commitish": "master",
+  "draft": false,
+  "prerelease": false
+}
