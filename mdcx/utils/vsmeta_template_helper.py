@@ -352,3 +352,49 @@ def render_template(template: str, data: dict) -> str:
             i += 1
     
     return "".join(result)
+
+
+def validate_template_syntax(template: str) -> tuple[bool, str]:
+    """验证模板语法，检查 {if:} 和 {/if} 是否配对
+
+    Args:
+        template: 模板字符串
+
+    Returns:
+        tuple[bool, str]: (是否有效, 错误信息)
+    """
+    depth = 0
+    for i in range(len(template)):
+        if template.startswith("{if:", i):
+            depth += 1
+        elif template.startswith("{/if}", i):
+            depth -= 1
+            if depth < 0:
+                return False, "{/if} 没有对应的 {if:}"
+    if depth > 0:
+        return False, "{if:} 没有对应的 {/if}"
+    return True, ""
+
+
+# 预览用的示例数据
+PREVIEW_SAMPLE_DATA: dict = {
+    "number": "ABC-123",
+    "title": "测试标题",
+    "originaltitle": "テストタイトル",
+    "publisher": "测试发行商",
+    "studio": "测试片商",
+    "series": "测试系列",
+    "actors": "演员A、演员B",
+    "director": "测试导演",
+    "outline": "这是中文简介",
+    "originalplot": "これは日本語の梗概です",
+    "year": "2024",
+    "release": "2024-01-15",
+    "runtime": "120",
+    "score": "8.5",
+    "genre": "剧情",
+    "country": "日本",
+    "mosaic": "有码",
+    "label": "测试标签",
+    "website": "https://example.com",
+}
