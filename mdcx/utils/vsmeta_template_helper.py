@@ -157,7 +157,7 @@ def validate_template(template: str) -> tuple[bool, str]:
     stack = []
     i = 0
     n = len(template)
-    
+
     while i < n:
         if template.startswith("{if:", i):
             stack.append("if")
@@ -171,18 +171,18 @@ def validate_template(template: str) -> tuple[bool, str]:
             end = template.find("}", i)
             if end == -1:
                 return False, f"未闭合的占位符: {{ 在位置 {i}"
-            
+
             inner_content = template[i+1:end]
             if "{" in inner_content:
                 return False, f"占位符内不允许嵌套 {{ 在位置 {i}"
-            
+
             i = end + 1
         else:
             i += 1
-    
+
     if stack:
         return False, "缺少闭合标签: {/if}"
-    
+
     return True, ""
 
 
@@ -247,7 +247,7 @@ def extract_placeholders(template: str) -> set[str]:
     placeholders = set()
     i = 0
     n = len(template)
-    
+
     while i < n:
         if template.startswith("{if:", i):
             # 条件标签 {if:field}
@@ -271,7 +271,7 @@ def extract_placeholders(template: str) -> set[str]:
             i = end + 1 if end != -1 else i + 1
         else:
             i += 1
-    
+
     return placeholders
 
 
@@ -289,7 +289,7 @@ def render_template(template: str, data: dict) -> str:
     result = []
     i = 0
     n = len(template)
-    
+
     while i < n:
         if template.startswith("{if:", i):
             # 条件渲染 {if:field}...{/if}
@@ -298,10 +298,10 @@ def render_template(template: str, data: dict) -> str:
                 result.append(template[i])
                 i += 1
                 continue
-            
+
             field = template[i + 4:field_end].strip()
             content_start = field_end + 1
-            
+
             # 查找对应的 {/if}
             depth = 1
             j = content_start
@@ -316,7 +316,7 @@ def render_template(template: str, data: dict) -> str:
                     j += 5
                 else:
                     j += 1
-            
+
             if depth == 0:
                 # 找到了闭合标签
                 if field in data and data[field]:
@@ -328,7 +328,7 @@ def render_template(template: str, data: dict) -> str:
                 # 未找到闭合标签，原样输出
                 result.append(template[i])
                 i += 1
-        
+
         elif template[i] == "{":
             # 普通占位符 {field} 或 {field|default}
             end = template.find("}", i)
@@ -336,21 +336,21 @@ def render_template(template: str, data: dict) -> str:
                 result.append(template[i])
                 i += 1
                 continue
-            
+
             content = template[i + 1:end]
             if "|" in content:
                 field, default = content.split("|", 1)
                 value = data.get(field.strip(), default)
             else:
                 value = data.get(content, "")
-            
+
             result.append(str(value) if value is not None else "")
             i = end + 1
-        
+
         else:
             result.append(template[i])
             i += 1
-    
+
     return "".join(result)
 
 

@@ -717,10 +717,10 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.lineEdit_vsmeta_custom_title.setText(manager.config.vsmeta_custom_title)
         self.Ui.lineEdit_vsmeta_custom_title2.setText(manager.config.vsmeta_custom_title2)
         self.Ui.plainTextEdit_vsmeta_custom_summary.setPlainText(manager.config.vsmeta_custom_summary)
-        
+
         # 加载自定义预设到下拉框
         self._load_vsmeta_custom_presets()
-        
+
         # 绑定预览更新
         self.Ui.lineEdit_vsmeta_custom_title.textChanged.connect(
             lambda: self._update_vsmeta_preview("title")
@@ -731,7 +731,7 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.plainTextEdit_vsmeta_custom_summary.textChanged.connect(
             lambda: self._update_vsmeta_preview("summary")
         )
-        
+
         # 绑定预设管理按钮
         self.Ui.pushButton_vsmeta_save_preset.clicked.connect(
             lambda: self._save_vsmeta_preset()
@@ -751,7 +751,7 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.pushButton_vsmeta_delete_preset3.clicked.connect(
             lambda: self._delete_vsmeta_preset()
         )
-        
+
         # 绑定重置和导出按钮
         self.Ui.pushButton_vsmeta_reset.clicked.connect(
             self._reset_vsmeta_config
@@ -759,7 +759,7 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.pushButton_vsmeta_export.clicked.connect(
             self._export_vsmeta_config
         )
-        
+
         # 绑定下拉框选择事件
         self.Ui.comboBox_vsmeta_show_title.currentIndexChanged.connect(
             self._on_vsmeta_title_preset_changed
@@ -770,7 +770,7 @@ def load_config(self: "MyMAinWindow"):
         self.Ui.comboBox_vsmeta_summary.currentIndexChanged.connect(
             self._on_vsmeta_summary_preset_changed
         )
-        
+
         # 初始化预览
         self._update_vsmeta_preview("title")
         self._update_vsmeta_preview("title2")
@@ -1209,7 +1209,7 @@ def _load_vsmeta_custom_presets(self: "MyMAinWindow"):
     default_count = 7  # 默认项的数量
     for i in range(self.Ui.comboBox_vsmeta_show_title.count() - 1, default_count - 1, -1):
         self.Ui.comboBox_vsmeta_show_title.removeItem(i)
-    
+
     # 添加自定义预设
     for preset in manager.config.custom_presets:
         self.Ui.comboBox_vsmeta_show_title.addItem(f"[自定义] {preset.name}")
@@ -1257,7 +1257,7 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
     """保存当前 VSMETA 配置为预设"""
     from PyQt6.QtWidgets import QInputDialog, QMessageBox
     from mdcx.config.models import VsmetaCustomPreset
-    
+
     name, ok = QInputDialog.getText(self, "保存预设", "请输入预设名称:")
     if not ok or not name:
         return
@@ -1294,7 +1294,7 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
 def _delete_vsmeta_preset(self: "MyMAinWindow"):
     """删除选中的 VSMETA 自定义预设"""
     from PyQt6.QtWidgets import QMessageBox
-    
+
     current_text = self.Ui.comboBox_vsmeta_show_title.currentText()
     if not current_text.startswith("[自定义] "):
         QMessageBox.information(self, "提示", "请先选择一个自定义预设")
@@ -1328,19 +1328,19 @@ def _on_vsmeta_title_preset_changed(self: "MyMAinWindow", index: int):
             self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
             self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(preset.show_title_type)
             self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
-            
+
             self.Ui.comboBox_vsmeta_show_title2.blockSignals(True)
             self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(preset.show_title2_type)
             self.Ui.comboBox_vsmeta_show_title2.blockSignals(False)
-            
+
             self.Ui.comboBox_vsmeta_summary.blockSignals(True)
             self.Ui.comboBox_vsmeta_summary.setCurrentIndex(preset.summary_type)
             self.Ui.comboBox_vsmeta_summary.blockSignals(False)
-            
+
             self.Ui.lineEdit_vsmeta_custom_title.setText(preset.custom_title)
             self.Ui.lineEdit_vsmeta_custom_title2.setText(preset.custom_title2)
             self.Ui.plainTextEdit_vsmeta_custom_summary.setPlainText(preset.custom_summary)
-            
+
             # 更新预览
             self._update_vsmeta_preview("title")
             self._update_vsmeta_preview("title2")
@@ -1363,7 +1363,7 @@ def _on_vsmeta_summary_preset_changed(self: "MyMAinWindow", index: int):
 def _reset_vsmeta_config(self: "MyMAinWindow"):
     """重置所有 VSMETA 配置为默认值"""
     from PyQt6.QtWidgets import QMessageBox
-    
+
     reply = QMessageBox.question(
         self, "确认重置", "确定要重置所有 VSMETA 配置为默认值吗?",
         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
@@ -1380,7 +1380,7 @@ def _reset_vsmeta_config(self: "MyMAinWindow"):
     self.Ui.spinBox_vsmeta_jpeg_quality.setValue(90)
     self.Ui.spinBox_vsmeta_actor_limit.setValue(20)
     self.Ui.spinBox_vsmeta_tag_limit.setValue(10)
-    
+
     self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(
         list(VsmetaShowTitle).index(VsmetaShowTitle.TITLE)
     )
@@ -1390,16 +1390,16 @@ def _reset_vsmeta_config(self: "MyMAinWindow"):
     self.Ui.comboBox_vsmeta_summary.setCurrentIndex(
         list(VsmetaSummary).index(VsmetaSummary.JP_ZH_JP)
     )
-    
+
     self.Ui.lineEdit_vsmeta_custom_title.setText("{number} - {title} ({originaltitle})")
     self.Ui.lineEdit_vsmeta_custom_title2.setText("{publisher} / {studio}")
     self.Ui.plainTextEdit_vsmeta_custom_summary.setPlainText("{originaltitle}\\n\\n{outline}\\n\\n{originalplot}")
-    
+
     # 更新预览
     self._update_vsmeta_preview("title")
     self._update_vsmeta_preview("title2")
     self._update_vsmeta_preview("summary")
-    
+
     QMessageBox.information(self, "成功", "VSMETA 配置已重置为默认值")
 
 
@@ -1408,7 +1408,7 @@ def _export_vsmeta_config(self: "MyMAinWindow"):
     import json
     from datetime import datetime
     from PyQt6.QtWidgets import QFileDialog, QMessageBox
-    
+
     file_path, _ = QFileDialog.getSaveFileName(
         self, "导出 VSMETA 配置", "vsmeta_config.json",
         "JSON Files (*.json)"
