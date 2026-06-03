@@ -11381,7 +11381,22 @@ class Ui_MDCx(object):
         ))
         self.label_vsmeta_template_help.setText(_translate(
             "MDCx",
-            "【模板语法完整指南】\n\n【基础占位符】\n• 番号相关：{number}\n• 标题相关：{title}（中文）、{originaltitle}（日文）\n• 制作信息：{publisher}（发行商）、{studio}（工作室）、{series}（系列）\n• 演职人员：{actors}（演员列表）、{director}（导演）\n• 剧情描述：{outline}（中文简介）、{originalplot}（日文简介）\n• 时间信息：{year}（年份）、{release}（发布日期）、{runtime}（时长）\n• 其他信息：{score}（评分）、{country}（国家）、{genre}（类型）、{mosaic}（马赛克类型）、{label}（标签）、{website}（官网）\n\n【增强语法】\n• 条件显示：{if:field}内容{/if} - 字段存在时显示内容\n• 默认值：{field|默认值} - 字段为空时使用默认值\n\n【示例模板】\n• 标题：[{number}] {title}\n• 副标题：{publisher} / {studio}\n• 简介：{originaltitle}\\n\\n{outline}\\n\\n发行: {publisher}\\n片商: {studio}"
+            "【模板语法完整指南】\n\n"
+            "【基础占位符】\n"
+            "• 番号相关：{number}\n"
+            "• 标题相关：{title}（中文）、{originaltitle}（日文）\n"
+            "• 制作信息：{publisher}（发行商）、{studio}（工作室）、{series}（系列）\n"
+            "• 演职人员：{actors}（演员列表）、{director}（导演）\n"
+            "• 剧情描述：{outline}（中文简介）、{originalplot}（日文简介）\n"
+            "• 时间信息：{year}（年份）、{release}（发布日期）、{runtime}（时长）\n"
+            "• 其他信息：{score}（评分）、{country}（国家）、{genre}（类型）、{mosaic}（马赛克类型）、{label}（标签）、{website}（官网）\n\n"
+            "【增强语法】\n"
+            "• 条件显示：{if:field}内容{/if} - 字段存在时显示内容\n"
+            "• 默认值：{field|默认值} - 字段为空时使用默认值\n\n"
+            "【默认值语法示例】\n"
+            "• {title|无标题} - 标题为空时显示\"无标题\"\n"
+            "• {actors|未知演员} - 演员为空时显示\"未知演员\"\n"
+            "• {score|暂无评分} - 评分为空时显示\"暂无评分\"\n"
         ))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))
