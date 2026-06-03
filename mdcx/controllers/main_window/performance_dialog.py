@@ -346,7 +346,6 @@ class PerformanceMonitorDialog(QDialog):
 
     def _export_report(self) -> None:
         """导出当前显示的报告"""
-        current_widget = self.tab_widget.currentWidget()
         current_index = self.tab_widget.currentIndex()
         report_text = ""
         report_type = ReportType.SCRAPE_RESULT

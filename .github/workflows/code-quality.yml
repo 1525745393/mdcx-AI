@@ -1,0 +1,295 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ========================================
+  # Job 1: 代码风格检查
+  # ========================================
+  lint:
+    name: Code Style Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Run Ruff linter
+        run: |
+          ruff check . --output-format=github
+
+      - name: Run Ruff formatter check
+        run: |
+          ruff format --check .
+
+  # ========================================
+  # Job 2: 类型检查
+  # ========================================
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mypy types-requests types-PyYAML
+
+      - name: Run MyPy type checker
+        run: |
+          mypy mdcx --strict --ignore-missing-imports --output-format=github
+
+  # ========================================
+  # Job 3: 单元测试
+  # ========================================
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run pytest
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/
+
+      - name: Run Tests
+        run: |
+          mkdir -p test-results
+          pytest tests/ -v --tb=short --junitxml=test-results/results.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results/
+
+  # ========================================
+  # Job 4: 测试覆盖率
+  # ========================================
+  coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" pytest-cov
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ --cov=mdcx --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  # ========================================
+  # Job 5: 安全扫描
+  # ========================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit safety
+
+      - name: Run Bandit security scan
+        run: |
+          bandit -r mdcx -f json -o bandit-report.json || true
+          bandit -r mdcx -f screen || true
+
+      - name: Check for known vulnerabilities
+        run: |
+          safety check --json --output=safety-report.json || true
+          safety check || true
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+
+  # ========================================
+  # Job 6: 依赖检查
+  # ========================================
+  dependencies:
+    name: Dependencies Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install pip-audit
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit
+
+      - name: Run pip-audit
+        run: |
+          pip-audit
+
+  # ========================================
+  # Job 7: 代码复杂度检查
+  # ========================================
+  complexity:
+    name: Code Complexity Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install radon
+
+      - name: Check code complexity
+        run: |
+          radon cc mdcx -a -s
+
+      - name: Check maintainability index
+        run: |
+          radon mi mdcx -s
+
+  # ========================================
+  # Job 8: 文档检查
+  # ========================================
+  docs:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Check for missing docstrings
+        run: |
+          python -m pip install --upgrade pip
+          pip install interrogate
+
+      - name: Run interrogate
+        run: |
+          interrogate mdcx -v --fail-under=80
+
+  # ========================================
+  # Job 9: 提交信息规范检查
+  # ========================================
+  commit-msg:
+    name: Commit Message Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install commitizen
+
+      - name: Validate commit messages
+        run: |
+          # 检查最新的 commit message
+          git log --oneline -1 --format="%s" | cz check --hook || true
+
+  # ========================================
+  # Job 10: 合并检查
+  # ========================================
+  merge-ready:
+    name: Merge Ready
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, test, coverage, security]
+    if: always()
+    steps:
+      - name: Check if all required jobs passed
+        run: |
+          if [ "${{ needs.lint.result }}" != "success" ]; then
+            echo "❌ Lint check failed"
+            exit 1
+          fi
+          if [ "${{ needs.type-check.result }}" != "success" ]; then
+            echo "❌ Type check failed"
+            exit 1
+          fi
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "❌ Test failed"
+            exit 1
+          fi
+          if [ "${{ needs.security.result }}" != "success" ]; then
+            echo "⚠️ Security scan found issues (non-blocking)"
+          fi
+          echo "✅ All required checks passed!"

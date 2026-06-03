@@ -18,3 +18,29 @@ repos:
         types: [python, pyi]
         require_serial: true
         minimum_pre_commit_version: "2.9.2"
+      - id: prettier
+        name: prettier
+        entry: npx prettier --write
+        language: node
+        types: [javascript, json, markdown, yaml, toml]
+        exclude: |
+          (?x)(
+            ^node_modules/|
+            ^dist/|
+            ^build/|
+            ^.pytest_cache/|
+            ^.ruff_cache/|
+            \.pyc$|
+            \.vsmeta$|
+            \.pdf$|
+            \.txt$
+          )
+        require_serial: true
+        minimum_pre_commit_version: "2.9.2"
+      - id: eslint
+        name: eslint
+        entry: npx eslint --fix
+        language: node
+        types: [javascript]
+        require_serial: true
+        minimum_pre_commit_version: "2.9.2"

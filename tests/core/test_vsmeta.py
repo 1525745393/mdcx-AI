@@ -1,5 +1,4 @@
 from io import BytesIO
-from pathlib import Path
 
 import pytest
 from PIL import Image
@@ -8,8 +7,8 @@ from mdcx.config.enums import VsmetaShowTitle, VsmetaShowTitle2, VsmetaSummary
 from mdcx.core.vsmeta import (
     VSMetaEncoder,
     parse_release_date,
-    parse_score,
     parse_runtime,
+    parse_score,
 )
 
 

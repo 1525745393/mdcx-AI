@@ -213,6 +213,7 @@ class MyMAinWindow(QMainWindow):
         self.Init_Ui()  # 设置Ui初始状态
         self.load_config()  # 加载配置
         self._setup_name_template_preview()
+        self._setup_vsmeta_preview()
         get_success_list()  # 获取历史成功刮削列表
         # endregion
 
@@ -299,6 +300,56 @@ class MyMAinWindow(QMainWindow):
             f"结果：{html.escape(rendered.text, quote=False)}\n"
             "示例字段：number=ABC-123, studio=Studio A, originaltitle=Original Title, definition=4K"
         )
+
+    def _update_vsmeta_preview(self, template_type: str) -> None:
+        """更新 VSMeta 模板预览
+
+        Args:
+            template_type: 模板类型 ("title", "title2", "summary")
+        """
+        from mdcx.utils.vsmeta_template_helper import (
+            PREVIEW_SAMPLE_DATA,
+            render_template,
+            validate_template_syntax,
+        )
+
+        if template_type == "title":
+            template = self.Ui.lineEdit_vsmeta_custom_title.text()
+            preview_label = self.Ui.label_vsmeta_title_preview
+        elif template_type == "title2":
+            template = self.Ui.lineEdit_vsmeta_custom_title2.text()
+            preview_label = self.Ui.label_vsmeta_title2_preview
+        else:
+            template = self.Ui.plainTextEdit_vsmeta_custom_summary.toPlainText()
+            preview_label = self.Ui.label_vsmeta_summary_preview
+
+        # 验证语法
+        is_valid, error_msg = validate_template_syntax(template)
+
+        if not is_valid:
+            preview_label.setStyleSheet("background-color: #ffcccc; padding: 5px;")
+            preview_label.setText(f"语法错误: {error_msg}")
+            return
+
+        # 渲染预览
+        preview_label.setStyleSheet("background-color: #f5f5f5; padding: 5px;")
+        prefix_map = {
+            "title": "标题预览：",
+            "title2": "副标题预览：",
+            "summary": "简介预览：",
+        }
+        preview_text = render_template(template, PREVIEW_SAMPLE_DATA)
+        preview_label.setText(f"{prefix_map[template_type]}{preview_text}")
+
+    def _setup_vsmeta_preview(self) -> None:
+        """绑定 VSMeta 自定义模板输入的 textChanged 信号以更新预览"""
+        self.Ui.lineEdit_vsmeta_custom_title.textChanged.connect(lambda: self._update_vsmeta_preview("title"))
+        self.Ui.lineEdit_vsmeta_custom_title2.textChanged.connect(lambda: self._update_vsmeta_preview("title2"))
+        self.Ui.plainTextEdit_vsmeta_custom_summary.textChanged.connect(lambda: self._update_vsmeta_preview("summary"))
+        # 初始化预览
+        self._update_vsmeta_preview("title")
+        self._update_vsmeta_preview("title2")
+        self._update_vsmeta_preview("summary")
 
     # region Init
     def _setup_fc2ppvdb_cookie_ui(self):
