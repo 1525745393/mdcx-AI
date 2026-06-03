@@ -1258,7 +1258,11 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
     from PyQt6.QtWidgets import QInputDialog, QMessageBox
     from mdcx.config.models import VsmetaCustomPreset
     
-    name, ok = QInputDialog.getText(self, "保存预设", "请输入预设名称:")
+    # 自动生成预设名称
+    preset_count = len(manager.config.custom_presets)
+    auto_name = f"预设 {preset_count + 1}"
+    
+    name, ok = QInputDialog.getText(self, "保存预设", "请输入预设名称:", text=auto_name)
     if not ok or not name:
         return
 
