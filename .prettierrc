@@ -1,0 +1,61 @@
+{
+  "printWidth": 120,
+  "tabWidth": 4,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "quoteProps": "as-needed",
+  "trailingComma": "none",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "css",
+  "endOfLine": "lf",
+  "embeddedLanguageFormatting": "auto",
+  "singleAttributePerLine": false,
+  "overrides": [
+    {
+      "files": ["*.json", "*.json5"],
+      "options": {
+        "printWidth": 80,
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": ["*.md"],
+      "options": {
+        "proseWrap": "always",
+        "printWidth": 80
+      }
+    },
+    {
+      "files": ["*.yml", "*.yaml"],
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": ["*.toml"],
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": ["*.py"],
+      "options": {
+        "printWidth": 120,
+        "tabWidth": 4,
+        "singleQuote": false
+      }
+    },
+    {
+      "files": ["*.js"],
+      "options": {
+        "printWidth": 120,
+        "tabWidth": 4,
+        "singleQuote": true
+      }
+    }
+  ]
+}

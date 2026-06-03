@@ -1,0 +1,26 @@
+{
+  "type": "module",
+  "name": "mdcx",
+  "version": "2.0.0",
+  "description": "MDCx - Media Data Collector",
+  "scripts": {
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:js": "prettier --write \"**/*.js\"",
+    "format:json": "prettier --write \"**/*.json\"",
+    "format:md": "prettier --write \"**/*.md\"",
+    "format:yml": "prettier --write \"**/*.yml\"",
+    "format:yaml": "prettier --write \"**/*.yaml\"",
+    "format:toml": "prettier --write \"**/*.toml\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jsdoc": "^63.0.1",
+    "prettier": "^3.2.5"
+  },
+  "private": true
+}

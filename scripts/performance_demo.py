@@ -13,8 +13,8 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 try:
-    from mdcx.utils.perf import perf_monitor, get_performance_report, reset_performance_monitor
     from mdcx.config.resources import resources
+    from mdcx.utils.perf import get_performance_report, reset_performance_monitor
 except Exception as e:
     print(f"导入模块失败: {e}")
     sys.exit(1)

@@ -747,4 +747,82 @@ FileInfo ──> CrawlTask ──> [Crawlers] ──> CrawlersResult ──> (tr
 
 ---
 
-*文档生成时间：2026-05-22*
+*文档生成时间：2026-05-31*
+
+---
+
+## 补充说明
+
+### VSMETA 自定义模板系统
+
+MDCx 支持使用自定义模板来格式化 VSMETA 文件的标题、副标题和简介。这些模板支持丰富的占位符和条件语法：
+
+| 占位符 | 说明 |
+|--------|------|
+| `{number}` | 作品番号 |
+| `{title}` | 中文标题 |
+| `{originaltitle}` | 原始标题（通常是日文） |
+| `{publisher}` | 发行商 |
+| `{studio}` | 制作商 |
+| `{series}` | 系列 |
+| `{actors}` | 演员列表（逗号分隔） |
+| `{outline}` | 中文简介 |
+| `{originalplot}` | 原始剧情简介 |
+| `{year}` | 年份 |
+| `{release}` | 发行日期 |
+| `{score}` | 评分 |
+| `{country}` | 国家 |
+| `{director}` | 导演 |
+| `{genre}` | 类型（逗号分隔） |
+| `{mosaic}` | 马赛克类型 |
+| `{runtime}` | 片长 |
+| `{label}` | 标签 |
+| `{website}` | 网站 |
+
+**条件语法**：
+```
+{number} - {title}{if:director} (导演: {director}){/if}
+```
+
+**默认值语法**：
+```
+{title|无标题}
+```
+
+### 最新的依赖版本（2026-05-31）
+
+| 依赖 | 版本 | 用途 |
+|------|------|------|
+| aiofiles | 24.1.0 | 异步文件操作 |
+| aiolimiter | 1.2.1 | 异步限流 |
+| av | ≥15.0.0 | 视频处理 |
+| beautifulsoup4 | 4.13.4 | HTML 解析 |
+| curl-cffi | 0.11.4 | HTTP 请求（Cloudflare 绕过） |
+| httpx[socks] | ≥0.28.1 | 异步 HTTP 客户端 |
+| lxml | ≥5.2.0 | XML/HTML 解析 |
+| openai | 1.91.0 | LLM 翻译 |
+| oshash | 0.1.1 | OpenSubtitles 哈希 |
+| parsel | ≥1.10.0 | 选择器解析 |
+| pillow | 11.3.0 | 图像处理 |
+| ping3 | 4.0.4 | 网络检查 |
+| pydantic-settings | ≥2.10.1 | 配置管理 |
+| pyqt6 | 6.11.0 | GUI 框架 |
+| zhconv | 1.4.3 | 中文简繁转换 |
+| opencv-contrib-python-headless | 4.13.0.92 | 图像处理（人脸检测等） |
+| jinja2 | ≥3.1.6 | 模板引擎 |
+
+### 开发环境快速启动
+
+```bash
+# 使用 uv 安装依赖
+uv sync --locked --all-extras --dev
+
+# 运行应用
+uv run python main.py
+
+# 运行测试
+uv run pytest tests/
+
+# 运行代码检查
+uv run ruff check .
+```

@@ -1,0 +1,15 @@
+node_modules/
+*.pyc
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+.eggs/
+.tox/
+.env
+.DS_Store
+*.vsmeta
+*.pdf
+*.txt

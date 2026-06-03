@@ -1,12 +1,10 @@
 import time
 
-import pytest
-
 from mdcx.utils.perf import (
     PerformanceMonitor,
     PerfRecord,
-    perf_monitor,
     get_performance_report,
+    perf_monitor,
     reset_performance_monitor,
 )
 

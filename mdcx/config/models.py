@@ -37,6 +37,18 @@ from .enums import (
 from .migrations import migrate_config_data
 
 
+@dataclass
+class VsmetaCustomPreset:
+    """VSMeta 自定义预设"""
+    name: str
+    show_title_type: int      # 对应 VsmetaShowTitle 枚举值
+    show_title2_type: int     # 对应 VsmetaShowTitle2 枚举值
+    summary_type: int         # 对应 VsmetaSummary 枚举值
+    custom_title: str
+    custom_title2: str
+    custom_summary: str
+
+
 def str_to_list(v: str | list[Any] | None, sep: Literal[",", "|"] = ",", unique: bool = True) -> list[str]:
     """
     将字符串转换为列表.
@@ -549,6 +561,7 @@ class Config(BaseModel):
     vsmeta_show_title: VsmetaShowTitle = Field(default=VsmetaShowTitle.TITLE, title="VSMETA 标题内容")
     vsmeta_show_title2: VsmetaShowTitle2 = Field(default=VsmetaShowTitle2.ORIGINALTITLE, title="VSMETA 副标题内容")
     vsmeta_summary: VsmetaSummary = Field(default=VsmetaSummary.JP_ZH_JP, title="VSMETA 简介内容")
+    custom_presets: list[VsmetaCustomPreset] = Field(default_factory=list, title="VSMeta 自定义预设")
     vsmeta_custom_title: str = Field(default="{number} - {title} ({originaltitle})", title="VSMETA 标题自定义模板")
     vsmeta_custom_title2: str = Field(default="{publisher} / {studio}", title="VSMETA 副标题自定义模板")
     vsmeta_custom_summary: str = Field(default="{originaltitle}\n\n{outline}\n\n{originalplot}", title="VSMETA 简介自定义模板")
