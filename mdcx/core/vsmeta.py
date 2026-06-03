@@ -430,7 +430,10 @@ def get_template_context(data: CrawlersResult) -> dict:
         "publisher": data.publisher or "",
         "studio": data.studio or "",
         "series": data.series or "",
-        "actors": ", ".join(actor_list[:3]) if actor_list else "",
+        "actors": ", ".join(data.actors[:3]) if data.actors else "",
+        "actors_full": ", ".join(data.actors) if data.actors else "",
+        "all_actors": ", ".join(data.all_actors[:3]) if data.all_actors else "",
+        "all_actors_full": ", ".join(data.all_actors) if data.all_actors else "",
         "actor": actor_list[0] if actor_list else "",
         "outline": data.outline or "",
         "originalplot": data.originalplot or "",
@@ -452,6 +455,7 @@ def get_template_context(data: CrawlersResult) -> dict:
         "thumb": data.thumb or "",
         "poster": data.poster or "",
         "trailer": data.trailer or "",
+        "extrafanart": ", ".join(data.extrafanart) if data.extrafanart else "",
     }
 
 
@@ -468,6 +472,9 @@ def render_template(template: str, data: CrawlersResult) -> str:
     - {studio} - Studio
     - {series} - Series name
     - {actors} - Actors (comma-separated, max 3)
+    - {actors_full} - Full actors list (all)
+    - {all_actors} - All actors (comma-separated, max 3)
+    - {all_actors_full} - Full all actors list (all)
     - {actor} - First actor
     - {outline} - Chinese summary
     - {originalplot} - Japanese summary
@@ -489,6 +496,7 @@ def render_template(template: str, data: CrawlersResult) -> str:
     - {thumb} - Thumbnail URL
     - {poster} - Poster URL
     - {trailer} - Trailer URL
+    - {extrafanart} - Extra fanart URLs (comma-separated)
 
     **Enhanced Syntax:**
     - {field|default} - Use default value if field is empty
