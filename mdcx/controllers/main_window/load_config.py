@@ -1258,9 +1258,31 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
     from PyQt6.QtWidgets import QInputDialog, QMessageBox
     from mdcx.config.models import VsmetaCustomPreset
     
-    # 自动生成预设名称
-    preset_count = len(manager.config.custom_presets)
-    auto_name = f"预设 {preset_count + 1}"
+    # 根据当前配置自动生成预设名称
+    title_type = self.Ui.comboBox_vsmeta_show_title.currentIndex()
+    title2_type = self.Ui.comboBox_vsmeta_show_title2.currentIndex()
+    summary_type = self.Ui.comboBox_vsmeta_summary.currentIndex()
+    
+    # 标题类型对应的名称
+    title_names = ["仅标题", "番号+标题", "仅番号", "番号+原名", "标题+原名", "原名+标题", "自定义"]
+    # 副标题类型对应的名称
+    title2_names = ["仅原名", "发行商", "片商", "发行商/片商", "系列", "演员", "发行日期", "导演", "评分/时长", "标签/类型", "自定义"]
+    # 简介类型对应的名称
+    summary_names = ["原名+简介+剧情", "原名+简介", "原名+剧情", "仅简介", "剧情+简介", "原名+简介", "仅标题", "简介+发行商", "番号+标题", "自定义"]
+    
+    name_parts = []
+    if title_type < len(title_names) and title_names[title_type] != "自定义":
+        name_parts.append(title_names[title_type])
+    if title2_type < len(title2_names) and title2_names[title2_type] != "自定义":
+        name_parts.append(title2_names[title2_type])
+    if summary_type < len(summary_names) and summary_names[summary_type] != "自定义":
+        name_parts.append(summary_names[summary_type])
+    
+    if name_parts:
+        auto_name = "+".join(name_parts)
+    else:
+        preset_count = len(manager.config.custom_presets)
+        auto_name = f"预设 {preset_count + 1}"
     
     name, ok = QInputDialog.getText(self, "保存预设", "请输入预设名称:", text=auto_name)
     if not ok or not name:
@@ -1275,9 +1297,9 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
 
     preset = VsmetaCustomPreset(
         name=name,
-        show_title_type=self.Ui.comboBox_vsmeta_show_title.currentIndex(),
-        show_title2_type=self.Ui.comboBox_vsmeta_show_title2.currentIndex(),
-        summary_type=self.Ui.comboBox_vsmeta_summary.currentIndex(),
+        show_title_type=title_type,
+        show_title2_type=title2_type,
+        summary_type=summary_type,
         custom_title=self.Ui.lineEdit_vsmeta_custom_title.text(),
         custom_title2=self.Ui.lineEdit_vsmeta_custom_title2.text(),
         custom_summary=self.Ui.plainTextEdit_vsmeta_custom_summary.toPlainText(),
