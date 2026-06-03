@@ -8005,7 +8005,7 @@ class Ui_MDCx(object):
         self.scrollAreaWidgetContents_vsmeta.setGeometry(QtCore.QRect(0, 0, 796, 950))
         self.scrollAreaWidgetContents_vsmeta.setObjectName("scrollAreaWidgetContents_vsmeta")
         self.groupBox_vsmeta_config = QtWidgets.QGroupBox(parent=self.scrollAreaWidgetContents_vsmeta)
-        self.groupBox_vsmeta_config.setGeometry(QtCore.QRect(30, 20, 701, 880))
+        self.groupBox_vsmeta_config.setGeometry(QtCore.QRect(30, 20, 701, 1100))
         self.groupBox_vsmeta_config.setMinimumSize(QtCore.QSize(200, 0))
         self.groupBox_vsmeta_config.setMaximumSize(QtCore.QSize(739, 16777215))
         self.groupBox_vsmeta_config.setObjectName("groupBox_vsmeta_config")
@@ -11398,6 +11398,9 @@ class Ui_MDCx(object):
             "• {actors|未知演员} - 演员为空时显示\"未知演员\"\n"
             "• {score|暂无评分} - 评分为空时显示\"暂无评分\"\n"
         ))
+        self.label_vsmeta_title_preview.setText(_translate("MDCx", "标题预览："))
+        self.label_vsmeta_title2_preview.setText(_translate("MDCx", "副标题预览："))
+        self.label_vsmeta_summary_preview.setText(_translate("MDCx", "简介预览："))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))
         self.groupBox_43.setTitle(_translate("MDCx", "Emby/Jellyfin 设置"))
