@@ -368,7 +368,7 @@ def render_template(template: str, data: dict) -> str:
 
 
 def validate_template_syntax(template: str) -> tuple[bool, str]:
-    """验证模板语法，检查 {if:} 和 {/if} 是否配对
+    """验证模板语法，检查 {if:} 和 {/if} 是否配对以及占位符有效性
 
     Args:
         template: 模板字符串
@@ -376,14 +376,51 @@ def validate_template_syntax(template: str) -> tuple[bool, str]:
     Returns:
         tuple[bool, str]: (是否有效, 错误信息)
     """
+    # 所有可用的占位符
+    valid_placeholders = {ph[0] for ph in PLACEHOLDERS_WITH_DESC}
+    
     depth = 0
-    for i in range(len(template)):
+    i = 0
+    n = len(template)
+    
+    while i < n:
         if template.startswith("{if:", i):
             depth += 1
+            # 检查 {if:} 后面的字段是否有效
+            field_end = template.find("}", i + 4)
+            if field_end == -1:
+                return False, "{if:} 没有闭合的 }"
+            field = template[i + 4:field_end].strip()
+            # 字段可以是空，但如果有内容就应该是有效的占位符
+            if field and field not in valid_placeholders:
+                return False, f"未知的占位符: {field}"
+            i = field_end + 1
         elif template.startswith("{/if}", i):
             depth -= 1
             if depth < 0:
                 return False, "{/if} 没有对应的 {if:}"
+            i += 5
+        elif template[i] == "{":
+            # 检查普通占位符
+            end = template.find("}", i + 1)
+            if end == -1:
+                return False, f"占位符 {template[i:]} 没有闭合的 }}"
+            content = template[i + 1:end]
+            # 检查是否有默认值语法
+            if "|" in content:
+                field = content.split("|", 1)[0].strip()
+            else:
+                field = content.strip()
+            # 检查占位符是否有效
+            if field and field not in valid_placeholders:
+                return False, f"未知的占位符: {field}"
+            i = end + 1
+        elif template[i] == "}":
+            # 多余的闭合花括号
+            return False, "多余的 }"
+        else:
+            i += 1
+    
     if depth > 0:
         return False, "{if:} 没有对应的 {/if}"
     return True, ""
