@@ -782,6 +782,28 @@ def load_config(self: "MyMAinWindow"):
             lambda: self._show_vsmeta_placeholder_menu("summary")
         )
         
+        # 绑定复制预览按钮
+        self.Ui.pushButton_vsmeta_copy_title.clicked.connect(
+            lambda: self._copy_vsmeta_preview("title")
+        )
+        self.Ui.pushButton_vsmeta_copy_title2.clicked.connect(
+            lambda: self._copy_vsmeta_preview("title2")
+        )
+        self.Ui.pushButton_vsmeta_copy_summary.clicked.connect(
+            lambda: self._copy_vsmeta_preview("summary")
+        )
+        
+        # 绑定复制模板按钮
+        self.Ui.pushButton_vsmeta_copy_title_template.clicked.connect(
+            lambda: self._copy_vsmeta_template("title")
+        )
+        self.Ui.pushButton_vsmeta_copy_title2_template.clicked.connect(
+            lambda: self._copy_vsmeta_template("title2")
+        )
+        self.Ui.pushButton_vsmeta_copy_summary_template.clicked.connect(
+            lambda: self._copy_vsmeta_template("summary")
+        )
+        
         # 初始化预览
         self._update_vsmeta_preview("title")
         self._update_vsmeta_preview("title2")
@@ -1571,3 +1593,79 @@ def _insert_vsmeta_placeholder(self: "MyMAinWindow", template_type: str, placeho
     new_text = current_text[:cursor_pos] + insert_text + current_text[cursor_pos:]
     line_edit.setText(new_text)
     line_edit.setCursorPosition(cursor_pos + len(insert_text))
+
+
+def _copy_vsmeta_preview(self: "MyMAinWindow", template_type: str):
+    """复制VSMeta模板预览内容到剪贴板"""
+    from PyQt6.QtWidgets import QApplication
+    
+    preview_text = ""
+    if template_type == "title":
+        preview_text = self.Ui.label_vsmeta_title_preview.text()
+        # 移除预览前缀
+        if preview_text.startswith("标题预览: "):
+            preview_text = preview_text[len("标题预览: "):]
+    elif template_type == "title2":
+        preview_text = self.Ui.label_vsmeta_title2_preview.text()
+        if preview_text.startswith("副标题预览: "):
+            preview_text = preview_text[len("副标题预览: "):]
+    else:
+        preview_text = self.Ui.label_vsmeta_summary_preview.text()
+        if preview_text.startswith("简介预览: "):
+            preview_text = preview_text[len("简介预览: "):]
+    
+    if preview_text:
+        clipboard = QApplication.clipboard()
+        clipboard.setText(preview_text)
+        # 显示短暂提示
+        original_text = ""
+        if template_type == "title":
+            original_text = self.Ui.pushButton_vsmeta_copy_title.text()
+            self.Ui.pushButton_vsmeta_copy_title.setText("已复制!")
+            self.Ui.pushButton_vsmeta_copy_title.repaint()
+            from PyQt6.QtCore import QTimer
+            QTimer.singleShot(1000, lambda: self.Ui.pushButton_vsmeta_copy_title.setText(original_text))
+        elif template_type == "title2":
+            original_text = self.Ui.pushButton_vsmeta_copy_title2.text()
+            self.Ui.pushButton_vsmeta_copy_title2.setText("已复制!")
+            self.Ui.pushButton_vsmeta_copy_title2.repaint()
+            from PyQt6.QtCore import QTimer
+            QTimer.singleShot(1000, lambda: self.Ui.pushButton_vsmeta_copy_title2.setText(original_text))
+        else:
+            original_text = self.Ui.pushButton_vsmeta_copy_summary.text()
+            self.Ui.pushButton_vsmeta_copy_summary.setText("已复制!")
+            self.Ui.pushButton_vsmeta_copy_summary.repaint()
+            from PyQt6.QtCore import QTimer
+            QTimer.singleShot(1000, lambda: self.Ui.pushButton_vsmeta_copy_summary.setText(original_text))
+
+
+def _copy_vsmeta_template(self: "MyMAinWindow", template_type: str):
+    """复制VSMeta模板内容到剪贴板"""
+    from PyQt6.QtWidgets import QApplication
+    
+    template_text = ""
+    if template_type == "title":
+        template_text = self.Ui.lineEdit_vsmeta_custom_title.text()
+        original_text = self.Ui.pushButton_vsmeta_copy_title_template.text()
+        self.Ui.pushButton_vsmeta_copy_title_template.setText("已复制!")
+        self.Ui.pushButton_vsmeta_copy_title_template.repaint()
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(1000, lambda: self.Ui.pushButton_vsmeta_copy_title_template.setText(original_text))
+    elif template_type == "title2":
+        template_text = self.Ui.lineEdit_vsmeta_custom_title2.text()
+        original_text = self.Ui.pushButton_vsmeta_copy_title2_template.text()
+        self.Ui.pushButton_vsmeta_copy_title2_template.setText("已复制!")
+        self.Ui.pushButton_vsmeta_copy_title2_template.repaint()
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(1000, lambda: self.Ui.pushButton_vsmeta_copy_title2_template.setText(original_text))
+    else:
+        template_text = self.Ui.plainTextEdit_vsmeta_custom_summary.toPlainText()
+        original_text = self.Ui.pushButton_vsmeta_copy_summary_template.text()
+        self.Ui.pushButton_vsmeta_copy_summary_template.setText("已复制!")
+        self.Ui.pushButton_vsmeta_copy_summary_template.repaint()
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(1000, lambda: self.Ui.pushButton_vsmeta_copy_summary_template.setText(original_text))
+    
+    if template_text:
+        clipboard = QApplication.clipboard()
+        clipboard.setText(template_text)

@@ -8106,6 +8106,12 @@ class Ui_MDCx(object):
         self.toolButton_vsmeta_title_placeholder.setText("▼")
         self.gridLayout_vsmeta_config.addWidget(self.toolButton_vsmeta_title_placeholder, 8, 2, 1, 1)
         
+        # 复制标题模板按钮
+        self.pushButton_vsmeta_copy_title_template = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_copy_title_template.setObjectName("pushButton_vsmeta_copy_title_template")
+        self.pushButton_vsmeta_copy_title_template.setText("复制模板")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_copy_title_template, 8, 3, 1, 1)
+        
         self.label_vsmeta_show_title2 = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
         self.label_vsmeta_show_title2.setObjectName("label_vsmeta_show_title2")
         self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_show_title2, 9, 0, 1, 1)
@@ -8138,6 +8144,12 @@ class Ui_MDCx(object):
         self.toolButton_vsmeta_title2_placeholder.setObjectName("toolButton_vsmeta_title2_placeholder")
         self.toolButton_vsmeta_title2_placeholder.setText("▼")
         self.gridLayout_vsmeta_config.addWidget(self.toolButton_vsmeta_title2_placeholder, 10, 2, 1, 1)
+        
+        # 复制副标题模板按钮
+        self.pushButton_vsmeta_copy_title2_template = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_copy_title2_template.setObjectName("pushButton_vsmeta_copy_title2_template")
+        self.pushButton_vsmeta_copy_title2_template.setText("复制模板")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_copy_title2_template, 10, 3, 1, 1)
         
         self.label_vsmeta_summary = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
         self.label_vsmeta_summary.setObjectName("label_vsmeta_summary")
@@ -8181,6 +8193,12 @@ class Ui_MDCx(object):
         self.toolButton_vsmeta_summary_placeholder.setText("▼")
         self.gridLayout_vsmeta_config.addWidget(self.toolButton_vsmeta_summary_placeholder, 12, 2, 1, 1)
         
+        # 复制简介模板按钮
+        self.pushButton_vsmeta_copy_summary_template = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_copy_summary_template.setObjectName("pushButton_vsmeta_copy_summary_template")
+        self.pushButton_vsmeta_copy_summary_template.setText("复制模板")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_copy_summary_template, 12, 3, 1, 1)
+        
         # 模板提示
         self.textEdit_vsmeta_template_help = QtWidgets.QPlainTextEdit(parent=self.gridLayoutWidget_vsmeta_config)
         self.textEdit_vsmeta_template_help.setStyleSheet("color: rgb(8, 128, 128); background-color: transparent; border: none;")
@@ -8195,6 +8213,12 @@ class Ui_MDCx(object):
         self.label_vsmeta_title_preview.setWordWrap(True)
         self.label_vsmeta_title_preview.setObjectName("label_vsmeta_title_preview")
         self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_title_preview, 14, 0, 1, 2)
+        
+        # 复制标题预览按钮
+        self.pushButton_vsmeta_copy_title = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_copy_title.setObjectName("pushButton_vsmeta_copy_title")
+        self.pushButton_vsmeta_copy_title.setText("复制预览")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_copy_title, 14, 2, 1, 1)
 
         # 副标题预览
         self.label_vsmeta_title2_preview = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
@@ -8202,6 +8226,12 @@ class Ui_MDCx(object):
         self.label_vsmeta_title2_preview.setWordWrap(True)
         self.label_vsmeta_title2_preview.setObjectName("label_vsmeta_title2_preview")
         self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_title2_preview, 15, 0, 1, 2)
+        
+        # 复制副标题预览按钮
+        self.pushButton_vsmeta_copy_title2 = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_copy_title2.setObjectName("pushButton_vsmeta_copy_title2")
+        self.pushButton_vsmeta_copy_title2.setText("复制预览")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_copy_title2, 15, 2, 1, 1)
 
         # 简介预览
         self.label_vsmeta_summary_preview = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
@@ -8209,6 +8239,12 @@ class Ui_MDCx(object):
         self.label_vsmeta_summary_preview.setWordWrap(True)
         self.label_vsmeta_summary_preview.setObjectName("label_vsmeta_summary_preview")
         self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_summary_preview, 16, 0, 1, 2)
+        
+        # 复制简介预览按钮
+        self.pushButton_vsmeta_copy_summary = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_copy_summary.setObjectName("pushButton_vsmeta_copy_summary")
+        self.pushButton_vsmeta_copy_summary.setText("复制预览")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_copy_summary, 16, 2, 1, 1)
 
         # 重置和导出按钮
         self.pushButton_vsmeta_reset = QtWidgets.QPushButton(parent=self.scrollAreaWidgetContents_vsmeta)
