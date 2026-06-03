@@ -8251,7 +8251,7 @@ class Ui_MDCx(object):
         self.pushButton_vsmeta_copy_summary.setText("复制预览")
         self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_copy_summary, 16, 2, 1, 1)
 
-        # 重置和导出按钮
+        # 重置、导入和导出按钮
         self.pushButton_vsmeta_reset = QtWidgets.QPushButton(parent=self.scrollAreaWidgetContents_vsmeta)
         self.pushButton_vsmeta_reset.setGeometry(QtCore.QRect(30, 1150, 100, 30))
         self.pushButton_vsmeta_reset.setObjectName("pushButton_vsmeta_reset")
@@ -8259,6 +8259,10 @@ class Ui_MDCx(object):
         self.pushButton_vsmeta_export = QtWidgets.QPushButton(parent=self.scrollAreaWidgetContents_vsmeta)
         self.pushButton_vsmeta_export.setGeometry(QtCore.QRect(140, 1150, 100, 30))
         self.pushButton_vsmeta_export.setObjectName("pushButton_vsmeta_export")
+        
+        self.pushButton_vsmeta_import = QtWidgets.QPushButton(parent=self.scrollAreaWidgetContents_vsmeta)
+        self.pushButton_vsmeta_import.setGeometry(QtCore.QRect(250, 1150, 100, 30))
+        self.pushButton_vsmeta_import.setObjectName("pushButton_vsmeta_import")
         
         self.label_vsmeta_tips = QtWidgets.QLabel(parent=self.scrollAreaWidgetContents_vsmeta)
         self.label_vsmeta_tips.setGeometry(QtCore.QRect(30, 1200, 701, 21))
@@ -11530,6 +11534,7 @@ class Ui_MDCx(object):
         self.pushButton_vsmeta_delete_preset3.setText(_translate("MDCx", "删除预设"))
         self.pushButton_vsmeta_reset.setText(_translate("MDCx", "重置为默认"))
         self.pushButton_vsmeta_export.setText(_translate("MDCx", "导出配置"))
+        self.pushButton_vsmeta_import.setText(_translate("MDCx", "导入配置"))
         self.label_vsmeta_tips.setText(_translate("MDCx", "VSMETA 是群晖 Video Station 专用元数据格式，与 NFO、Emby 等互不影响"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MDCx", " VSMETA "))
         self.groupBox_43.setTitle(_translate("MDCx", "Emby/Jellyfin 设置"))

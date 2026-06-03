@@ -752,12 +752,15 @@ def load_config(self: "MyMAinWindow"):
             lambda: self._delete_vsmeta_preset()
         )
         
-        # 绑定重置和导出按钮
+        # 绑定重置、导入和导出按钮
         self.Ui.pushButton_vsmeta_reset.clicked.connect(
             self._reset_vsmeta_config
         )
         self.Ui.pushButton_vsmeta_export.clicked.connect(
             self._export_vsmeta_config
+        )
+        self.Ui.pushButton_vsmeta_import.clicked.connect(
+            self._import_vsmeta_config
         )
         
         # 绑定下拉框选择事件
@@ -1507,6 +1510,63 @@ def _export_vsmeta_config(self: "MyMAinWindow"):
         QMessageBox.information(self, "成功", f"VSMETA 配置已导出到:\n{file_path}")
     except Exception as e:
         QMessageBox.warning(self, "错误", f"导出失败: {str(e)}")
+
+
+def _import_vsmeta_config(self: "MyMAinWindow"):
+    """从 JSON 文件导入 VSMETA 配置"""
+    import json
+    from PyQt6.QtWidgets import QFileDialog, QMessageBox
+    from mdcx.config.models import VsmetaCustomPreset
+    
+    file_path, _ = QFileDialog.getOpenFileName(
+        self, "导入 VSMETA 配置", "", "JSON Files (*.json)"
+    )
+    if not file_path:
+        return
+    
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            import_data = json.load(f)
+        
+        imported_count = 0
+        skipped_count = 0
+        
+        if "custom_presets" in import_data:
+            for preset_data in import_data["custom_presets"]:
+                preset_name = preset_data.get("name")
+                
+                # 检查是否已存在同名预设
+                exists = any(p.name == preset_name for p in manager.config.custom_presets)
+                
+                if exists:
+                    skipped_count += 1
+                else:
+                    new_preset = VsmetaCustomPreset(
+                        name=preset_name,
+                        show_title_type=preset_data.get("show_title_type", 0),
+                        show_title2_type=preset_data.get("show_title2_type", 0),
+                        summary_type=preset_data.get("summary_type", 0),
+                        custom_title=preset_data.get("custom_title", ""),
+                        custom_title2=preset_data.get("custom_title2", ""),
+                        custom_summary=preset_data.get("custom_summary", ""),
+                    )
+                    manager.config.custom_presets.append(new_preset)
+                    imported_count += 1
+        
+        if imported_count > 0:
+            manager.save()
+            self._load_vsmeta_custom_presets()
+        
+        message = f"导入完成！\n成功导入 {imported_count} 个预设"
+        if skipped_count > 0:
+            message += f"\n跳过了 {skipped_count} 个已存在的预设"
+        
+        QMessageBox.information(self, "成功", message)
+        
+    except json.JSONDecodeError:
+        QMessageBox.critical(self, "错误", "无效的 JSON 文件格式")
+    except Exception as e:
+        QMessageBox.critical(self, "错误", f"导入失败:\n{str(e)}")
 
 
 def _show_vsmeta_placeholder_menu(self: "MyMAinWindow", template_type: str):
