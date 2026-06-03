@@ -813,6 +813,9 @@ def load_config(self: "MyMAinWindow"):
         self._update_vsmeta_preview("title")
         self._update_vsmeta_preview("title2")
         self._update_vsmeta_preview("summary")
+        
+        # 设置占位符自动补全
+        self._setup_vsmeta_autocomplete()
         # 画质命名规则
         set_radio_buttons(
             manager.config.hd_name,
@@ -1552,6 +1555,98 @@ def _show_vsmeta_placeholder_menu(self: "MyMAinWindow", template_type: str):
         menu.exec(button.mapToGlobal(button.rect().bottomLeft()))
 
 
+def _setup_vsmeta_autocomplete(self: "MyMAinWindow"):
+    """设置VSMeta模板输入框的自动补全功能"""
+    from PyQt6.QtWidgets import QCompleter
+    from PyQt6.QtCore import Qt
+    from mdcx.utils.vsmeta_template_helper import PLACEHOLDERS_WITH_DESC
+    
+    # 创建纯占位符列表
+    placeholder_list = [p for p, d in PLACEHOLDERS_WITH_DESC]
+    
+    # 为标题输入框设置自动补全
+    completer_title = QCompleter(placeholder_list, self)
+    completer_title.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+    completer_title.setFilterMode(Qt.MatchFlag.MatchContains)
+    completer_title.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+    completer_title.activated.connect(lambda text: self._on_vsmeta_completer_activated("title", text))
+    self.Ui.lineEdit_vsmeta_custom_title.setCompleter(completer_title)
+    
+    # 为副标题输入框设置自动补全
+    completer_title2 = QCompleter(placeholder_list, self)
+    completer_title2.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+    completer_title2.setFilterMode(Qt.MatchFlag.MatchContains)
+    completer_title2.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+    completer_title2.activated.connect(lambda text: self._on_vsmeta_completer_activated("title2", text))
+    self.Ui.lineEdit_vsmeta_custom_title2.setCompleter(completer_title2)
+    
+    # 存储占位符字典，方便后续处理
+    self._vsmeta_placeholder_map = {p: d for p, d in PLACEHOLDERS_WITH_DESC}
+    self._vsmeta_placeholder_list = placeholder_list
+    
+    # 绑定textChanged信号来触发补全
+    self.Ui.lineEdit_vsmeta_custom_title.textChanged.connect(
+        lambda: self._on_vsmeta_text_changed("title")
+    )
+    self.Ui.lineEdit_vsmeta_custom_title2.textChanged.connect(
+        lambda: self._on_vsmeta_text_changed("title2")
+    )
+
+
+def _on_vsmeta_text_changed(self: "MyMAinWindow", template_type: str):
+    """VSMeta模板输入框文本变化时触发补全"""
+    if template_type == "title":
+        line_edit = self.Ui.lineEdit_vsmeta_custom_title
+    elif template_type == "title2":
+        line_edit = self.Ui.lineEdit_vsmeta_custom_title2
+    else:
+        return
+    
+    cursor_pos = line_edit.cursorPosition()
+    text = line_edit.text()
+    
+    # 查找光标前最近的{
+    last_brace_pos = text.rfind('{', 0, cursor_pos)
+    if last_brace_pos != -1:
+        # 获取{后的部分
+        partial = text[last_brace_pos + 1:cursor_pos]
+        completer = line_edit.completer()
+        if completer:
+            completer.setCompletionPrefix(partial)
+            # 如果有输入内容或刚输入{，显示补全列表
+            if len(partial) >= 0:
+                completer.complete()
+
+
+def _on_vsmeta_completer_activated(self: "MyMAinWindow", template_type: str, placeholder: str):
+    """当用户从自动补全列表中选择一个占位符时调用"""
+    if template_type == "title":
+        line_edit = self.Ui.lineEdit_vsmeta_custom_title
+    elif template_type == "title2":
+        line_edit = self.Ui.lineEdit_vsmeta_custom_title2
+    else:
+        return
+    
+    cursor_pos = line_edit.cursorPosition()
+    text = line_edit.text()
+    
+    # 查找光标前最近的{
+    last_brace_pos = text.rfind('{', 0, cursor_pos)
+    if last_brace_pos != -1:
+        # 替换从{到光标位置的内容为完整的占位符
+        before_brace = text[:last_brace_pos]
+        after_cursor = text[cursor_pos:]
+        
+        insert_text = f"{{{placeholder}}}"
+        new_text = before_brace + insert_text + after_cursor
+        
+        # 暂时断开信号避免循环
+        from PyQt6.QtCore import QSignalBlocker
+        with QSignalBlocker(line_edit):
+            line_edit.setText(new_text)
+            line_edit.setCursorPosition(last_brace_pos + len(insert_text))
+
+
 def _insert_vsmeta_placeholder(self: "MyMAinWindow", template_type: str, placeholder: str):
     """在指定模板输入框中插入占位符"""
     if template_type == "title":
@@ -1573,6 +1668,23 @@ def _insert_vsmeta_placeholder(self: "MyMAinWindow", template_type: str, placeho
     # 处理LineEdit
     cursor_pos = line_edit.cursorPosition()
     current_text = line_edit.text()
+    
+    # 检查是否有未闭合的{需要替换
+    last_brace_pos = current_text.rfind('{', 0, cursor_pos)
+    if last_brace_pos != -1:
+        # 替换从{到光标位置的内容
+        before_brace = current_text[:last_brace_pos]
+        after_cursor = current_text[cursor_pos:]
+        
+        if placeholder == "if":
+            insert_text = "{if:}内容{/if}"
+        else:
+            insert_text = f"{{{placeholder}}}"
+        
+        new_text = before_brace + insert_text + after_cursor
+        line_edit.setText(new_text)
+        line_edit.setCursorPosition(last_brace_pos + len(insert_text))
+        return
     
     if placeholder == "if":
         insert_text = "{if:}内容{/if}"
