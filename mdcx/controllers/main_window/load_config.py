@@ -1351,9 +1351,8 @@ def _on_vsmeta_title_preset_changed(self: "MyMAinWindow", index: int):
     preset_name = current_text[len("[自定义] "):]
     for preset in manager.config.custom_presets:
         if preset.name == preset_name:
-            self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
-            self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(preset.show_title_type)
-            self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
+            # 保存当前选中的索引
+            current_title_index = self.Ui.comboBox_vsmeta_show_title.currentIndex()
             
             self.Ui.comboBox_vsmeta_show_title2.blockSignals(True)
             self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(preset.show_title2_type)
@@ -1371,6 +1370,11 @@ def _on_vsmeta_title_preset_changed(self: "MyMAinWindow", index: int):
             self._update_vsmeta_preview("title")
             self._update_vsmeta_preview("title2")
             self._update_vsmeta_preview("summary")
+            
+            # 重新选择自定义预设
+            self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
+            self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(current_title_index)
+            self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
             break
 
 
