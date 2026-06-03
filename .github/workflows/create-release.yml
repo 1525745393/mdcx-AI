@@ -1,0 +1,35 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: V220260603 - 修复VSMeta方法绑定问题
+          body: |
+            ## 修复
+
+            - 修复运行时 AttributeError：`MyMAinWindow` 对象缺少 `_load_vsmeta_custom_presets` 等VSMeta相关方法
+            - 补全了9个VSMeta方法的外部绑定：
+              - `_load_vsmeta_custom_presets`
+              - `_update_vsmeta_preview`
+              - `_save_vsmeta_preset`
+              - `_delete_vsmeta_preset`
+              - `_on_vsmeta_title_preset_changed`
+              - `_on_vsmeta_title2_preset_changed`
+              - `_on_vsmeta_summary_preset_changed`
+              - `_reset_vsmeta_config`
+              - `_export_vsmeta_config`
+          draft: false
+          prerelease: false
