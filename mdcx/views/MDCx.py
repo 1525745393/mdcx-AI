@@ -8087,9 +8087,14 @@ class Ui_MDCx(object):
         self.pushButton_vsmeta_save_preset.setObjectName("pushButton_vsmeta_save_preset")
         self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_save_preset, 7, 2, 1, 1)
 
+        self.pushButton_vsmeta_preview_preset = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.pushButton_vsmeta_preview_preset.setObjectName("pushButton_vsmeta_preview_preset")
+        self.pushButton_vsmeta_preview_preset.setText("预览")
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_preview_preset, 7, 3, 1, 1)
+        
         self.pushButton_vsmeta_delete_preset = QtWidgets.QPushButton(parent=self.gridLayoutWidget_vsmeta_config)
         self.pushButton_vsmeta_delete_preset.setObjectName("pushButton_vsmeta_delete_preset")
-        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_delete_preset, 7, 3, 1, 1)
+        self.gridLayout_vsmeta_config.addWidget(self.pushButton_vsmeta_delete_preset, 7, 4, 1, 1)
         
         # 自定义标题模板输入
         self.label_vsmeta_custom_title = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)

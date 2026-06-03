@@ -101,6 +101,9 @@ from .load_config import (
     _insert_vsmeta_placeholder,
     _copy_vsmeta_preview,
     _copy_vsmeta_template,
+    _preview_vsmeta_preset,
+    _apply_vsmeta_preset,
+    _on_vsmeta_preview_preset_clicked,
 )
 from .performance_dialog import open_performance_dialog
 from .save_config import save_config
@@ -3440,4 +3443,7 @@ MyMAinWindow._show_vsmeta_placeholder_menu = _show_vsmeta_placeholder_menu
 MyMAinWindow._insert_vsmeta_placeholder = _insert_vsmeta_placeholder
 MyMAinWindow._copy_vsmeta_preview = _copy_vsmeta_preview
 MyMAinWindow._copy_vsmeta_template = _copy_vsmeta_template
+MyMAinWindow._preview_vsmeta_preset = _preview_vsmeta_preset
+MyMAinWindow._apply_vsmeta_preset = _apply_vsmeta_preset
+MyMAinWindow._on_vsmeta_preview_preset_clicked = _on_vsmeta_preview_preset_clicked
 # endregion

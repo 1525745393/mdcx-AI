@@ -804,6 +804,11 @@ def load_config(self: "MyMAinWindow"):
             lambda: self._copy_vsmeta_template("summary")
         )
         
+        # 绑定预览预设按钮
+        self.Ui.pushButton_vsmeta_preview_preset.clicked.connect(
+            self._on_vsmeta_preview_preset_clicked
+        )
+        
         # 初始化预览
         self._update_vsmeta_preview("title")
         self._update_vsmeta_preview("title2")
@@ -1382,33 +1387,17 @@ def _on_vsmeta_title_preset_changed(self: "MyMAinWindow", index: int):
         return
 
     preset_name = current_text[len("[自定义] "):]
-    for preset in manager.config.custom_presets:
-        if preset.name == preset_name:
-            # 保存当前选中的索引
-            current_title_index = self.Ui.comboBox_vsmeta_show_title.currentIndex()
-            
-            self.Ui.comboBox_vsmeta_show_title2.blockSignals(True)
-            self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(preset.show_title2_type)
-            self.Ui.comboBox_vsmeta_show_title2.blockSignals(False)
-            
-            self.Ui.comboBox_vsmeta_summary.blockSignals(True)
-            self.Ui.comboBox_vsmeta_summary.setCurrentIndex(preset.summary_type)
-            self.Ui.comboBox_vsmeta_summary.blockSignals(False)
-            
-            self.Ui.lineEdit_vsmeta_custom_title.setText(preset.custom_title)
-            self.Ui.lineEdit_vsmeta_custom_title2.setText(preset.custom_title2)
-            self.Ui.plainTextEdit_vsmeta_custom_summary.setPlainText(preset.custom_summary)
-            
-            # 更新预览
-            self._update_vsmeta_preview("title")
-            self._update_vsmeta_preview("title2")
-            self._update_vsmeta_preview("summary")
-            
-            # 重新选择自定义预设
-            self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
-            self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(current_title_index)
-            self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
-            break
+    
+    # 先保存当前选中的索引，以便恢复
+    current_title_index = index
+    
+    # 显示预览对话框
+    self._preview_vsmeta_preset(preset_name)
+    
+    # 恢复之前的选中状态
+    self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
+    self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(current_title_index)
+    self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
 
 
 def _on_vsmeta_title2_preset_changed(self: "MyMAinWindow", index: int):
@@ -1669,3 +1658,144 @@ def _copy_vsmeta_template(self: "MyMAinWindow", template_type: str):
     if template_text:
         clipboard = QApplication.clipboard()
         clipboard.setText(template_text)
+
+
+def _preview_vsmeta_preset(self: "MyMAinWindow", preset_name: str):
+    """预览VSMeta预设"""
+    from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+    from mdcx.utils.vsmeta_template_helper import PREVIEW_SAMPLE_DATA, render_template
+    
+    # 查找预设
+    preset = None
+    for p in manager.config.custom_presets:
+        if p.name == preset_name:
+            preset = p
+            break
+    
+    if not preset:
+        return
+    
+    # 渲染预览
+    title_preview = ""
+    title2_preview = ""
+    summary_preview = ""
+    
+    if preset.show_title_type == 6:  # 自定义模板
+        title_preview = render_template(preset.custom_title, PREVIEW_SAMPLE_DATA)
+    else:
+        title_preview = f"使用预设类型: {preset.show_title_type}"
+    
+    if preset.show_title2_type == 5:  # 自定义模板
+        title2_preview = render_template(preset.custom_title2, PREVIEW_SAMPLE_DATA)
+    else:
+        title2_preview = f"使用预设类型: {preset.show_title2_type}"
+    
+    if preset.summary_type == 9:  # 自定义模板
+        summary_preview = render_template(preset.custom_summary, PREVIEW_SAMPLE_DATA)
+    else:
+        summary_preview = f"使用预设类型: {preset.summary_type}"
+    
+    # 创建预览对话框
+    dialog = QDialog(self)
+    dialog.setWindowTitle(f"预览预设: {preset_name}")
+    dialog.setMinimumWidth(400)
+    
+    layout = QVBoxLayout()
+    
+    # 标题预览
+    title_label = QLabel("<b>标题预览:</b>")
+    title_value = QLabel(title_preview)
+    title_value.setWordWrap(True)
+    title_value.setStyleSheet("background-color: #f5f5f5; padding: 10px;")
+    
+    # 副标题预览
+    title2_label = QLabel("<b>副标题预览:</b>")
+    title2_value = QLabel(title2_preview)
+    title2_value.setWordWrap(True)
+    title2_value.setStyleSheet("background-color: #f5f5f5; padding: 10px;")
+    
+    # 简介预览
+    summary_label = QLabel("<b>简介预览:</b>")
+    summary_value = QLabel(summary_preview)
+    summary_value.setWordWrap(True)
+    summary_value.setStyleSheet("background-color: #f5f5f5; padding: 10px;")
+    
+    # 按钮
+    button_layout = QHBoxLayout()
+    apply_button = QPushButton("应用预设")
+    close_button = QPushButton("关闭")
+    
+    apply_button.clicked.connect(lambda: self._apply_vsmeta_preset(preset, dialog))
+    close_button.clicked.connect(dialog.accept)
+    
+    button_layout.addWidget(apply_button)
+    button_layout.addWidget(close_button)
+    
+    layout.addWidget(title_label)
+    layout.addWidget(title_value)
+    layout.addWidget(title2_label)
+    layout.addWidget(title2_value)
+    layout.addWidget(summary_label)
+    layout.addWidget(summary_value)
+    layout.addLayout(button_layout)
+    
+    dialog.setLayout(layout)
+    dialog.exec()
+
+
+def _on_vsmeta_preview_preset_clicked(self: "MyMAinWindow"):
+    """预览预设按钮点击"""
+    current_text = self.Ui.comboBox_vsmeta_show_title.currentText()
+    if not current_text.startswith("[自定义] "):
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(self, "提示", "请先选择一个自定义预设")
+        return
+    
+    preset_name = current_text[len("[自定义] "):]
+    self._preview_vsmeta_preset(preset_name)
+
+
+def _apply_vsmeta_preset(self: "MyMAinWindow", preset, dialog):
+    """应用预设到当前配置"""
+    # 保存当前标题下拉框的索引，以便恢复自定义预设选中状态
+    current_title_text = self.Ui.comboBox_vsmeta_show_title.currentText()
+    is_custom_preset_selected = current_title_text.startswith("[自定义] ")
+    saved_custom_preset_name = current_title_text[len("[自定义] "):] if is_custom_preset_selected else None
+    
+    # 应用预设
+    self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
+    self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(preset.show_title_type)
+    self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
+    
+    self.Ui.comboBox_vsmeta_show_title2.blockSignals(True)
+    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(preset.show_title2_type)
+    self.Ui.comboBox_vsmeta_show_title2.blockSignals(False)
+    
+    self.Ui.comboBox_vsmeta_summary.blockSignals(True)
+    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(preset.summary_type)
+    self.Ui.comboBox_vsmeta_summary.blockSignals(False)
+    
+    self.Ui.lineEdit_vsmeta_custom_title.setText(preset.custom_title)
+    self.Ui.lineEdit_vsmeta_custom_title2.setText(preset.custom_title2)
+    self.Ui.plainTextEdit_vsmeta_custom_summary.setPlainText(preset.custom_summary)
+    
+    # 更新预览
+    self._update_vsmeta_preview("title")
+    self._update_vsmeta_preview("title2")
+    self._update_vsmeta_preview("summary")
+    
+    # 如果之前选中了自定义预设，恢复选中状态
+    if saved_custom_preset_name:
+        # 重新加载预设列表以确保最新
+        self._load_vsmeta_custom_presets()
+        # 查找自定义预设的索引并恢复选中
+        for i in range(self.Ui.comboBox_vsmeta_show_title.count()):
+            item_text = self.Ui.comboBox_vsmeta_show_title.itemText(i)
+            if item_text == f"[自定义] {saved_custom_preset_name}":
+                self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
+                self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(i)
+                self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
+                break
+    
+    # 关闭对话框
+    dialog.accept()
