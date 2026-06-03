@@ -8100,6 +8100,12 @@ class Ui_MDCx(object):
         self.lineEdit_vsmeta_custom_title.setObjectName("lineEdit_vsmeta_custom_title")
         self.gridLayout_vsmeta_config.addWidget(self.lineEdit_vsmeta_custom_title, 8, 1, 1, 1)
         
+        # 标题占位符插入按钮
+        self.toolButton_vsmeta_title_placeholder = QtWidgets.QToolButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.toolButton_vsmeta_title_placeholder.setObjectName("toolButton_vsmeta_title_placeholder")
+        self.toolButton_vsmeta_title_placeholder.setText("▼")
+        self.gridLayout_vsmeta_config.addWidget(self.toolButton_vsmeta_title_placeholder, 8, 2, 1, 1)
+        
         self.label_vsmeta_show_title2 = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
         self.label_vsmeta_show_title2.setObjectName("label_vsmeta_show_title2")
         self.gridLayout_vsmeta_config.addWidget(self.label_vsmeta_show_title2, 9, 0, 1, 1)
@@ -8126,6 +8132,12 @@ class Ui_MDCx(object):
         self.lineEdit_vsmeta_custom_title2.setMinimumSize(QtCore.QSize(300, 0))
         self.lineEdit_vsmeta_custom_title2.setObjectName("lineEdit_vsmeta_custom_title2")
         self.gridLayout_vsmeta_config.addWidget(self.lineEdit_vsmeta_custom_title2, 10, 1, 1, 1)
+        
+        # 副标题占位符插入按钮
+        self.toolButton_vsmeta_title2_placeholder = QtWidgets.QToolButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.toolButton_vsmeta_title2_placeholder.setObjectName("toolButton_vsmeta_title2_placeholder")
+        self.toolButton_vsmeta_title2_placeholder.setText("▼")
+        self.gridLayout_vsmeta_config.addWidget(self.toolButton_vsmeta_title2_placeholder, 10, 2, 1, 1)
         
         self.label_vsmeta_summary = QtWidgets.QLabel(parent=self.gridLayoutWidget_vsmeta_config)
         self.label_vsmeta_summary.setObjectName("label_vsmeta_summary")
@@ -8162,6 +8174,12 @@ class Ui_MDCx(object):
         self.plainTextEdit_vsmeta_custom_summary.setMinimumSize(QtCore.QSize(300, 100))
         self.plainTextEdit_vsmeta_custom_summary.setObjectName("plainTextEdit_vsmeta_custom_summary")
         self.gridLayout_vsmeta_config.addWidget(self.plainTextEdit_vsmeta_custom_summary, 12, 1, 1, 1)
+        
+        # 简介占位符插入按钮
+        self.toolButton_vsmeta_summary_placeholder = QtWidgets.QToolButton(parent=self.gridLayoutWidget_vsmeta_config)
+        self.toolButton_vsmeta_summary_placeholder.setObjectName("toolButton_vsmeta_summary_placeholder")
+        self.toolButton_vsmeta_summary_placeholder.setText("▼")
+        self.gridLayout_vsmeta_config.addWidget(self.toolButton_vsmeta_summary_placeholder, 12, 2, 1, 1)
         
         # 模板提示
         self.textEdit_vsmeta_template_help = QtWidgets.QPlainTextEdit(parent=self.gridLayoutWidget_vsmeta_config)

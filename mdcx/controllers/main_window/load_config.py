@@ -771,6 +771,17 @@ def load_config(self: "MyMAinWindow"):
             self._on_vsmeta_summary_preset_changed
         )
         
+        # 绑定占位符插入按钮
+        self.Ui.toolButton_vsmeta_title_placeholder.clicked.connect(
+            lambda: self._show_vsmeta_placeholder_menu("title")
+        )
+        self.Ui.toolButton_vsmeta_title2_placeholder.clicked.connect(
+            lambda: self._show_vsmeta_placeholder_menu("title2")
+        )
+        self.Ui.toolButton_vsmeta_summary_placeholder.clicked.connect(
+            lambda: self._show_vsmeta_placeholder_menu("summary")
+        )
+        
         # 初始化预览
         self._update_vsmeta_preview("title")
         self._update_vsmeta_preview("title2")
@@ -1482,3 +1493,81 @@ def _export_vsmeta_config(self: "MyMAinWindow"):
         QMessageBox.information(self, "成功", f"VSMETA 配置已导出到:\n{file_path}")
     except Exception as e:
         QMessageBox.warning(self, "错误", f"导出失败: {str(e)}")
+
+
+def _show_vsmeta_placeholder_menu(self: "MyMAinWindow", template_type: str):
+    """显示占位符插入菜单"""
+    from PyQt6.QtWidgets import QMenu
+    from mdcx.utils.vsmeta_template_helper import PLACEHOLDERS_WITH_DESC
+    
+    # 创建菜单
+    menu = QMenu(self)
+    
+    # 按类别分组添加占位符
+    categories = {
+        "番号与标题": ["number", "title", "originaltitle", "letters"],
+        "制作信息": ["publisher", "studio", "series", "director"],
+        "演员": ["actors", "actors_full", "all_actors", "all_actors_full", "actor"],
+        "简介与剧情": ["outline", "originalplot"],
+        "时间信息": ["year", "release", "runtime"],
+        "评分与标签": ["score", "genre", "country", "tag", "tags_list", "mosaic", "label", "wanted"],
+        "图片资源": ["thumb", "poster", "trailer", "extrafanart"],
+    }
+    
+    # 为每个类别创建子菜单
+    for category, placeholders in categories.items():
+        submenu = menu.addMenu(category)
+        for ph in placeholders:
+            # 查找占位符描述
+            desc = next((d for p, d in PLACEHOLDERS_WITH_DESC if p == ph), ph)
+            action = submenu.addAction(f"{{{ph}}} - {desc}")
+            action.triggered.connect(lambda checked, p=ph: self._insert_vsmeta_placeholder(template_type, p))
+    
+    # 添加条件语句
+    condition_menu = menu.addMenu("条件语句")
+    condition_action = condition_menu.addAction("{if:xxx}内容{/if}")
+    condition_action.triggered.connect(lambda checked: self._insert_vsmeta_placeholder(template_type, "if"))
+    
+    # 显示菜单
+    button = None
+    if template_type == "title":
+        button = self.Ui.toolButton_vsmeta_title_placeholder
+    elif template_type == "title2":
+        button = self.Ui.toolButton_vsmeta_title2_placeholder
+    else:
+        button = self.Ui.toolButton_vsmeta_summary_placeholder
+    
+    if button:
+        menu.exec(button.mapToGlobal(button.rect().bottomLeft()))
+
+
+def _insert_vsmeta_placeholder(self: "MyMAinWindow", template_type: str, placeholder: str):
+    """在指定模板输入框中插入占位符"""
+    if template_type == "title":
+        line_edit = self.Ui.lineEdit_vsmeta_custom_title
+    elif template_type == "title2":
+        line_edit = self.Ui.lineEdit_vsmeta_custom_title2
+    else:
+        # 简介是PlainTextEdit
+        text_edit = self.Ui.plainTextEdit_vsmeta_custom_summary
+        cursor = text_edit.textCursor()
+        if placeholder == "if":
+            # 插入条件语句模板
+            cursor.insertText("{if:}内容{/if}")
+        else:
+            cursor.insertText(f"{{{placeholder}}}")
+        text_edit.setTextCursor(cursor)
+        return
+    
+    # 处理LineEdit
+    cursor_pos = line_edit.cursorPosition()
+    current_text = line_edit.text()
+    
+    if placeholder == "if":
+        insert_text = "{if:}内容{/if}"
+    else:
+        insert_text = f"{{{placeholder}}}"
+    
+    new_text = current_text[:cursor_pos] + insert_text + current_text[cursor_pos:]
+    line_edit.setText(new_text)
+    line_edit.setCursorPosition(cursor_pos + len(insert_text))
