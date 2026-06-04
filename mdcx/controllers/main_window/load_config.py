@@ -1301,6 +1301,7 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
     """保存当前 VSMETA 配置为预设"""
     from PyQt6.QtWidgets import QInputDialog, QMessageBox
     from mdcx.config.models import VsmetaCustomPreset
+    from mdcx.config.enums import VsmetaShowTitle, VsmetaShowTitle2, VsmetaSummary
     
     # 根据当前配置自动生成预设名称
     title_type = self.Ui.comboBox_vsmeta_show_title.currentIndex()
@@ -1308,18 +1309,18 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
     summary_type = self.Ui.comboBox_vsmeta_summary.currentIndex()
     
     # 标题类型对应的名称
-    title_names = ["仅标题", "番号+标题", "仅番号", "番号+原名", "标题+原名", "原名+标题", "自定义"]
+    title_names = VsmetaShowTitle.names()
     # 副标题类型对应的名称
-    title2_names = ["仅原名", "发行商", "片商", "发行商/片商", "系列", "演员", "发行日期", "导演", "评分/时长", "标签/类型", "自定义"]
+    title2_names = VsmetaShowTitle2.names()
     # 简介类型对应的名称
-    summary_names = ["原名+简介+剧情", "原名+简介", "原名+剧情", "仅简介", "剧情+简介", "原名+简介", "仅标题", "简介+发行商", "番号+标题", "自定义"]
+    summary_names = VsmetaSummary.names()
     
     name_parts = []
-    if title_type < len(title_names) and title_names[title_type] != "自定义":
+    if title_type < len(title_names) and title_names[title_type] != "自定义模板":
         name_parts.append(title_names[title_type])
-    if title2_type < len(title2_names) and title2_names[title2_type] != "自定义":
+    if title2_type < len(title2_names) and title2_names[title2_type] != "自定义模板":
         name_parts.append(title2_names[title2_type])
-    if summary_type < len(summary_names) and summary_names[summary_type] != "自定义":
+    if summary_type < len(summary_names) and summary_names[summary_type] != "自定义模板":
         name_parts.append(summary_names[summary_type])
     
     if name_parts:
@@ -1899,6 +1900,7 @@ def _preview_vsmeta_preset(self: "MyMAinWindow", preset_name: str):
     """预览VSMeta预设"""
     from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
     from mdcx.utils.vsmeta_template_helper import PREVIEW_SAMPLE_DATA, render_template
+    from mdcx.config.enums import VsmetaShowTitle, VsmetaShowTitle2, VsmetaSummary
     
     # 查找预设
     preset = None
@@ -1915,17 +1917,17 @@ def _preview_vsmeta_preset(self: "MyMAinWindow", preset_name: str):
     title2_preview = ""
     summary_preview = ""
     
-    if preset.show_title_type == 6:  # 自定义模板
+    if preset.show_title_type == list(VsmetaShowTitle).index(VsmetaShowTitle.CUSTOM):  # 自定义模板
         title_preview = render_template(preset.custom_title, PREVIEW_SAMPLE_DATA)
     else:
         title_preview = f"使用预设类型: {preset.show_title_type}"
     
-    if preset.show_title2_type == 5:  # 自定义模板
+    if preset.show_title2_type == list(VsmetaShowTitle2).index(VsmetaShowTitle2.CUSTOM):  # 自定义模板
         title2_preview = render_template(preset.custom_title2, PREVIEW_SAMPLE_DATA)
     else:
         title2_preview = f"使用预设类型: {preset.show_title2_type}"
     
-    if preset.summary_type == 9:  # 自定义模板
+    if preset.summary_type == list(VsmetaSummary).index(VsmetaSummary.CUSTOM):  # 自定义模板
         summary_preview = render_template(preset.custom_summary, PREVIEW_SAMPLE_DATA)
     else:
         summary_preview = f"使用预设类型: {preset.summary_type}"
