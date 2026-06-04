@@ -2030,10 +2030,17 @@ def _preview_vsmeta_preset(self: "MyMAinWindow", preset_name: str):
 
 def _on_vsmeta_preview_preset_clicked(self: "MyMAinWindow"):
     """预览预设按钮点击"""
-    current_text = self.Ui.comboBox_vsmeta_show_title.currentText()
-    if not current_text.startswith("[自定义] "):
+    current_text = None
+    if self.Ui.comboBox_vsmeta_show_title.currentText().startswith("[自定义] "):
+        current_text = self.Ui.comboBox_vsmeta_show_title.currentText()
+    elif self.Ui.comboBox_vsmeta_show_title2.currentText().startswith("[自定义] "):
+        current_text = self.Ui.comboBox_vsmeta_show_title2.currentText()
+    elif self.Ui.comboBox_vsmeta_summary.currentText().startswith("[自定义] "):
+        current_text = self.Ui.comboBox_vsmeta_summary.currentText()
+    
+    if not current_text:
         from PyQt6.QtWidgets import QMessageBox
-        QMessageBox.information(self, "提示", "请先选择一个自定义预设")
+        QMessageBox.information(self, "提示", "请先从任意下拉框中选择一个自定义预设")
         return
     
     preset_name = current_text[len("[自定义] "):]
@@ -2042,11 +2049,6 @@ def _on_vsmeta_preview_preset_clicked(self: "MyMAinWindow"):
 
 def _apply_vsmeta_preset(self: "MyMAinWindow", preset, dialog):
     """应用预设到当前配置"""
-    # 保存当前标题下拉框的索引，以便恢复自定义预设选中状态
-    current_title_text = self.Ui.comboBox_vsmeta_show_title.currentText()
-    is_custom_preset_selected = current_title_text.startswith("[自定义] ")
-    saved_custom_preset_name = current_title_text[len("[自定义] "):] if is_custom_preset_selected else None
-    
     # 应用预设
     self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
     self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(preset.show_title_type)
@@ -2069,18 +2071,8 @@ def _apply_vsmeta_preset(self: "MyMAinWindow", preset, dialog):
     self._update_vsmeta_preview("title2")
     self._update_vsmeta_preview("summary")
     
-    # 如果之前选中了自定义预设，恢复选中状态
-    if saved_custom_preset_name:
-        # 重新加载预设列表以确保最新
-        self._load_vsmeta_custom_presets()
-        # 查找自定义预设的索引并恢复选中
-        for i in range(self.Ui.comboBox_vsmeta_show_title.count()):
-            item_text = self.Ui.comboBox_vsmeta_show_title.itemText(i)
-            if item_text == f"[自定义] {saved_custom_preset_name}":
-                self.Ui.comboBox_vsmeta_show_title.blockSignals(True)
-                self.Ui.comboBox_vsmeta_show_title.setCurrentIndex(i)
-                self.Ui.comboBox_vsmeta_show_title.blockSignals(False)
-                break
+    # 重新加载预设列表以确保最新
+    self._load_vsmeta_custom_presets()
     
     # 关闭对话框
     dialog.accept()
