@@ -1248,15 +1248,27 @@ def load_config(self: "MyMAinWindow"):
 
 
 def _load_vsmeta_custom_presets(self: "MyMAinWindow"):
-    """加载自定义 VSMETA 预设到下拉框"""
-    # 先清除现有的自定义预设项（保留默认项）
-    default_count = 7  # 默认项的数量
-    for i in range(self.Ui.comboBox_vsmeta_show_title.count() - 1, default_count - 1, -1):
+    """加载自定义 VSMETA 预设到所有下拉框"""
+    # 清除标题下拉框的自定义预设项（保留默认项）
+    title_default_count = 7
+    for i in range(self.Ui.comboBox_vsmeta_show_title.count() - 1, title_default_count - 1, -1):
         self.Ui.comboBox_vsmeta_show_title.removeItem(i)
     
-    # 添加自定义预设
+    # 清除副标题下拉框的自定义预设项（保留默认项）
+    title2_default_count = 5
+    for i in range(self.Ui.comboBox_vsmeta_show_title2.count() - 1, title2_default_count - 1, -1):
+        self.Ui.comboBox_vsmeta_show_title2.removeItem(i)
+    
+    # 清除简介下拉框的自定义预设项（保留默认项）
+    summary_default_count = 8
+    for i in range(self.Ui.comboBox_vsmeta_summary.count() - 1, summary_default_count - 1, -1):
+        self.Ui.comboBox_vsmeta_summary.removeItem(i)
+    
+    # 添加自定义预设到所有三个下拉框
     for preset in manager.config.custom_presets:
         self.Ui.comboBox_vsmeta_show_title.addItem(f"[自定义] {preset.name}")
+        self.Ui.comboBox_vsmeta_show_title2.addItem(f"[自定义] {preset.name}")
+        self.Ui.comboBox_vsmeta_summary.addItem(f"[自定义] {preset.name}")
 
 
 def _update_vsmeta_preview(self: "MyMAinWindow", template_type: str):
@@ -1363,12 +1375,20 @@ def _save_vsmeta_preset(self: "MyMAinWindow"):
 
 
 def _delete_vsmeta_preset(self: "MyMAinWindow"):
-    """删除选中的 VSMETA 自定义预设"""
+    """删除选中的 VSMETA 自定义预设（从任意下拉框）"""
     from PyQt6.QtWidgets import QMessageBox
     
-    current_text = self.Ui.comboBox_vsmeta_show_title.currentText()
-    if not current_text.startswith("[自定义] "):
-        QMessageBox.information(self, "提示", "请先选择一个自定义预设")
+    # 检查三个下拉框中是否有选中的自定义预设
+    current_text = None
+    if self.Ui.comboBox_vsmeta_show_title.currentText().startswith("[自定义] "):
+        current_text = self.Ui.comboBox_vsmeta_show_title.currentText()
+    elif self.Ui.comboBox_vsmeta_show_title2.currentText().startswith("[自定义] "):
+        current_text = self.Ui.comboBox_vsmeta_show_title2.currentText()
+    elif self.Ui.comboBox_vsmeta_summary.currentText().startswith("[自定义] "):
+        current_text = self.Ui.comboBox_vsmeta_summary.currentText()
+    
+    if not current_text:
+        QMessageBox.information(self, "提示", "请先从任意下拉框中选择一个自定义预设")
         return
 
     preset_name = current_text[len("[自定义] "):]
@@ -1409,14 +1429,42 @@ def _on_vsmeta_title_preset_changed(self: "MyMAinWindow", index: int):
 
 def _on_vsmeta_title2_preset_changed(self: "MyMAinWindow", index: int):
     """处理副标题预设选择变化"""
-    # 这里我们可以复用 _on_vsmeta_title_preset_changed 的逻辑
-    self._on_vsmeta_title_preset_changed(index)
+    current_text = self.Ui.comboBox_vsmeta_show_title2.currentText()
+    if not current_text.startswith("[自定义] "):
+        return
+
+    preset_name = current_text[len("[自定义] "):]
+    
+    # 先保存当前选中的索引，以便恢复
+    current_title2_index = index
+    
+    # 显示预览对话框
+    self._preview_vsmeta_preset(preset_name)
+    
+    # 恢复之前的选中状态
+    self.Ui.comboBox_vsmeta_show_title2.blockSignals(True)
+    self.Ui.comboBox_vsmeta_show_title2.setCurrentIndex(current_title2_index)
+    self.Ui.comboBox_vsmeta_show_title2.blockSignals(False)
 
 
 def _on_vsmeta_summary_preset_changed(self: "MyMAinWindow", index: int):
     """处理简介预设选择变化"""
-    # 这里我们可以复用 _on_vsmeta_title_preset_changed 的逻辑
-    self._on_vsmeta_title_preset_changed(index)
+    current_text = self.Ui.comboBox_vsmeta_summary.currentText()
+    if not current_text.startswith("[自定义] "):
+        return
+
+    preset_name = current_text[len("[自定义] "):]
+    
+    # 先保存当前选中的索引，以便恢复
+    current_summary_index = index
+    
+    # 显示预览对话框
+    self._preview_vsmeta_preset(preset_name)
+    
+    # 恢复之前的选中状态
+    self.Ui.comboBox_vsmeta_summary.blockSignals(True)
+    self.Ui.comboBox_vsmeta_summary.setCurrentIndex(current_summary_index)
+    self.Ui.comboBox_vsmeta_summary.blockSignals(False)
 
 
 def _reset_vsmeta_config(self: "MyMAinWindow"):
